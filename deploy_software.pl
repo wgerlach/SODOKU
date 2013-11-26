@@ -18,7 +18,7 @@ use Data::Dumper;
 my $target = "/home/ubuntu/";
 
 #my @package_list = ('gg_otus', 'picrust_data', 'picrust_symlink', 'qiime(/home/ubuntu/qiime-1.7.0-fixed.conf)');
-
+my $default_repository = 'https://raw.github.com/wgerlach/DeploySoftware/master/repository.json';
 
 #########################################
 my %already_installed;
@@ -556,7 +556,7 @@ sub install_package {
 #############################################################
 
 
-GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all');
+GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repository');
 
 unless ( @ARGV  || @ARGV > 1) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
@@ -692,7 +692,20 @@ my $package_rules_json = <<'EOF';
 }
 EOF
 
-my $package_rules = decode_json($package_rules_json);
+#my $package_rules = decode_json($package_rules_json);
+my $package_rules = undef;
+
+if (defined $h->{'repository'}) {
+	
+	
+} else {
+	
+	print "fetching repository: ".$default_repository."\n";
+	my $curl_cmd = "curl -S -s -o /dev/stdout ".$default_repository;
+	$package_rules_json = `$curl_cmd`;
+	chomp($package_rules_json);
+}
+$package_rules = decode_json($package_rules_json);
 
 
 datastructure_walk($package_rules, \&process_scalar, undef); # for my "environment variables"... ;-)
