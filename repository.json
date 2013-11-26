@@ -1,0 +1,77 @@
+{
+	"aweclient" : {
+		"source" : "github.com/MG-RAST/AWE/...",
+		"source-type" : "go",
+		"subpackages" : [
+			{	"exec" : "sudo apt-get update" },
+			{
+				"source" : "mongodb-server bzr make gcc mercurial git",
+				"source-type" : "apt"
+			},
+			{	"exec" : [	"for i in data logs work ; do mkdir -p ${target}data/awe/${i} ; chmod 777 ${target}data/awe/${i} ; done" ,
+							"mkdir -p ${target}gopath ${target}etc" ,
+							"sudo ln -s -f /lib/init/upstart-job /etc/init.d/awe-client",
+							"sudo rm -f /etc/init/awe-client.conf",
+							"cd ${target} && rm -f ${target}awe-client.conf && wget http://www.mcs.anl.gov/~wtang/files/awe-client.conf",
+							"sudo mv awe-client.conf /etc/init/awe-client.conf"]
+			}
+		],
+		"depends" : ["go"]
+	},
+	"go" : {
+		"source" : "-u release https://code.google.com/p/go",
+		"source-type" : "mercurial",
+		"build-exec" : "cd ${target}go/src && ./all.bash",
+		"set-env" : {	"GOPATH" : "${target}gopath",
+			"PATH" : "$PATH:${target}go/bin:${target}gopath/bin"}
+	},
+	"qiime" : {
+		"_comment" : "QIIME uses a configuration file like qiime.conf for the deployment, which has to given as an argument to this package",
+		"source" : "git://github.com/qiime/qiime-deploy.git",
+		"source-temporary" : 1,
+		"build-exec" : "cd ${source} ; python qiime-deploy.py $target/qiime_software/ -f ${1} --force-remove-failed-dirs",
+		"test" : "source ${target}qiime_software/activate.sh ; print_qiime_config.py -t",
+		"subpackages" : [
+			{
+				"exec" : "sudo add-apt-repository \"deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe multiverse\"",
+				"set-env" : {"JAVA_HOME":"/usr/lib/jvm/java-6-openjdk-amd64"}
+			},
+			{
+				"source" : "python-dev libncurses5-dev libssl-dev libzmq-dev libgsl0-dev openjdk-6-jdk libxml2 libxslt1.1 libxslt1-dev ant git subversion build-essential zlib1g-dev libpng12-dev libfreetype6-dev mpich2 libreadline-dev gfortran unzip libmysqlclient18 libmysqlclient-dev ghc sqlite3 libsqlite3-dev",
+				"source-type" : "apt"
+			}
+		]
+	},
+	"usearch" : {
+		"_comment" : "due to license issues of usearch the download url has to be given as a parameter",
+		"source" : {"url" : "${1}", "filename" : "usearch"},
+		"destination-dir" : "${target}bin",
+		"build-exec" : "chmod +x ${target}bin/usearch",
+		"set-env" : {"PATH" : "${target}bin:$PATH"},
+		"subpackages" : [
+			{
+				"exec" : "mkdir -p ${target}bin"
+			}
+		]
+	},
+	"gg_otus" : {
+		"version" : [13,5],
+		"source" : "ftp://greengenes.microbio.me/greengenes_release/gg_${v1}_${v2}/gg_${v1}_${v2}_otus.tar.gz",
+		"source-extract" : 1,
+		"exec" : [	"mkdir -p $QIIME/../gg_otus-${v1}_${v2}-release/rep_set",
+					"ln --force -s ${target}gg_${v1}_${v2}_otus "],
+		"_comment": "creates symlink for use in QIIME"
+	},
+	"picrust_data" : {
+		"source" : ["ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/16S_13_5_precalculated.tab.gz",
+					"ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/ko_13_5_precalculated.tab.gz"],
+		"dir" : 1
+	},
+	"picrust_symlink" : {
+		"_comment": "makes symlink in QIIME/picrust installation to picrust_data",
+		"exec" : [	"mkdir -p $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data",
+					"ln --force -s ${target}picrust_data/16S_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/16S_13_5_precalculated.tab.gz",
+					"ln --force -s ${target}picrust_data/ko_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/ko_13_5_precalculated.tab.gz"],
+		"depends" : ["picrust_data"]
+	}
+}
