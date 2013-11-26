@@ -5,8 +5,17 @@ DeploySoftware
 deploys software.
 
 
-Packages
+Usage
 --------
+
+> deploy_software.pl --target=<target> [package ...]
+
+Example:
+> deploy_software.pl --target=/home/ubuntu/ aweclient
+
+* use --new to overwrite existing files and directories
+* use --repository to specify url to repository, default fetches repository.json from this git-repository
+
 package name examples: 
 * mypackage
 * mypackage(arg1 arg2)
