@@ -8,7 +8,7 @@ use Getopt::Long;
 use File::Basename;
 use JSON;
 use File::Temp;
-use LWP::UserAgent;
+#use LWP::UserAgent;
 use Data::Dumper;
 
 1;
@@ -17,7 +17,6 @@ use Data::Dumper;
 
 my $target = "/home/ubuntu/";
 
-#my @package_list = ('gg_otus', 'picrust_data', 'picrust_symlink', 'qiime(/home/ubuntu/qiime-1.7.0-fixed.conf)');
 my $default_repository = 'https://raw.github.com/wgerlach/DeploySoftware/master/repository.json';
 
 #########################################
@@ -154,12 +153,20 @@ sub setenv {
 
 sub git_clone {
 	my ($source, $dir) = @_;
-		
-	my $gitname = (split('/', $source))[-1];
-	($gitname) = $gitname =~ /(.*)\.git/;
 	
-	unless (defined $gitname) {
-		die;
+	
+	my $gitname;
+	
+	#example git://github.com/qiime/qiime-deploy.git
+	#example kbase@git.kbase.us:dev_container
+	$gitname = (split(/\/|:/, $source))[-1]; # split on "/" and ":"
+	
+	if ($gitname =~ /\.git$/) { # remove .git suffix
+		($gitname) = $gitname =~ /(.*)\.git/;
+	}
+		
+	unless (defined $gitname){
+		die "git string unkown: $source";
 	}
 	
 	my $gitdir = $dir.$gitname;
@@ -204,6 +211,8 @@ sub hg_clone {
 	return $hgdir;
 }
 
+
+# replaces ${i} variables
 sub replaceArguments {
 	my $exec = shift(@_);
 	my $package_args_ref = shift(@_);
@@ -254,6 +263,23 @@ sub replaceVersionNumbers {
 	return $exec;
 }
 
+sub replacePtarget {
+	my $exec = shift(@_);
+	my $ptarget = shift(@_);
+	
+	unless (defined $ptarget) {
+		die;
+	}
+	
+	#print 'ref: '.ref($version_numbers_ref)."\n";
+	
+	print "exec: $exec\n";
+	$exec =~ s/\$\{ptarget\}/$ptarget/g;
+	
+	print "exec: $exec\n";
+	return $exec;
+}
+
 
 sub parsePackageString{
 	my $package_string = shift(@_);
@@ -267,8 +293,7 @@ sub parsePackageString{
 	if (defined $package_arg_line) {
 		$package = $p;
 		@package_args = split(' ', $package_arg_line) ;
-		
-		#datastructure_walk($package_rules, \&replaceArguments, \@package_args);
+
 		
 	} else {
 		$package = $package_string;
@@ -345,6 +370,15 @@ sub install_package {
 		datastructure_walk($package_rules, \&replaceVersionNumbers, $pack_hash->{'version'});
 	}
 	
+	my $ptarget = $pack_hash->{'ptarget'} || $target;
+	if (substr($ptarget, -1, 1) ne '/') {
+		$ptarget .= '/';
+	}
+	if ((defined $pack_hash->{'ptarget'})) {
+		datastructure_walk($package_rules, \&replacePtarget, $ptarget);
+	}
+	
+	
 	
 	#dependencies
 	if (defined $pack_hash->{'depends'}) {
@@ -368,7 +402,7 @@ sub install_package {
 	}
 	
 	
-	my $packagedir = $target.$package.'/';
+	my $packagedir = $ptarget.$package.'/';
 	if (defined($pack_hash->{'dir'}) && ! -d $packagedir ) {
 		system("mkdir -p ".$packagedir);
 	}
@@ -414,7 +448,7 @@ sub install_package {
 			}
 			
 			my $temp_dir_obj = undef;
-			my $temp_dir = $target;
+			my $temp_dir = $ptarget;
 			my $sourcedir=undef;
 			if ($st eq 'git' || $st eq 'mercurial' || $st eq 'go') {
 				
@@ -469,10 +503,8 @@ sub install_package {
 				my $download_dir = undef ;
 				if (defined $pack_hash->{'dir'}) {
 					$download_dir = $packagedir;
-				} elsif (defined $pack_hash->{'destination-dir'}) {
-					$download_dir = $pack_hash->{'destination-dir'};
 				} else {
-					$download_dir = $target;
+					$download_dir = $ptarget;
 				}
 				
 				my $downloaded_file = downloadFile('url' => $source, 'target-dir' => $download_dir, 'target-name' => $source_filename);
