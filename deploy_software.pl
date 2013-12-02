@@ -382,13 +382,15 @@ sub install_package {
 	
 	my $packagedir = $ptarget.$package.'/';
 	if (defined($pack_hash->{'dir'}) && ! -d $packagedir ) {
-		system("mkdir -p ".$packagedir);
+		systemp("mkdir -p ".$packagedir);
 	}
 
 	if (defined($pack_hash->{'dir'})) {
+		print "chdir $packagedir\n";
 		chdir($packagedir);
 	} else {
 		if (-d $ptarget) {
+			print "chdir $ptarget\n";
 			chdir($ptarget);
 		} else {
 			print STDERR "warning: could not chdir $ptarget\n";
