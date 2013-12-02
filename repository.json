@@ -75,7 +75,7 @@
 		"depends" : ["picrust_data"]
 	},
 	"kbase_dev_container" : {
-		"_comment": "target is /kb/",
+		"_comment": "--target should be /kb/",
 		"source" : "kbase@git.kbase.us:dev_container",
 		"source-type" : "git"
 	},
@@ -86,7 +86,7 @@
 		"depends" : ["kbase_dev_container"]
 	},
 	"kbase-deploy" : {
-		"exec" : [	"pwd ; ./bootstrap /kb/runtime",
+		"exec" : [	"./bootstrap ${target}runtime",
 					". ${ptarget}user-env.sh ; make ; make deploy"],
 		"ptarget" : "${target}dev_container",
 		"depends" : ["kbase-coremodules"]
