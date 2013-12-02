@@ -385,19 +385,6 @@ sub install_package {
 		systemp("mkdir -p ".$packagedir);
 	}
 
-	if (defined($pack_hash->{'dir'})) {
-		print "chdir $packagedir\n";
-		chdir($packagedir);
-	} else {
-		if (-d $ptarget) {
-			print "chdir $ptarget\n";
-			chdir($ptarget);
-		} else {
-			print STDERR "warning: could not chdir $ptarget\n";
-		}
-	}
-			
-		
 	
 	#dependencies
 	if (defined $pack_hash->{'depends'}) {
@@ -407,6 +394,20 @@ sub install_package {
 			}else {
 				print "install dependency $dependency for $package...\n";
 				install_package($package_rules, $dependency, $version, undef);
+			}
+		}
+	}
+	
+	if ($package ne "subpackage") {
+		if (defined($pack_hash->{'dir'})) {
+			print "chdir $packagedir\n";
+			chdir($packagedir);
+		} else {
+			if (-d $ptarget) {
+				print "chdir $ptarget\n";
+				chdir($ptarget);
+			} else {
+				print STDERR "warning: could not chdir $ptarget\n";
 			}
 		}
 	}
