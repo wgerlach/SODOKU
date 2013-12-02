@@ -88,7 +88,7 @@
 	},
 	"kbase-deploy" : {
 		"_comment": "in /kb/dev_container/",
-		"exec" : [	"./bootstrap /kb/runtime",
+		"exec" : [	"pwd ; ./bootstrap /kb/runtime",
 					"source user-env.sh ; make ; make deploy"],
 		"ptarget" : "${target}dev_container",
 		"depends" : ["kbase-coremodules"]
