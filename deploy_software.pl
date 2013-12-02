@@ -380,6 +380,23 @@ sub install_package {
 	
 	
 	
+	my $packagedir = $ptarget.$package.'/';
+	if (defined($pack_hash->{'dir'}) && ! -d $packagedir ) {
+		system("mkdir -p ".$packagedir);
+	}
+
+	if (defined($pack_hash->{'dir'})) {
+		chdir($packagedir);
+	} else {
+		if (-d $ptarget) {
+			chdir($ptarget);
+		} else {
+			print STDERR "warning: could not chdir $ptarget\n";
+		}
+	}
+			
+		
+	
 	#dependencies
 	if (defined $pack_hash->{'depends'}) {
 		foreach my $dependency (@{$pack_hash->{'depends'}}) {
@@ -402,11 +419,7 @@ sub install_package {
 	}
 	
 	
-	my $packagedir = $ptarget.$package.'/';
-	if (defined($pack_hash->{'dir'}) && ! -d $packagedir ) {
-		system("mkdir -p ".$packagedir);
-	}
-
+	
 
 	if (defined $pack_hash->{'source'}) {
 		my @sources;
