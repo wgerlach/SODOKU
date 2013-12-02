@@ -80,16 +80,14 @@
 		"source-type" : "git"
 	},
 	"kbase-coremodules" : {
-		"_comment": "in /kb/dev_container/modules/",
 		"source" : ["kbase@git.kbase.us:kb_seed", "kbase@git.kbase.us:kbapi_common", "kbase@git.kbase.us:typecomp", "kbase@git.kbase.us:auth", "kbase@git.kbase.us:jars"],
 		"source-type" : "git",
 		"ptarget" : "${target}dev_container/modules",
 		"depends" : ["kbase_dev_container"]
 	},
 	"kbase-deploy" : {
-		"_comment": "in /kb/dev_container/",
 		"exec" : [	"pwd ; ./bootstrap /kb/runtime",
-					". user-env.sh ; make ; make deploy"],
+					". ${ptarget}user-env.sh ; make ; make deploy"],
 		"ptarget" : "${target}dev_container",
 		"depends" : ["kbase-coremodules"]
 	}
