@@ -364,6 +364,7 @@ sub function_kbasemodules {
 					or die "could not open $filename: $!";
 				<$fh>;
 			};
+			chomp(@deps);
 			push(@kbase_modules, @deps);
 		}
 		
