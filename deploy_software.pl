@@ -464,7 +464,7 @@ sub install_package {
 				#autodetect source type
 				if ($source =~ /^git:\/\//) {
 					$st = 'git';
-				} elsif (defined($pack_hash->{'git-server'}) {
+				} elsif (defined($pack_hash->{'git-server'})) {
 					$st = 'git';
 				} elsif ($source =~ /^http.*\.git/) {
 					$st = 'git';
