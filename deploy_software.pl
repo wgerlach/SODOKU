@@ -352,7 +352,7 @@ sub function_kbasemodules {
 	while (@kbase_modules > 0) {
 		my $module = shift(@kbase_modules);
 		unless (defined $downloaded_modules->{$module}) {
-			my $gitdir = git_clone($server.$module, target);
+			my $gitdir = git_clone($server.$module, $target);
 			$downloaded_modules->{$module} = 1;
 			my @deps = do {
 				my $filename = $gitdir.'DEPENDENCIES';
