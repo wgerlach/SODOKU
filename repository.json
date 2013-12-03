@@ -87,7 +87,9 @@
 		"ptarget" : "${target}dev_container/modules"
 	},
 	"kbase_FBAModeling" : {
-		"depends" : ["kbase_modules(workspace_service idserver kb_model_seed probabilistic_annotation KBaseFBAModeling)"]
+		"depends" : ["kbase_modules(KBaseFBAModeling)"]
+		"exec" : "for dep in `cat KBaseFBAModeling/DEPENDENCIES` ; do echo $dep ; done"
+		"ptarget" : "${target}dev_container/modules"
 	},
 	"kbase" : {
 		"exec" : [	"./bootstrap ${target}runtime",
