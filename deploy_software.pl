@@ -470,7 +470,7 @@ sub install_package {
 	if ($pack_hash->{'depend-function'}) {
 		
 		foreach my $function_name (@{$pack_hash->{'depend-function'}}) {
-			&functions->{$function_name};
+			&{functions->{$function_name}}();
 		}
 		
 		
