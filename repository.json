@@ -86,10 +86,13 @@
 		"git-server" : "kbase@git.kbase.us:",
 		"ptarget" : "${target}dev_container/modules"
 	},
+	"kbase_FBAModeling" : {
+		"depends" : ["kbase_modules(workspace_service idserver kb_model_seed probabilistic_annotation KBaseFBAModeling)"]
+	},
 	"kbase" : {
 		"exec" : [	"./bootstrap ${target}runtime",
 					". ${ptarget}user-env.sh ; make ; make deploy"],
 		"ptarget" : "${target}dev_container",
-		"depends" : ["kbase_dev_container","kbase_modules(${arguments})"]
+		"depends" : ["kbase_dev_container", "kbase_FBAModeling"]
 	}
 }
