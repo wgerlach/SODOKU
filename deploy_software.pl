@@ -334,6 +334,42 @@ sub parsePackageString{
 	
 }
 
+
+my $functions = {};
+
+
+sub function_kbasemodules {
+	my %arghash = @_;
+	
+	my $server = $arghash{'server'};
+	my $target = $arghash{'target'};
+	my $package_list = $arghash{'package_list'};
+	
+	
+	my @kbase_modules = split(' ', $arghash{'package_list'});
+	
+	my $downloaded_modules = {};
+	while (@kbase_modules > 0) {
+		my $module = shift(@kbase_modules);
+		unless (defined $downloaded_modules->{$module})
+			my $gitdir = git_clone($server.$module, target);
+			$downloaded_modules->{$module} = 1;
+			my @deps = do {
+				my $filename = $gitdir.'DEPENDENCIES';
+				open my $fh, "<", $filename
+					or die "could not open $filename: $!";
+				<$fh>;
+			};
+			push(@kbase_modules, @deps);
+		}
+		
+	}
+	
+	
+}
+
+$functions->{'kbasemodules'} = \&function_kbasemodules;
+
 sub install_package {
 	my ($package_rules, $package, $version, $package_args_ref) = @_;
 	
@@ -428,6 +464,16 @@ sub install_package {
 			print "install subpackage for $package...\n";
 			install_package($dependency, "subpackage", $version, $package_args_ref); #recursive !
 		}
+	}
+	
+	
+	if ($pack_hash->{'depend-function'}) {
+		
+		foreach my $function_name (@{$pack_hash->{'depend-function'}}) {
+			&functions->{$function_name};
+		}
+		
+		
 	}
 	
 	
