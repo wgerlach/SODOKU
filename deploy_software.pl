@@ -169,7 +169,7 @@ sub git_clone {
 		die "git string unkown: $source";
 	}
 	
-	my $gitdir = $dir.$gitname;
+	my $gitdir = $dir.$gitname.'/';
 	
 	if (-d $gitdir) {
 		if (defined $h->{'update'}) {
@@ -345,6 +345,10 @@ sub function_kbasemodules {
 	my $target = $arghash{'target'} or die;
 	my $package_list = $arghash{'package-list'} or die;
 	
+	
+	if (substr($target, -1, 1) ne "/") {
+		$target .= '/';
+	}
 	
 	my @kbase_modules = split(' ', $arghash{'package-list'});
 	
