@@ -346,7 +346,7 @@ sub function_kbasemodules {
 	my $package_list = $arghash{'package-list'} or die;
 	
 	
-	my @kbase_modules = split(' ', $arghash{'package_list'});
+	my @kbase_modules = split(' ', $arghash{'package-list'});
 	
 	my $downloaded_modules = {};
 	while (@kbase_modules > 0) {
