@@ -87,8 +87,8 @@
 		"ptarget" : "${target}dev_container/modules"
 	},
 	"kbase_FBAModeling" : {
-		"depends" : ["kbase_modules(KBaseFBAModeling)"]
-		"exec" : "for dep in `cat KBaseFBAModeling/DEPENDENCIES` ; do echo $dep ; done"
+		"depends" : ["kbase_modules(KBaseFBAModeling)"],
+		"exec" : "for dep in `cat KBaseFBAModeling/DEPENDENCIES` ; do rm -rf $dep ; git clone kbase@git.kbase.us:$dep ; done",
 		"ptarget" : "${target}dev_container/modules"
 	},
 	"kbase" : {
