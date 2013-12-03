@@ -430,7 +430,7 @@ sub install_package {
 	
 	if (defined $pack_hash->{'source-as-parameter'} && $pack_hash->{'source-as-parameter'} ==1) {
 		if (defined $package_args_ref) {
-			push(@{$pack_hash->{'source'}}, @{$package_args_ref}};
+			push(@{$pack_hash->{'source'}}, @{$package_args_ref});
 			print "source total: ".join(',', @{$pack_hash->{'source'}})."\n";
 		}
 	}
