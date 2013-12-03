@@ -231,6 +231,12 @@ sub replaceArguments {
 			#print "j: ".$j."\n";
 			$exec =~ s/\$\{$k\}/$j/g;
 		}
+		
+		my $package_args_string = join(' ', @$package_args_ref);
+		$exec =~ s/\$\{arguments\}/$package_args_string/g;
+		
+		
+		
 	}
 	print "exec: $exec\n";
 	return $exec;
@@ -422,7 +428,12 @@ sub install_package {
 	}
 	
 	
-	
+	if (defined $pack_hash->{'source-as-parameter'} && $pack_hash->{'source-as-parameter'} ==1) {
+		if (defined $package_args_ref) {
+			push(@{$pack_hash->{'source'}}, @{$package_args_ref}};
+			print "source total: ".join(',', @{$pack_hash->{'source'}})."\n";
+		}
+	}
 
 	if (defined $pack_hash->{'source'}) {
 		my @sources;
@@ -453,6 +464,8 @@ sub install_package {
 				#autodetect source type
 				if ($source =~ /^git:\/\//) {
 					$st = 'git';
+				} elsif (defined($pack_hash->{'git-server'}) {
+					$st = 'git';
 				} elsif ($source =~ /^http.*\.git/) {
 					$st = 'git';
 				} elsif ($source =~ /^ssh.*\.git/) {
@@ -466,6 +479,11 @@ sub install_package {
 			my $temp_dir_obj = undef;
 			my $temp_dir = $ptarget;
 			my $sourcedir=undef;
+			
+			if ($st eq 'git' && defined($pack_hash->{'git-server'})) {
+				$source = $pack_hash->{'git-server'}.$source;
+			}
+			
 			if ($st eq 'git' || $st eq 'mercurial' || $st eq 'go') {
 				
 				
@@ -596,9 +614,19 @@ sub install_package {
 		systemp($pack_hash->{'test'}) == 0 or die;
 	}
 	
+
 	unless ($package eq "subpackage") {
 		$already_installed{$package} = 1;
 	}
+	
+	#if (defined $pack_hash->{'finish-package'}) {
+	#	if (ref($pack_hash->{'finish-package'}) eq 'ARRAY' ) {
+	#		return $pack_hash->{'finish-package'};
+	#	} else {
+	#		return ($pack_hash->{'finish-package'});
+	#	}
+	#}
+	
 }
 
 #############################################################

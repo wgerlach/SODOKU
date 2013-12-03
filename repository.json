@@ -79,16 +79,17 @@
 		"source" : "kbase@git.kbase.us:dev_container",
 		"source-type" : "git"
 	},
-	"kbase-coremodules" : {
-		"source" : ["kbase@git.kbase.us:kb_seed", "kbase@git.kbase.us:kbapi_common", "kbase@git.kbase.us:typecomp", "kbase@git.kbase.us:auth", "kbase@git.kbase.us:jars"],
-		"source-type" : "git",
-		"ptarget" : "${target}dev_container/modules",
-		"depends" : ["kbase_dev_container"]
+	"kbase_modules" : {
+		"_comment": "example: KBaseFBAModeling",
+		"source" : ["kb_seed", "kbapi_common", "typecomp", "auth", "jars"],
+		"source-as-parameter" : 1,
+		"git-server" : "kbase@git.kbase.us:",
+		"ptarget" : "${target}dev_container/modules"
 	},
-	"kbase-deploy" : {
+	"kbase" : {
 		"exec" : [	"./bootstrap ${target}runtime",
 					". ${ptarget}user-env.sh ; make ; make deploy"],
 		"ptarget" : "${target}dev_container",
-		"depends" : ["kbase-coremodules"]
+		"depends" : ["kbase_dev_container","kbase_modules(${arguments})"]
 	}
 }
