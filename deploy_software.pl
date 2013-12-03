@@ -395,11 +395,14 @@ sub install_package {
 	#dependencies
 	if (defined $pack_hash->{'depends'}) {
 		foreach my $dependency (@{$pack_hash->{'depends'}}) {
-			if (defined $already_installed{$dependency} && $already_installed{$dependency}==1) {
+			
+			my ($dep_package, $dep_version, $dep_package_args_ref) = parsePackageString($dependency);
+			
+			if (defined $already_installed{$package} && $already_installed{$package}==1) {
 				print "dependency $dependency already installed\n";
 			}else {
-				print "install dependency $dependency for $package...\n";
-				install_package($package_rules, $dependency, $version, undef);
+				print "install dependency $dependency for $dep_package...\n";
+				install_package($package_rules, $dep_package, $dep_version, $dep_package_args_ref);
 			}
 		}
 	}
