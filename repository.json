@@ -79,22 +79,23 @@
 		"source" : "kbase@git.kbase.us:dev_container",
 		"source-type" : "git"
 	},
-	"kbase_modules" : {
+	"kbase_modules_core" : {
 		"_comment": "example: KBaseFBAModeling",
 		"source" : ["kb_seed", "kbapi_common", "typecomp", "auth", "jars"],
 		"source-as-parameter" : 1,
 		"git-server" : "kbase@git.kbase.us:",
 		"ptarget" : "${target}dev_container/modules"
 	},
-	"kbase_FBAModeling" : {
-		"depends" : ["kbase_modules(KBaseFBAModeling)"],
-		"exec" : "for dep in `cat KBaseFBAModeling/DEPENDENCIES` ; do rm -rf $dep ; git clone kbase@git.kbase.us:$dep ; done",
+	"kbase_modules" : {
+		"_comment": "installs modules including direct dependencies",
+		"source-as-parameter" : 1,
+		"build-exec" : "git clone kbase@git.kbase.us:${source} ; for dep in `cat ${source}/DEPENDENCIES` ; do rm -rf $dep ; git clone kbase@git.kbase.us:$dep ; done",
 		"ptarget" : "${target}dev_container/modules"
 	},
 	"kbase" : {
 		"exec" : [	"./bootstrap ${target}runtime",
 					". ${ptarget}user-env.sh ; make ; make deploy"],
 		"ptarget" : "${target}dev_container",
-		"depends" : ["kbase_dev_container", "kbase_FBAModeling"]
+		"depends" : ["kbase_dev_container", "kbase_modules_core", "kbase_modules(KBaseFBAModeling)"]
 	}
 }
