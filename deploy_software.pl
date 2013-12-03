@@ -341,9 +341,9 @@ my $functions = {};
 sub function_kbasemodules {
 	my %arghash = @_;
 	
-	my $server = $arghash{'server'};
-	my $target = $arghash{'target'};
-	my $package_list = $arghash{'package_list'};
+	my $server = $arghash{'server'} or die;
+	my $target = $arghash{'target'} or die;
+	my $package_list = $arghash{'package-list'} or die;
 	
 	
 	my @kbase_modules = split(' ', $arghash{'package_list'});
@@ -471,7 +471,7 @@ sub install_package {
 		
 		foreach my $function_hash (@{$pack_hash->{'depend-function'}}) {
 			my $function_name = $function_hash->{'name'};
-			&{$functions->{$function_name}}();
+			&{$functions->{$function_name}}(%$function_hash);
 		}
 		
 		
