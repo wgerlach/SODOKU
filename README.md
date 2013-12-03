@@ -56,6 +56,7 @@ JSON fields
   * otherwise subpackages are the same as packages (I think... )
   * subpackages are installed after depends
 * *version*: specifies default version, e.g. v2.5 ['2','5']
+* *ptarget*: allows to define a package specfic target location that is different from global target location
 
 Execution order
 ---------------
