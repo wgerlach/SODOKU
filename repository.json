@@ -89,7 +89,7 @@
 			{
 				"name" : "kbasemodules",
 				"server": "kbase@git.kbase.us:",
-				"target" : "${target}",
+				"target" : "${ptarget}modules",
 				"package-list" : "${arguments}"
 			}
 		]
