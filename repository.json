@@ -89,7 +89,8 @@
 	"kbase_modules" : {
 		"_comment": "installs modules including direct dependencies",
 		"source-as-parameter" : 1,
-		"build-exec" : "git clone kbase@git.kbase.us:${source} ; for dep in `cat ${source}/DEPENDENCIES` ; do rm -rf $dep ; git clone kbase@git.kbase.us:$dep ; done",
+		"git-server" : "kbase@git.kbase.us:",
+		"build-exec" : "for dep in `cat ${source}/DEPENDENCIES` ; do rm -rf $dep ; git clone kbase@git.kbase.us:$dep ; done",
 		"ptarget" : "${target}dev_container/modules"
 	},
 	"kbase" : {
