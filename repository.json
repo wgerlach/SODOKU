@@ -86,7 +86,7 @@
 		"ptarget" : "${target}dev_container",
 		"depends" : ["kbase_dev_container"],
 		"depend-function" : [
-			"kbasemodules" : {
+				{"name" : "kbasemodules",
 				"server": "kbase@git.kbase.us:",
 				"target" : "${target}",
 				"package_list" : "${arguments}"
