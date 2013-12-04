@@ -358,14 +358,21 @@ sub function_kbasemodules {
 		unless (defined $downloaded_modules->{$module}) {
 			my $gitdir = git_clone($server.$module, $target);
 			$downloaded_modules->{$module} = 1;
-			my @deps = do {
-				my $filename = $gitdir.'DEPENDENCIES';
+			
+			
+			
+			my $filename = $gitdir.'DEPENDENCIES';
+			if (-e $filename) {
 				open my $fh, "<", $filename
-					or die "could not open $filename: $!";
-				<$fh>;
-			};
-			chomp(@deps);
-			push(@kbase_modules, @deps);
+				or die "could not open $filename: $!";
+				my @deps = <$fh>;
+				chomp(@deps);
+				push(@kbase_modules, @deps);
+			}
+				
+			
+			
+			
 		}
 		
 	}
