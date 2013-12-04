@@ -344,14 +344,14 @@ sub function_kbasemodules {
 	
 	my $server = $arghash{'server'} or die;
 	my $target = $arghash{'target'} or die;
-	my $package_list = $arghash{'package-list'} or die;
+	my $package_list = $arghash{'package-list'} || [];
 	
 	
 	if (substr($target, -1, 1) ne "/") {
 		$target .= '/';
 	}
 	
-	my @kbase_modules = split(' ', $arghash{'package-list'});
+	my @kbase_modules = split(' ', $package_list);
 	
 	my $downloaded_modules = {};
 	while (@kbase_modules > 0) {
