@@ -218,26 +218,27 @@ sub replaceArguments {
 	my $package_args_ref = shift(@_);
 	
 	unless (defined $package_args_ref) {
-		return $exec;
+		$package_args_ref=[];
 	}
 	
 	print "exec: $exec\n";
 	print "package_args: ".@$package_args_ref."\n";
-	if (@$package_args_ref > 0) {
-		for (my $i = 0 ; $i < @$package_args_ref; $i++) {
-			my $k = $i+1;
-			my $j = $package_args_ref->[$i];
-			
-			#print "j: ".$j."\n";
-			$exec =~ s/\$\{$k\}/$j/g;
-		}
+	
+	
+	for (my $i = 0 ; $i < @$package_args_ref; $i++) {
+		my $k = $i+1;
+		my $j = $package_args_ref->[$i];
 		
-		my $package_args_string = join(' ', @$package_args_ref);
-		$exec =~ s/\$\{arguments\}/$package_args_string/g;
-		
-		
-		
+		#print "j: ".$j."\n";
+		$exec =~ s/\$\{$k\}/$j/g;
 	}
+	
+	my $package_args_string = join(' ', @$package_args_ref);
+	$exec =~ s/\$\{arguments\}/$package_args_string/g;
+	
+	
+		
+	
 	print "exec: $exec\n";
 	return $exec;
 }
@@ -387,10 +388,10 @@ sub install_package {
 	
 	print 'ref1: '.ref($version)."\n";
 	
-	if (defined($package_args_ref)) {
-		# replace arguments if they have been used
-		datastructure_walk($package_rules, \&replaceArguments, $package_args_ref);
-	}
+	
+	# replace arguments if they have been used
+	datastructure_walk($package_rules, \&replaceArguments, $package_args_ref);
+	
 	
 	print "install package: $package\n";
 	print "args: ".join(' ',@$package_args_ref)."\n" if defined $package_args_ref;
