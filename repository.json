@@ -80,7 +80,7 @@
 		"source-type" : "git"
 	},
 	"kbase" : {
-		"_comment": "example: KBaseFBAModeling",
+		"_comment": "example: kbase(KBaseFBAModeling)",
 		"exec" : [	"./bootstrap ${target}runtime",
 					". ${ptarget}user-env.sh ; make ; make deploy"],
 		"ptarget" : "${target}dev_container",
