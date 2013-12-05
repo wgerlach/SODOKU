@@ -747,7 +747,7 @@ if (substr($target, -1, 1) ne "/") {
 
 
 
-my $package_rules_json = <<'EOF';
+my $repository_json = <<'EOF';
 {
 	xxxxx
 }
