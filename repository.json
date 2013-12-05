@@ -116,12 +116,13 @@
 		"source-type" : "go",
 		"subpackages" : [{	"source" : "http://www.mcs.anl.gov/~wtang/files/shock.cfg",
 							"ptarget" : "${target}/etc"
-					   }]
+					   }],
+		"depends" : ["go"]
 	},
 	"FragGeneScan-Wei" : {
 		"source": "http://www.mcs.anl.gov/~wtang/files/fgs.tar.gz",
 		"source-extract" : 1,
-		"ptarget" : "${target}/apps/FragGeneScan"
+		"ptarget" : "${target}apps/FragGeneScan"
 	},
 	"MG-RAST-biotools" : {
 		"source" : ["ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/superblat",
