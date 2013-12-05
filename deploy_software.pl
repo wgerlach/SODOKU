@@ -141,7 +141,7 @@ sub datastructure_walk {
 
 sub setenv {
 	my ($key, $value) = @_;
-	my $envline = "$key=$value";
+	my $envline = "export $key=$value";
 	systemp("grep -q -e '$envline' ~/.bashrc || echo '$envline' >> ~/.bashrc");
 	
 	
