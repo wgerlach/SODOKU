@@ -70,17 +70,18 @@
 	},
 	"MG-RAST" : {
 		"_comment" : "target: $HOME",
-		"exec" : "mkdir -p ${INSTALLDIR}/apps",
+		"ptarget" : "${target}apps",
 		"subpackages" : [
 					   {
 						 "source" : "mongodb-server bzr make gcc mercurial git python-biopython libcache-memcached-perl libdbi-perl bowtie",
 						 "source-type" : "apt"
 					   },
 					   {
-						 "source" : "https://github.com/MG-RAST/pipeline"
+						 "source" : "https://github.com/MG-RAST/pipeline",
+						 "source-type" : "git"
 					   }
 					   ],
-		"depends" : ["aweclient"]
+		"depends" : ["aweclient", "aweserver", "Shock", "FragGeneScan-Wei", "MG-RAST-biotools"]
 	},
 	"AWE" : {
 		"source" : "github.com/MG-RAST/AWE/...",

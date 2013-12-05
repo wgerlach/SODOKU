@@ -395,7 +395,7 @@ sub install_package {
 	
 	
 	if (defined $package_hash->{'ignore'}) {
-		print STDERR "warning: package ignored.\n";
+		print STDERR "warning: package $package ignored.\n";
 		return;
 	}
 	
