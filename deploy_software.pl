@@ -426,8 +426,8 @@ sub install_package {
 	if (substr($ptarget, -1, 1) ne '/') {
 		$ptarget .= '/';
 	}
-	if (defined($packagedir->{'ptarget'})) {
-		datastructure_walk('data' => $package_rules, 'sub' => \&replacePtarget, 'subarg' => $ptarget, 'nosubpackages' => 1);
+	if (defined($package_hash->{'ptarget'})) {
+		datastructure_walk('data' => $package_hash, 'sub' => \&replacePtarget, 'subarg' => $ptarget, 'nosubpackages' => 1);
 	}
 	
 	if (defined($package_hash->{'dir'}) && defined($package_hash->{'ptarget'})) {
@@ -435,7 +435,7 @@ sub install_package {
 	}
 	if (defined($package_hash->{'dir'}) {
 		$ptarget .= $package.'/';
-		$packagedir->{'ptarget'} = $ptarget;
+		$package_hash->{'ptarget'} = $ptarget;
 	}
 	
 
@@ -474,8 +474,8 @@ sub install_package {
 	if (defined $package_hash->{'subpackages'}) {
 		my $subpackages =$package_hash->{'subpackages'};
 		foreach my $subpackage (@{$subpackages}) {
-			if (defined($packagedir->{'ptarget'}) && ! defined($subpackage->{'ptarget'})) { # inherit ptarget
-				$subpackage->{'ptarget'} = $packagedir->{'ptarget'};
+			if (defined($package_hash->{'ptarget'}) && ! defined($subpackage->{'ptarget'})) { # inherit ptarget
+				$subpackage->{'ptarget'} = $package_hash->{'ptarget'};
 			}
 			print "install subpackage for $package...\n";
 			install_package($repository, $subpackage, "subpackage", $version, $package_args_ref); #recursive !
