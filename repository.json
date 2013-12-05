@@ -3,7 +3,7 @@
 		"_comment" : "QIIME uses a configuration file like qiime.conf for the deployment, which has to given as an argument to this package",
 		"source" : "git://github.com/qiime/qiime-deploy.git",
 		"source-temporary" : 1,
-		"build-exec" : "cd ${source} ; python qiime-deploy.py $target/qiime_software/ -f ${1} --force-remove-failed-dirs",
+		"build-exec" : "cd ${source-dir} ; python qiime-deploy.py $target/qiime_software/ -f ${1} --force-remove-failed-dirs",
 		"test" : ". ${target}qiime_software/activate.sh ; print_qiime_config.py -t",
 		"subpackages" : [
 			{
@@ -127,7 +127,7 @@
 		"source" : ["ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/superblat",
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/blat",
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/usearch"],
-		"build-exec" : "chmod +x superblat blat usearch",
+		"build-exec" : "chmod +x ${source-file}",
 		"ptarget" : "${target}/apps/biotools"
 	},
 	"MG-RAST-databases" : {

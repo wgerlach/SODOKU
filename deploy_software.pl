@@ -545,7 +545,7 @@ sub install_package {
 			my $temp_dir_obj = undef;
 			my $temp_dir = $ptarget;
 			my $sourcedir=undef;
-			
+			my $downloaded_file=undef;
 			if ($st eq 'git' && defined($package_hash->{'git-server'})) {
 				$source = $package_hash->{'git-server'}.$source;
 			}
@@ -600,7 +600,7 @@ sub install_package {
 			} elsif ($st eq 'download') {
 				#simple download
 				
-				my $downloaded_file = downloadFile('url' => $source, 'target-dir' => $ptarget, 'target-name' => $source_filename);
+				$downloaded_file = downloadFile('url' => $source, 'target-dir' => $ptarget, 'target-name' => $source_filename);
 				unless (defined $downloaded_file) {
 					die;
 				}
@@ -623,8 +623,12 @@ sub install_package {
 			# different build-types
 			if (defined($package_hash->{'build-exec'})) {
 				my $exec = $package_hash->{'build-exec'};
+				if (defined $downloaded_file) {
+					$exec =~ s/\$\{source-file\}/$downloaded_file/g;
+				}
+				
 				if (defined $sourcedir) {
-					$exec =~ s/\$\{source\}/$sourcedir/g;
+					$exec =~ s/\$\{source-dir\}/$sourcedir/g;
 				}
 				print "build-exec:\n";
 				systemp($exec) == 0 or die;
