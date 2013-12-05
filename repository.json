@@ -1,30 +1,4 @@
 {
-	"aweclient" : {
-		"source" : "github.com/MG-RAST/AWE/...",
-		"source-type" : "go",
-		"subpackages" : [
-			{	"exec" : "sudo apt-get update" },
-			{
-				"source" : "mongodb-server bzr make gcc mercurial git",
-				"source-type" : "apt"
-			},
-			{	"exec" : [	"for i in data logs work ; do mkdir -p ${target}data/awe/${i} ; chmod 777 ${target}data/awe/${i} ; done" ,
-							"mkdir -p ${target}gopath ${target}etc" ,
-							"sudo ln -s -f /lib/init/upstart-job /etc/init.d/awe-client",
-							"sudo rm -f /etc/init/awe-client.conf",
-							"cd ${target} && rm -f ${target}awe-client.conf && wget http://www.mcs.anl.gov/~wtang/files/awe-client.conf",
-							"sudo mv awe-client.conf /etc/init/awe-client.conf"]
-			}
-		],
-		"depends" : ["go"]
-	},
-	"go" : {
-		"source" : "-u release https://code.google.com/p/go",
-		"source-type" : "mercurial",
-		"build-exec" : "cd ${target}go/src && ./all.bash",
-		"set-env" : {	"GOPATH" : "${target}gopath",
-						"PATH" : "$PATH:${target}go/bin:${target}gopath/bin"}
-	},
 	"qiime" : {
 		"_comment" : "QIIME uses a configuration file like qiime.conf for the deployment, which has to given as an argument to this package",
 		"source" : "git://github.com/qiime/qiime-deploy.git",
@@ -93,5 +67,88 @@
 				"package-list" : "${arguments}"
 			}
 		]
+	},
+	"MG-RAST" : {
+		"_comment" : "target: $HOME",
+		"exec" : "mkdir -p ${INSTALLDIR}/apps",
+		"subpackages" : [
+					   {
+						 "source" : "mongodb-server bzr make gcc mercurial git python-biopython libcache-memcached-perl libdbi-perl bowtie",
+						 "source-type" : "apt"
+					   },
+					   {
+						 "source" : "https://github.com/MG-RAST/pipeline"
+					   }
+					   ],
+		"depends" : ["aweclient"]
+	},
+	"AWE" : {
+		"source" : "github.com/MG-RAST/AWE/...",
+		"source-type" : "go",
+		"subpackages" : [
+						 {
+						 "source" : "mongodb-server bzr make gcc mercurial git",
+						 "source-type" : "apt"
+						 }
+						 ],
+		"depends" : ["go"]
+	},
+	"aweclient-upstart" : {
+		"exec" : ["sudo ln -s -f /lib/init/upstart-job /etc/init.d/awe-client",
+				  "sudo rm -f /etc/init/awe-client.conf",
+				  "cd ${target} && rm -f ${target}awe-client.conf && wget http://www.mcs.anl.gov/~wtang/files/awe-client.conf",
+				  "sudo mv awe-client.conf /etc/init/awe-client.conf"]
+	},
+	"aweserver" : {
+		"source" : "http://www.mcs.anl.gov/~wtang/files/awe.cfg",
+		"ptarget" : "${target}/etc",
+		"depends" : ["AWE"]
+	},
+	"go" : {
+		"source" : "-u release https://code.google.com/p/go",
+		"source-type" : "mercurial",
+		"build-exec" : "cd ${target}go/src && ./all.bash",
+		"set-env" : {	"GOPATH" : "${target}gopath",
+						"PATH"   : "$PATH:${target}go/bin:${target}gopath/bin"}
+	},
+	"Shock" : {
+		"source" : "github.com/MG-RAST/Shock/...",
+		"source-type" : "go",
+		"subpackages" : [{	"source" : "http://www.mcs.anl.gov/~wtang/files/shock.cfg",
+							"ptarget" : "${target}/etc"
+					   }]
+	},
+	"FragGeneScan-Wei" : {
+		"source": "http://www.mcs.anl.gov/~wtang/files/fgs.tar.gz",
+		"source-extract" : 1,
+		"ptarget" : "${target}/apps"
+	},
+	"MG-RAST-biotools" : {
+		"source" : ["ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/superblat",
+					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/blat",
+					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/usearch"],
+		"build-exec" : "chmod +x superblat blat usearch",
+		"ptarget" : "${target}/apps/biotools"
+	},
+	"MG-RAST-databases" : {
+		"_comment" : "target: /mnt or data",
+		"source" : ["ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.1",
+					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.2",
+					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr",
+					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.clust"],
+		
+		"subpackages" : [
+						 {
+						 "source" : "ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/h_sapiens.tar.gz",
+						 "source-extract" : 1
+						 }
+		],
+		"ptarget" : "${target}/refdb",
+		"exec": [ "for i in data logs work ; do mkdir -p ${target}awe/${i} ; chmod 777 ${target}awe/${i} ; done",
+				 "sudo mkdir -p ${target}/local",
+					"sudo chmod 777 ${target}/local",
+					"mkdir -p ${target}/local/shock/data",
+					"mkdir -p ${target}/local/shock/log",
+					"sudo chmod 777 ${target}/refdb"]
 	}
 }

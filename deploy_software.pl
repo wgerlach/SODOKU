@@ -97,27 +97,32 @@ sub process_scalar {
 }
 
 sub datastructure_walk {
-    my ($datastructure, $sub, $arg) = @_;
+    my %arghash = @_;
+	my $datastructure = $arghash{'data'};
+	my $sub = $arghash{'sub'};
+	my $arg = $arghash{'subarg'};
 	
 	if (ref($datastructure) eq 'HASH') {
 		while (my ($k, $v) = each %$datastructure) {
 			print "goto $k\n";
 			if (ref($v) eq '') {
-				print "scalar: ".$datastructure->{$k}."\n";
+				#print "scalar: ".$datastructure->{$k}."\n";
 				$datastructure->{$k} = $sub->($v, $arg);
-				print "scalar: ".$datastructure->{$k}."\n";
+				#print "scalar: ".$datastructure->{$k}."\n";
 			} else {
-				datastructure_walk($v, $sub, $arg);
+				unless (defined($arghash{'nosubpackages'}) && $k eq "subpackages") {
+					datastructure_walk('data' => $v, 'sub' => $sub, 'subarg' => $arg);
+				}
 			}
 		}
 	} elsif (ref($datastructure) eq 'ARRAY') {
 		for (my $i = 0 ; $i < @$datastructure ; $i++ ) {
 			if (ref($datastructure->[$i]) eq '') {
-				print "scalar: ".$datastructure->[$i]."\n";
+				#print "scalar: ".$datastructure->[$i]."\n";
 				$datastructure->[$i] = $sub->($datastructure->[$i], $arg);
-				print "scalar: ".$datastructure->[$i]."\n";
+				#print "scalar: ".$datastructure->[$i]."\n";
 			} else {
-				datastructure_walk($datastructure->[$i], $sub, $arg);
+				datastructure_walk('data' => $datastructure->[$i], 'sub' => $sub, 'subarg' => $arg);
 			}
 		}
 	
@@ -384,28 +389,20 @@ sub function_kbasemodules {
 $functions->{'kbasemodules'} = \&function_kbasemodules;
 
 sub install_package {
-	my ($package_rules, $package, $version, $package_args_ref) = @_;
+	my ($repository, $package_hash, $package, $version, $package_args_ref) = @_;
 	
 	print 'ref1: '.ref($version)."\n";
 	
 	
 	# replace arguments if they have been used
-	datastructure_walk($package_rules, \&replaceArguments, $package_args_ref);
+	datastructure_walk('data' => $package_hash, 'sub' => \&replaceArguments, 'subarg' => $package_args_ref);
 	
 	
 	print "install package: $package\n";
 	print "args: ".join(' ',@$package_args_ref)."\n" if defined $package_args_ref;
 	
 	
-	my $pack_hash;
-	
-	if ($package eq "subpackage") {
-		$pack_hash = $package_rules;
-	} else {
-		$pack_hash = $package_rules->{$package};
-	}
-	
-	unless (defined $pack_hash) {
+	unless (defined $package_hash) {
 		print STDERR "error: no configuration found for package $package\n";
 		exit(1);
 	}
@@ -417,33 +414,39 @@ sub install_package {
 	}
 	
 	if (defined $version) {
-		print 'ref2: '.ref($pack_hash->{'version'})."\n";
-		$pack_hash->{'version'} = $version;
+		print 'ref2: '.ref($package_hash->{'version'})."\n";
+		$package_hash->{'version'} = $version;
 	}
-	if ((defined $pack_hash->{'version'}) && ($package ne "subpackage")) {
-		print 'ref3: '.ref($pack_hash->{'version'})."\n";
-		datastructure_walk($package_rules, \&replaceVersionNumbers, $pack_hash->{'version'});
+	if ((defined $package_hash->{'version'}) && ($package ne "subpackage")) {
+		print 'ref3: '.ref($package_hash->{'version'})."\n";
+		datastructure_walk('data' => $package_hash, 'sub' => \&replaceVersionNumbers, 'subarg' => $package_hash->{'version'});
 	}
 	
-	my $ptarget = $pack_hash->{'ptarget'} || $target;
+	my $ptarget = $package_hash->{'ptarget'} || $target;
 	if (substr($ptarget, -1, 1) ne '/') {
 		$ptarget .= '/';
 	}
-	if ((defined $pack_hash->{'ptarget'})) {
-		datastructure_walk($package_rules, \&replacePtarget, $ptarget);
+	if (defined($packagedir->{'ptarget'})) {
+		datastructure_walk('data' => $package_rules, 'sub' => \&replacePtarget, 'subarg' => $ptarget, 'nosubpackages' => 1);
 	}
 	
+	if (defined($package_hash->{'dir'}) && defined($package_hash->{'ptarget'})) {
+		die;
+	}
+	if (defined($package_hash->{'dir'}) {
+		$ptarget .= $package.'/';
+		$packagedir->{'ptarget'} = $ptarget;
+	}
 	
-	
-	my $packagedir = $ptarget.$package.'/';
-	if (defined($pack_hash->{'dir'}) && ! -d $packagedir ) {
-		systemp("mkdir -p ".$packagedir);
+
+	unless (-d $ptarget) {
+		systemp("mkdir -p ".$ptarget);
 	}
 
 	
 	#dependencies
-	if (defined $pack_hash->{'depends'}) {
-		foreach my $dependency (@{$pack_hash->{'depends'}}) {
+	if (defined $package_hash->{'depends'}) {
+		foreach my $dependency (@{$package_hash->{'depends'}}) {
 			
 			my ($dep_package, $dep_version, $dep_package_args_ref) = parsePackageString($dependency);
 			
@@ -451,38 +454,38 @@ sub install_package {
 				print "dependency $dependency already installed\n";
 			}else {
 				print "install dependency $dependency for $dep_package...\n";
-				install_package($package_rules, $dep_package, $dep_version, $dep_package_args_ref);
+				install_package($repository, $repository->{$dep_package}, $dep_package, $dep_version, $dep_package_args_ref);
 			}
 		}
 	}
 	
 	if ($package ne "subpackage") {
-		if (defined($pack_hash->{'dir'})) {
-			print "chdir $packagedir\n";
-			chdir($packagedir);
+		
+		if (-d $ptarget) {
+			print "chdir $ptarget\n";
+			chdir($ptarget);
 		} else {
-			if (-d $ptarget) {
-				print "chdir $ptarget\n";
-				chdir($ptarget);
-			} else {
-				print STDERR "warning: could not chdir $ptarget\n";
-			}
+			print STDERR "warning: could not chdir $ptarget\n";
 		}
+	
 	}
 	
 	#subpackages
-	if (defined $pack_hash->{'subpackages'}) {
-		my $subpackages =$pack_hash->{'subpackages'};
-		foreach my $dependency (@{$subpackages}) {
+	if (defined $package_hash->{'subpackages'}) {
+		my $subpackages =$package_hash->{'subpackages'};
+		foreach my $subpackage (@{$subpackages}) {
+			if (defined($packagedir->{'ptarget'}) && ! defined($subpackage->{'ptarget'})) { # inherit ptarget
+				$subpackage->{'ptarget'} = $packagedir->{'ptarget'};
+			}
 			print "install subpackage for $package...\n";
-			install_package($dependency, "subpackage", $version, $package_args_ref); #recursive !
+			install_package($repository, $subpackage, "subpackage", $version, $package_args_ref); #recursive !
 		}
 	}
 	
 	
-	if ($pack_hash->{'depend-function'}) {
+	if ($package_hash->{'depend-function'}) {
 		
-		foreach my $function_hash (@{$pack_hash->{'depend-function'}}) {
+		foreach my $function_hash (@{$package_hash->{'depend-function'}}) {
 			my $function_name = $function_hash->{'name'};
 			&{$functions->{$function_name}}(%$function_hash);
 		}
@@ -491,24 +494,24 @@ sub install_package {
 	}
 	
 	
-	if (defined $pack_hash->{'source-as-parameter'} && $pack_hash->{'source-as-parameter'} ==1) {
+	if (defined $package_hash->{'source-as-parameter'} && $package_hash->{'source-as-parameter'} ==1) {
 		if (defined $package_args_ref) {
-			push(@{$pack_hash->{'source'}}, @{$package_args_ref});
-			print "source total: ".join(',', @{$pack_hash->{'source'}})."\n";
+			push(@{$package_hash->{'source'}}, @{$package_args_ref});
+			print "source total: ".join(',', @{$package_hash->{'source'}})."\n";
 		}
 	}
 
-	if (defined $pack_hash->{'source'}) {
+	if (defined $package_hash->{'source'}) {
 		my @sources;
-		if (ref($pack_hash->{'source'}) eq 'ARRAY') {
-			@sources = @{$pack_hash->{'source'}};
+		if (ref($package_hash->{'source'}) eq 'ARRAY') {
+			@sources = @{$package_hash->{'source'}};
 		} else {  # scalar or hash
-			@sources = ($pack_hash->{'source'});
+			@sources = ($package_hash->{'source'});
 		}
 		
-		my $build_type = $pack_hash->{'build-type'} || 'exec';
+		my $build_type = $package_hash->{'build-type'} || 'exec';
 		
-		my $source_type = $pack_hash->{'source-type'} || 'auto';
+		my $source_type = $package_hash->{'source-type'} || 'auto';
 		foreach my $source_obj (@sources) {
 			
 			my $source;
@@ -527,7 +530,7 @@ sub install_package {
 				#autodetect source type
 				if ($source =~ /^git:\/\//) {
 					$st = 'git';
-				} elsif (defined($pack_hash->{'git-server'})) {
+				} elsif (defined($package_hash->{'git-server'})) {
 					$st = 'git';
 				} elsif ($source =~ /^http.*\.git/) {
 					$st = 'git';
@@ -543,15 +546,15 @@ sub install_package {
 			my $temp_dir = $ptarget;
 			my $sourcedir=undef;
 			
-			if ($st eq 'git' && defined($pack_hash->{'git-server'})) {
-				$source = $pack_hash->{'git-server'}.$source;
+			if ($st eq 'git' && defined($package_hash->{'git-server'})) {
+				$source = $package_hash->{'git-server'}.$source;
 			}
 			
 			if ($st eq 'git' || $st eq 'mercurial' || $st eq 'go') {
 				
 				
 				
-				if (defined $pack_hash->{'source-temporary'} && $pack_hash->{'source-temporary'}==1) {
+				if (defined $package_hash->{'source-temporary'} && $package_hash->{'source-temporary'}==1) {
 					$temp_dir_obj = File::Temp->newdir( TEMPLATE => 'deployXXXXX' );
 					$temp_dir = $temp_dir_obj->dirname.'/';
 				}
@@ -597,21 +600,14 @@ sub install_package {
 			} elsif ($st eq 'download') {
 				#simple download
 				
-				my $download_dir = undef ;
-				if (defined $pack_hash->{'dir'}) {
-					$download_dir = $packagedir;
-				} else {
-					$download_dir = $ptarget;
-				}
-				
-				my $downloaded_file = downloadFile('url' => $source, 'target-dir' => $download_dir, 'target-name' => $source_filename);
+				my $downloaded_file = downloadFile('url' => $source, 'target-dir' => $ptarget, 'target-name' => $source_filename);
 				unless (defined $downloaded_file) {
 					die;
 				}
 				
-				if (defined $pack_hash->{'source-extract'} && $pack_hash->{'source-extract'} == 1) {
+				if (defined $package_hash->{'source-extract'} && $package_hash->{'source-extract'} == 1) {
 					if ($downloaded_file =~ /\.tar\.gz$/) {
-						systemp("tar xvfz ".$downloaded_file." -C ".$download_dir);
+						systemp("tar xvfz ".$downloaded_file." -C ".$ptarget);
 					} else {
 						die "unknown archive";
 					}
@@ -625,8 +621,8 @@ sub install_package {
 			
 			
 			# different build-types
-			if (defined($pack_hash->{'build-exec'})) {
-				my $exec = $pack_hash->{'build-exec'};
+			if (defined($package_hash->{'build-exec'})) {
+				my $exec = $package_hash->{'build-exec'};
 				if (defined $sourcedir) {
 					$exec =~ s/\$\{source\}/$sourcedir/g;
 				}
@@ -650,20 +646,20 @@ sub install_package {
 	}
 
 
-	if (defined $pack_hash->{'set-env'}) {
-		my $env_pairs = $pack_hash->{'set-env'};
+	if (defined $package_hash->{'set-env'}) {
+		my $env_pairs = $package_hash->{'set-env'};
 		foreach my $key (keys %{$env_pairs} ) {
 			setenv($key, $env_pairs->{$key}) ;
 		}
 	}
 	
-	if (defined $pack_hash->{'exec'}) {
+	if (defined $package_hash->{'exec'}) {
 		
 		my @execs;
-		if (ref($pack_hash->{'exec'}) eq 'ARRAY') {
-			@execs = @{$pack_hash->{'exec'}};
+		if (ref($package_hash->{'exec'}) eq 'ARRAY') {
+			@execs = @{$package_hash->{'exec'}};
 		} else {
-			@execs = ($pack_hash->{'exec'});
+			@execs = ($package_hash->{'exec'});
 		}
 		foreach my $exec (@execs) {
 			
@@ -672,9 +668,9 @@ sub install_package {
 		}
 	}
 	
-	if (defined $pack_hash->{'test'}) {
+	if (defined $package_hash->{'test'}) {
 		print "test_exec:\n";
-		systemp($pack_hash->{'test'}) == 0 or die;
+		systemp($package_hash->{'test'}) == 0 or die;
 	}
 	
 
@@ -682,11 +678,11 @@ sub install_package {
 		$already_installed{$package} = 1;
 	}
 	
-	#if (defined $pack_hash->{'finish-package'}) {
-	#	if (ref($pack_hash->{'finish-package'}) eq 'ARRAY' ) {
-	#		return $pack_hash->{'finish-package'};
+	#if (defined $package_hash->{'finish-package'}) {
+	#	if (ref($package_hash->{'finish-package'}) eq 'ARRAY' ) {
+	#		return $package_hash->{'finish-package'};
 	#	} else {
-	#		return ($pack_hash->{'finish-package'});
+	#		return ($package_hash->{'finish-package'});
 	#	}
 	#}
 	
@@ -758,7 +754,7 @@ my $package_rules_json = <<'EOF';
 EOF
 
 #my $package_rules = decode_json($package_rules_json);
-my $package_rules = undef;
+my $repository = undef;
 
 
 my $use_repository;
@@ -770,14 +766,14 @@ if (defined $h->{'repository'}) {
 
 print "fetching repository: ".$use_repository."\n";
 my $curl_cmd = "curl -S -s -o /dev/stdout ".$use_repository;
-$package_rules_json = `$curl_cmd`;
-chomp($package_rules_json);
+$repository_json = `$curl_cmd`;
+chomp($repository_json);
 
 
-$package_rules = decode_json($package_rules_json);
+$repository = decode_json($repository_json);
 
 
-datastructure_walk($package_rules, \&process_scalar, undef); # for my "environment variables"... ;-)
+datastructure_walk('data' => $repository, 'sub' => \&process_scalar); # for my "environment variables"... ;-)
 
 
 
@@ -792,9 +788,8 @@ foreach my $package_string (@package_list) {
 	
 	my ($package, $version, $package_args_ref) = parsePackageString($package_string);
 	
-	print 'ref0: '.ref($version)."\n";
-	
-	install_package($package_rules, $package, $version, $package_args_ref);
+
+	install_package($repository, $repository->{$package}, $package, $version, $package_args_ref);
 	
 }
 
