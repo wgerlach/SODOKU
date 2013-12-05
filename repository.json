@@ -128,7 +128,7 @@
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/blat",
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/usearch"],
 		"build-exec" : "chmod +x ${source-file}",
-		"ptarget" : "${target}/apps/biotools"
+		"ptarget" : "${target}apps/biotools"
 	},
 	"MG-RAST-databases" : {
 		"_comment" : "target: /mnt or data",

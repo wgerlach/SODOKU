@@ -25,8 +25,10 @@ Variables
 ---------
 * ${target} installation target as specified in --target
 * ${1}, ${2}.. package arguments 
-* ${source} directory of downloaded source
+* ${source-dir} directory of downloaded source repository
+* ${source-file} filename of downloaded source file
 * ${v1}, ${v2}.. version numbers
+* ${ptarget} current package directory as defined by ptarget
 
 problem: if packages expect parameter but does not get parameter, the unresolved package variable is passed to the bash which will replace the variable with the empty string. Be careful about that!
 
@@ -47,16 +49,17 @@ JSON fields
   * is executed after installation, if you need earlier execution use exec in subpackage
 * *set-env*: sets environment variable in ~/.bashrc
 * *_comment*: only way to make comments in json
-* *dir*: create package directory in target directory with same name as package
+* *ptarget* allows to define a package specfic target location that is different from global target location
+* *dir*: boolean, short for ptarget=${target}<packagename>/
 * *test*: command to test installation
 * *depends*: list of packages that wil be installed first
   * TODO : arguments for dependencies not yet possible
 * *subpackages*: have no names and are installed in sequential order,
   * other packages can not depend on these subpackages,
-  * otherwise subpackages are the same as packages (I think... )
+  * subpackages can inherit ${ptarget}
   * subpackages are installed after depends
 * *version*: specifies default version, e.g. v2.5 ['2','5']
-* *ptarget*: allows to define a package specfic target location that is different from global target location
+ 
 
 Execution order
 ---------------
