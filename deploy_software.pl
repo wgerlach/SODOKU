@@ -394,6 +394,11 @@ sub install_package {
 	print 'ref1: '.ref($version)."\n";
 	
 	
+	if (defined $package_hash->{'ignore'}) {
+		print STDERR "warning: package ignored.\n";
+		return;
+	}
+	
 	# replace arguments if they have been used
 	datastructure_walk('data' => $package_hash, 'sub' => \&replaceArguments, 'subarg' => $package_args_ref);
 	
