@@ -433,7 +433,7 @@ sub install_package {
 	if (defined($package_hash->{'dir'}) && defined($package_hash->{'ptarget'})) {
 		die;
 	}
-	if (defined($package_hash->{'dir'}) {
+	if (defined($package_hash->{'dir'})) {
 		$ptarget .= $package.'/';
 		$package_hash->{'ptarget'} = $ptarget;
 	}
