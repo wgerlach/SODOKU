@@ -413,7 +413,7 @@ sub install_package {
 	
 	
 	if (definedAndTrue($package_hash->{'ignore'})) {
-		print STDERR "warning: package $package ignored.\n";
+		print STDERR "package $package ignored.\n";
 		return;
 	}
 	
@@ -832,6 +832,7 @@ if (defined $h->{'ignore'}) {
 	foreach my $p (@ignorepackages) {
 		if (defined($repository->{$p})) {
 			$repository->{$p}->{'ignore'} = 1;
+			print "ignore package $p requested\n";
 		} else {
 			die "package $p not found";
 		}
