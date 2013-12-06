@@ -834,7 +834,7 @@ my @package_list = @ARGV;
 print "target: $target\n";
 
 
-if (definedAndTrue($h->{'ignore'})) {
+if (defined($h->{'ignore'})) {
 	my @ignorepackages = split(',', $h->{'ignore'});
 	foreach my $p (@ignorepackages) {
 		if (defined($repository->{$p})) {
