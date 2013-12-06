@@ -167,7 +167,7 @@
 							"ptarget" : "${target}apps/app-deploy-qiime-1.5.0/etc"
 						 },
 						 {
-							"exec" : "python app-deploy.py ${INSTALLDIR}/apps/qiime -f etc/qiime_1.5.0_uclust.conf --force-remove-failed-dirs",
+							"exec" : "python app-deploy.py ${target}apps/qiime -f etc/qiime_1.5.0_uclust.conf --force-remove-failed-dirs",
 							"ptarget" : "${target}apps/app-deploy-qiime-1.5.0/"
 						 },
 						 {
