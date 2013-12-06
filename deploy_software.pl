@@ -578,7 +578,7 @@ sub install_package {
 				
 				
 				
-				if (definedAndTrue $package_hash->{'source-temporary'}) {
+				if (definedAndTrue($package_hash->{'source-temporary'})) {
 					$temp_dir_obj = File::Temp->newdir( TEMPLATE => 'deployXXXXX' );
 					$temp_dir = $temp_dir_obj->dirname.'/';
 				}
@@ -632,11 +632,13 @@ sub install_package {
 					die;
 				}
 				
-				if (defined $package_hash->{'source-extract'} && $package_hash->{'source-extract'} == 1) {
+				if (definedAndTrue($package_hash->{'source-extract'})) {
 					if ($downloaded_file =~ /\.tar\.gz$/) {
 						systemp("tar xvfz ".$downloaded_file." -C ".$ptarget);
+					} elsif ($downloaded_file =~ /\.tgz$/) {
+						systemp("tar xvfz ".$downloaded_file." -C ".$ptarget);
 					} else {
-						die "unknown archive";
+						die "unknown archive: $downloaded_file";
 					}
 				}
 				
