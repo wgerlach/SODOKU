@@ -33,7 +33,7 @@ sub modifyINIfile {
 	
 	require Config::IniFiles; # cpanm install Config::IniFiles
 	
-	$cfg = Config::IniFiles->new( -file => $inifile );
+	my $cfg = Config::IniFiles->new( -file => $inifile );
 	
 	foreach my $section (keys %$ini_hash) {
 		my $section_hash = $ini_hash->{$section};
