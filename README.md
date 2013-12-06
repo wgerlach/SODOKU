@@ -1,8 +1,8 @@
-DeploySoftware
-==============
+SODOKU
+======
 
+a simple software deployment and configuration system
 
-deploys software.
 
 
 Usage
