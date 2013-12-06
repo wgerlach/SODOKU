@@ -65,7 +65,7 @@ sub downloadFile {
 	$file = $dir. $targetname;
 	
 	if (-e $file) {
-		if (defined $h->{'new'} || definedAndTrue $h->{'remove-existing-file'}) {
+		if (defined($h->{'new'}) || definedAndTrue($h->{'remove-existing-file'})) {
 			systemp("rm -f $file");
 		} else {
 			print "skip file: $file already exists....\n";
