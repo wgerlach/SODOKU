@@ -65,8 +65,8 @@ sub downloadFile {
 	$file = $dir. $targetname;
 	
 	if (-e $file) {
-		if (defined $h->{'new'}) {
-			systemp("rm $file");
+		if (defined $h->{'new'} || definedAndTrue $h->{'remove-existing-file'}) {
+			systemp("rm -f $file");
 		} else {
 			print "skip file: $file already exists....\n";
 			return $file;
@@ -142,8 +142,9 @@ sub datastructure_walk {
 sub setenv {
 	my ($key, $value) = @_;
 	my $envline = "export $key=$value";
-	systemp("grep -q -e '$envline' ~/.bashrc || echo '$envline' >> ~/.bashrc");
+	#systemp("grep -q -e '$envline' ~/.bashrc || echo '$envline' >> ~/.bashrc");
 	
+	bashrc_append($envline);
 	
 	if ($value =~ /\$/ || $value =~ /\~/) {
 		#make sure that environment variables are evaluated
@@ -154,6 +155,14 @@ sub setenv {
 	
 	$ENV{$key}=$value; # makes sure variable can be used even if bashrc is not sourced yet.
 	return;
+}
+
+
+sub bashrc_append {
+	my $line = shift(@_);
+	
+	systemp("grep -q -e '$line' ~/.bashrc || echo '$line' >> ~/.bashrc");
+	
 }
 
 sub git_clone {
@@ -388,6 +397,15 @@ sub function_kbasemodules {
 
 $functions->{'kbasemodules'} = \&function_kbasemodules;
 
+
+sub definedAndTrue {
+	my $x = shift(@_);
+	if (defined $x && $x == 1) {
+		return 1;
+	}
+	return 0;
+}
+
 sub install_package {
 	my ($repository, $package_hash, $package, $version, $package_args_ref) = @_;
 	
@@ -413,7 +431,8 @@ sub install_package {
 	}
 	
 	# START installation ########################
-	if (defined $already_installed{$package} && $already_installed{$package}==1) {
+	#if (defined $already_installed{$package} && $already_installed{$package}==1) {
+	if (definedAndTrue($already_installed{$package})) {
 		print "package $package already installed, skip it...\n";
 		next;
 	}
@@ -455,7 +474,7 @@ sub install_package {
 			
 			my ($dep_package, $dep_version, $dep_package_args_ref) = parsePackageString($dependency);
 			
-			if (defined $already_installed{$package} && $already_installed{$package}==1) {
+			if ( definedAndTrue( $already_installed{$package} ) ) {
 				print "dependency $dependency already installed\n";
 			}else {
 				print "install dependency $dependency for $dep_package...\n";
@@ -559,7 +578,7 @@ sub install_package {
 				
 				
 				
-				if (defined $package_hash->{'source-temporary'} && $package_hash->{'source-temporary'}==1) {
+				if (definedAndTrue $package_hash->{'source-temporary'}) {
 					$temp_dir_obj = File::Temp->newdir( TEMPLATE => 'deployXXXXX' );
 					$temp_dir = $temp_dir_obj->dirname.'/';
 				}
@@ -605,7 +624,10 @@ sub install_package {
 			} elsif ($st eq 'download') {
 				#simple download
 				
-				$downloaded_file = downloadFile('url' => $source, 'target-dir' => $ptarget, 'target-name' => $source_filename);
+				$downloaded_file = downloadFile('url' => $source,
+												'target-dir' => $ptarget,
+												'target-name' => $source_filename,
+												'remove-existing-file' => $package_hash->{'source-remove-existing-file'});
 				unless (defined $downloaded_file) {
 					die;
 				}
@@ -661,6 +683,20 @@ sub install_package {
 			setenv($key, $env_pairs->{$key}) ;
 		}
 	}
+	
+	if (defined $package_hash->{'bashrc-append'}) {
+		my @lines;
+		if (ref($package_hash->{'bashrc-append'}) eq 'ARRAY') {
+			@lines = @{$package_hash->{'bashrc-append'}};
+		} else {
+			@lines = ($package_hash->{'bashrc-append'});
+		}
+		foreach my $line (@lines) {
+			bashrc_append($line) ;
+		}
+		
+	}
+	
 	
 	if (defined $package_hash->{'exec'}) {
 		

@@ -72,16 +72,31 @@
 		"_comment" : "target: $HOME",
 		"ptarget" : "${target}apps",
 		"subpackages" : [
-					   {
-						 "source" : "mongodb-server bzr make gcc mercurial git python-biopython libcache-memcached-perl libdbi-perl bowtie",
-						 "source-type" : "apt"
-					   },
-					   {
-						 "source" : "https://github.com/MG-RAST/pipeline",
-						 "source-type" : "git"
-					   }
+						 {
+							"source" : "mongodb-server bzr make gcc mercurial git python-biopython libcache-memcached-perl libdbi-perl bowtie",
+							"source-type" : "apt"
+						 },
+						 {
+							"source" : "https://github.com/MG-RAST/pipeline",
+							"source-type" : "git"
+						 },
+						 {
+							"ptarget" : "${target}apps/bin",
+							"exec" : [
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_preprocess.pl",
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_dereplicate.pl",
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_bowtie_screen.pl",
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_genecalling.pl",
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_cluster_parallel.pl",
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_blat.py",
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_annotate.pl",
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_rna_blat.sh",
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_rna_search.pl"
+								   ]
+						 }
 					   ],
-		"depends" : ["aweclient", "aweserver", "Shock", "FragGeneScan-Wei", "MG-RAST-biotools"]
+		"set-env" : {"PATH" : "$PATH:${target}apps/FragGeneScan/1.16a/bin:${target}apps/pipeline/bin:${target}apps/pipeline/awecmd:${target}apps/biotools"},
+		"depends" : ["aweclient", "aweserver", "Shock", "MG-RAST/FragGeneScan", "MG-RAST/biotools", "MG-RAST/qiime"]
 	},
 	"AWE" : {
 		"source" : "github.com/MG-RAST/AWE/...",
@@ -116,29 +131,60 @@
 	"Shock" : {
 		"source" : "github.com/MG-RAST/Shock/...",
 		"source-type" : "go",
-		"subpackages" : [{	"source" : "http://www.mcs.anl.gov/~wtang/files/shock.cfg",
+		"subpackages" : [
+						 {	"source" : "http://www.mcs.anl.gov/~wtang/files/shock.cfg",
 							"ptarget" : "${target}/etc"
-					   }],
+						 }
+						],
 		"depends" : ["go"]
 	},
-	"FragGeneScan-Wei" : {
+	"MG-RAST/FragGeneScan" : {
 		"source": "http://www.mcs.anl.gov/~wtang/files/fgs.tar.gz",
 		"source-extract" : 1,
 		"ptarget" : "${target}apps/FragGeneScan"
 	},
-	"MG-RAST-biotools" : {
+	"MG-RAST/biotools" : {
 		"source" : ["ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/superblat",
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/blat",
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/usearch"],
 		"build-exec" : "chmod +x ${source-file}",
 		"ptarget" : "${target}apps/biotools"
 	},
-	"MG-RAST-databases" : {
+	"MG-RAST/qiime" : {
+		"subpackages" : [
+						 {
+							"source" : "libssl-dev libzmq-dev libgsl0-dev openjdk-6-jdk libxml2 libxslt1.1 libxslt1-dev ant subversion build-essential zlib1g-dev libpng12-dev libfreetype6-dev mpich2 libreadline-dev gfortran unzip libmysqlclient18 libmysqlclient-dev ghc",
+							"source-type" : "apt"
+						 },
+						 {
+							"source" : "ftp://thebeast.colorado.edu/pub/QIIME-v1.5.0-dependencies/app-deploy-qiime-1.5.0.tgz",
+							"source-extract" : 1,
+							"ptarget" : "${target}apps"
+						 },
+						 {
+							"source" : "http://www.mcs.anl.gov/~wtang/files/qiime_1.5.0_uclust.conf",
+							"source-remove-existing-file" : 1,
+							"ptarget" : "${target}apps/app-deploy-qiime-1.5.0/etc"
+						 },
+						 {
+							"exec" : "python app-deploy.py ${INSTALLDIR}/apps/qiime -f etc/qiime_1.5.0_uclust.conf --force-remove-failed-dirs",
+							"ptarget" : "${target}apps/app-deploy-qiime-1.5.0/"
+						 },
+						 {
+							"source" : "http://www.mcs.anl.gov/~wtang/files/activate.sh",
+							"source-remove-existing-file" : 1,
+							"ptarget" : "${target}apps/qiime",
+							"bashrc-append" : "source ${target}apps/qiime/activate.sh"
+						 }
+						 ]
+	},
+	"MG-RAST/databases" : {
 		"_comment" : "target: /mnt or data",
 		"source" : ["ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.1",
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.2",
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr",
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.clust"],
+		"set-env" : {"REFDBPATH" : "${target}refdb"},
 		
 		"subpackages" : [
 						 {
