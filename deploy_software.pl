@@ -483,16 +483,11 @@ sub install_package {
 		}
 	}
 	
-	if ($package ne "subpackage") {
-		
-		if (-d $ptarget) {
-			print "chdir $ptarget\n";
-			chdir($ptarget);
-		} else {
-			print STDERR "warning: could not chdir $ptarget\n";
-		}
 	
-	}
+		
+	
+	#print "chdir $ptarget\n";
+	chdir($ptarget);
 	
 	#subpackages
 	if (defined $package_hash->{'subpackages'}) {
@@ -506,6 +501,8 @@ sub install_package {
 		}
 	}
 	
+	#print "chdir $ptarget\n";
+	chdir($ptarget);
 	
 	if ($package_hash->{'depend-function'}) {
 		
