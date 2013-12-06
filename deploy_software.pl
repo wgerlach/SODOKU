@@ -454,10 +454,10 @@ sub install_package {
 		datastructure_walk('data' => $package_hash, 'sub' => \&replacePtarget, 'subarg' => $ptarget, 'nosubpackages' => 1);
 	}
 	
-	if (defined($package_hash->{'dir'}) && defined($package_hash->{'ptarget'})) {
+	if (definedAndTrue($package_hash->{'dir'}) && defined($package_hash->{'ptarget'})) {
 		die;
 	}
-	if (defined($package_hash->{'dir'})) {
+	if (definedAndTrue($package_hash->{'dir'})) {
 		$ptarget .= $package.'/';
 		$package_hash->{'ptarget'} = $ptarget;
 	}
@@ -605,6 +605,9 @@ sub install_package {
 							if (-d $src_dir) {
 								systemp("rm -rf ".$src_dir)
 							}
+						}
+						if (defined $ENV{GOPATH} && ! -d $ENV{GOPATH} ) {
+							system("mkdir -p ".$ENV{GOPATH});
 						}
 						
 					}
@@ -827,7 +830,7 @@ my @package_list = @ARGV;
 print "target: $target\n";
 
 
-if (defined $h->{'ignore'}) {
+if (definedAndTrue($h->{'ignore'})) {
 	my @ignorepackages = split(',', $h->{'ignore'});
 	foreach my $p (@ignorepackages) {
 		if (defined($repository->{$p})) {
