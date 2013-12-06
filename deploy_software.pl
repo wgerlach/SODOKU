@@ -45,6 +45,7 @@ sub modifyINIfile {
 		}
 	}
 	
+	$cfg->WriteConfig($inifile);
 }
 
 sub setINIvalue {
