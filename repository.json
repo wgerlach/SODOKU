@@ -180,13 +180,12 @@
 						 ]
 	},
 	"MG-RAST/databases" : {
-		"_comment" : "target: /mnt or data",
+		"_comment" : "target: /mnt or data, data not needed, what about directories !?",
 		"source" : ["ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.1",
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.2",
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr",
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.clust"],
 		"set-env" : {"REFDBPATH" : "${target}refdb"},
-		
 		"subpackages" : [
 						 {
 						 "source" : "ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/h_sapiens.tar.gz",
