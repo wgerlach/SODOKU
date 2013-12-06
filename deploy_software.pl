@@ -874,7 +874,7 @@ if (defined $h->{'target'}) {
 
 
 unless (defined $target) {
-	$target = getcwd;
+	$target = getcwd();
 }
 
 if (substr($target, -1, 1) ne "/") {
