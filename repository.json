@@ -96,7 +96,20 @@
 						 }
 					   ],
 		"set-env" : {"PATH" : "$PATH:${target}apps/FragGeneScan/1.16a/bin:${target}apps/pipeline/bin:${target}apps/pipeline/awecmd:${target}apps/biotools"},
-		"depends" : ["aweclient-upstart", "Shock", "MG-RAST/FragGeneScan", "MG-RAST/biotools", "MG-RAST/qiime"]
+		"depends" : ["AWE", "Shock", "aweclient-upstart", "MG-RAST/FragGeneScan", "MG-RAST/biotools", "MG-RAST/qiime"]
+	},
+	"awclient-cfg" : {
+		"set-ini-values" : {
+			"file" : "${target}/etc/awe.cfg",
+			"cfg-string" : "${arguments}"
+		}
+	},
+	"aweclient-upstart" : {
+		"_comment" : "requires root",
+		"exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client",
+		"source" : "http://www.mcs.anl.gov/~wtang/files/awe-client.conf",
+		"source-remove-existing-file" : 1,
+		"ptarget" : "/etc/init/"
 	},
 	"AWE" : {
 		"source" : "github.com/MG-RAST/AWE/...",
@@ -108,18 +121,6 @@
 						 }
 						 ],
 		"depends" : ["go"]
-	},
-	"awclient-cfg" : {
-		"set-ini-values" : {
-								"file" : "${target}/etc/awe.cfg",
-								"cfg-string" : "${arguments}"
-							}
-	},
-	"aweclient-upstart" : {
-		"exec" : ["sudo ln -s -f /lib/init/upstart-job /etc/init.d/awe-client",
-				  "sudo rm -f /etc/init/awe-client.conf",
-				  "cd ${target} && rm -f ${target}awe-client.conf && wget http://www.mcs.anl.gov/~wtang/files/awe-client.conf",
-				  "sudo mv awe-client.conf /etc/init/awe-client.conf"]
 	},
 	"go" : {
 		"source" : "-u release https://code.google.com/p/go",
