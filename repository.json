@@ -1,6 +1,6 @@
 {
 	"qiime" : {
-		"_comment" : "QIIME uses a configuration file like qiime.conf for the deployment, which has to given as an argument to this package",
+		"_comment" : "QIIME uses a configuration file like qiime.conf for the deployment, which has to be given as an argument to this package",
 		"source" : "git://github.com/qiime/qiime-deploy.git",
 		"source-temporary" : 1,
 		"build-exec" : "cd ${source-dir} ; python qiime-deploy.py $target/qiime_software/ -f ${1} --force-remove-failed-dirs",
@@ -180,7 +180,7 @@
 						 ]
 	},
 	"MG-RAST/databases" : {
-		"_comment" : "target: /mnt or data, data not needed, what about directories !?",
+		"_comment" : "target: /mnt or data, data not needed, what about directories and env !?",
 		"source" : ["ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.1",
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.2",
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr",
