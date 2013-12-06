@@ -872,15 +872,24 @@ if (defined $h->{'target'}) {
 	$target = $h->{'target'};
 }
 
-if (defined $target) {
-	unless (-d $target) {
-		die "target \"$target\" not found!\n";
-	}
+
+unless (defined $target) {
+	$target = getcwd;
 }
 
 if (substr($target, -1, 1) ne "/") {
 	$target .= "/";
 }
+
+if (defined $target) {
+	unless (-d $target) {
+		die "target \"$target\" not found!\n";
+	}
+} else {
+	die;
+}
+
+
 
 
 
