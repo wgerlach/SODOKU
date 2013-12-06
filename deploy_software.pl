@@ -412,7 +412,7 @@ sub install_package {
 	print 'ref1: '.ref($version)."\n";
 	
 	
-	if (defined $package_hash->{'ignore'}) {
+	if (definedAndTrue($package_hash->{'ignore'})) {
 		print STDERR "warning: package $package ignored.\n";
 		return;
 	}
@@ -735,7 +735,7 @@ sub install_package {
 #############################################################
 
 
-GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repository');
+GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repository=s', 'ignore=s');
 
 unless ( @ARGV  || @ARGV > 1) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
@@ -744,6 +744,7 @@ unless ( @ARGV  || @ARGV > 1) {
 	print "     --update to update existing repositories if possible \n";
 	print "     --new to delete repositories before cloning \n";
 	print "     --all to install all packages in repository \n";
+	print "     --ignore=package1,package2\n";
 	exit 1;
 }
 
@@ -824,6 +825,18 @@ datastructure_walk('data' => $repository, 'sub' => \&process_scalar); # for my "
 my @package_list = @ARGV;
 
 print "target: $target\n";
+
+
+if (defined $h->{'ignore'}) {
+	my @ignorepackages = split(',', $h->{'ignore'});
+	foreach my $p (@ignorepackages) {
+		if (defined($repository->{$p})) {
+			$repository->{$p}->{'ignore'} = 1;
+		} else {
+			die "package $p not found";
+		}
+	}
+}
 
 
 

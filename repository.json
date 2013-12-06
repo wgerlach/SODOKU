@@ -121,7 +121,6 @@
 		"depends" : ["AWE"]
 	},
 	"go" : {
-		"ignore" : 1,
 		"source" : "-u release https://code.google.com/p/go",
 		"source-type" : "mercurial",
 		"build-exec" : "cd ${target}go/src && ./all.bash",
