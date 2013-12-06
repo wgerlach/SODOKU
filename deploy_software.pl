@@ -28,6 +28,74 @@ sub systemp {
 	return system(@_);
 }
 
+sub modifyINIfile {
+	my ($inifile, $ini_hash) = @_;
+	
+	require Config::IniFiles; # cpanm install Config::IniFiles
+	
+	$cfg = Config::IniFiles->new( -file => $inifile );
+	
+	foreach my $section (keys %$ini_hash) {
+		my $section_hash = $ini_hash->{$section};
+		foreach my $key (keys %$section_hash) {
+			my $value = $section_hash->{$key};
+			
+			setINIvalue($cfg, $section, $key, $value);
+			
+		}
+	}
+	
+}
+
+sub setINIvalue {
+	my ($cfg, $section, $key, $value) = @_;
+	
+	
+	if ($cfg->exists($section, $key)) {
+		$cfg->setval($section, $key, $value);
+	} else {
+		$cfg->newval($section, $key, $value);
+	}
+	
+}
+
+#example:[section]key=value?key=value...
+sub INI_cmds_to_hash {
+	
+	my $strings = shift(@_);
+	
+	my $ini_hash={};
+	foreach my $parameter (@{$strings}) {
+		my ($section, $pair_string) = $parameter =~ /^\[(\S+)\](.*)$/;
+		
+		unless (defined $section && defined $pair_string) {
+			print $parameter."\n";
+			die;
+		}
+		
+		my @pairs = split('\?', $pair_string);
+		if (@pairs == 0) {
+			die;
+		}
+		
+		foreach my $pair (@pairs) {
+			my ($key, $value) = split('=', $pair);
+			unless (defined $key && defined $value) {
+				print $parameter." , ".$pair."\n";
+				die;
+			}
+			$ini_hash->{$section}->{$key} = $value;
+		}
+		
+	}
+	
+	
+	return  $ini_hash;
+}
+
+
+
+
 sub downloadFile {
 	my %args = @_;
 	
@@ -688,6 +756,22 @@ sub install_package {
 		foreach my $key (keys %{$env_pairs} ) {
 			setenv($key, $env_pairs->{$key}) ;
 		}
+	}
+	
+	
+	if (defined($package_hash->{'set-ini-values'})) {
+		my $inifile = $package_hash->{'set-ini-values'}->{'file'};
+		unless (defined $inifile || ! -e $inifile) {
+			die "INI-file $inifile not defined or not found";
+		}
+		
+		my $cfg_string = $package_hash->{'set-ini-values'}->{'cfg-string'} || "";
+		
+		if ($cfg_string ne "") {
+			my $ini_hash = INI_cmds_to_hash(($cfg_string));
+			modifyINIfile($inifile, $ini_hash)
+		};
+		
 	}
 	
 	if (defined $package_hash->{'bashrc-append'}) {
