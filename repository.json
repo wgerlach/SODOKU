@@ -191,6 +191,15 @@
 		"source-temporary" : 1,
 		"build-type" : "make-install"
 	},
+	"cdbfasta" : {
+		"source" : {	"url" : "http://sourceforge.net/projects/cdbfasta/files/latest/download?source=files",
+						"filename" : "cdbfasta.tar.gz",
+						"subdir" : "cdbfasta"
+					}
+		"source-extract" : 1,
+		"source-temporary" : 1,
+		"build-type" : "make-install"
+	},
 	"MG-RAST/databases" : {
 		"_comment" : "not needed",
 		"source" : ["ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.1",
