@@ -753,9 +753,6 @@ sub install_package {
 					system("cd $build_dir && make && make install")== 0 or die;
 				}
 				
-				
-				
-				die;
 			} else {
 				# no build
 			}
