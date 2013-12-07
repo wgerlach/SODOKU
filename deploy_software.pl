@@ -610,8 +610,10 @@ sub install_package {
 			
 			my $source;
 			my $source_filename;
+			my $source_subdir;
 			if (ref($source_obj) eq 'HASH') {
 				$source = $source_obj->{'url'};
+				$source_subdir = $source_obj->{'subdir'};
 				$source_filename=$source_obj->{'filename'};
 			} else {
 				$source = $source_obj;
@@ -742,15 +744,20 @@ sub install_package {
 				
 				my $build_dir = $sourcedir;
 				
-				# change directory if needed
-				if (! -e $build_dir.'configure' && -e $build_dir.'Makefile' ) {
-					opendir my $dir, "/some/path" or die "Cannot open directory: $!";
-					my @files = readdir $dir;
-					closedir $dir;
-					print join(',', @files)."\n";
-					die;
-					
+				if (defined $source_subdir) {
+					$build_dir .= $source_subdir;
 				}
+				
+				
+				# change directory if needed
+				#if (! -e $build_dir.'configure' && -e $build_dir.'Makefile' ) {
+				#	opendir my $dir, "/some/path" or die "Cannot open directory: $!";
+				#	my @files = readdir $dir;
+				#	closedir $dir;
+				#	print join(',', @files)."\n";
+				#	die;
+				#
+				#}
 				
 				
 				if (substr($build_dir,-1,1) ne '/') {

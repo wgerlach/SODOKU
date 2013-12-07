@@ -186,7 +186,7 @@
 						 ]
 	},
 	"jellyfish" : {
-		"source" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-1.1.5.tar.gz",
+		"source" : { "url" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-1.1.5.tar.gz", "subdir" : "jellyfish-1.1.5" },
 		"source-extract" : 1,
 		"source-temporary" : 1,
 		"build-type" : "make-install"
