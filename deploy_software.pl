@@ -143,7 +143,7 @@ sub downloadFile {
 	}
 	
 	
-	systemp("cd $dir && curl -o $targetname --retry 1 --retry-delay 5 \"$url\"") == 0 or die;
+	systemp("cd $dir && curl -L -o $targetname --retry 1 --retry-delay 5 \"$url\"") == 0 or die;
 	
 	unless (-s $file) {
 		die "file $file was not downloaded!?";
