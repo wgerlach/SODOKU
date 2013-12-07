@@ -647,7 +647,6 @@ sub install_package {
 			if (definedAndTrue($package_hash->{'source-temporary'})) {
 				$temp_dir_obj = File::Temp->newdir( TEMPLATE => 'deployXXXXX' );
 				$temp_dir = $temp_dir_obj->dirname.'/';
-				$sourcedir=$temp_dir;
 			}
 			
 			if ($st eq 'git' || $st eq 'mercurial' || $st eq 'go') {
@@ -716,6 +715,7 @@ sub install_package {
 					} else {
 						die "unknown archive: $downloaded_file";
 					}
+					$sourcedir=$temp_dir;
 				}
 				
 			} else {
@@ -741,9 +741,18 @@ sub install_package {
 			} elsif ($build_type eq 'make-install'){
 				
 				my $build_dir = $sourcedir;
-				if (defined($package_hash->{'build-subdir'})) {
-					$build_dir.=$package_hash->{'build-subdir'};
+				
+				# change directory if needed
+				if (! -e $build_dir.'configure' && -e $build_dir.'Makefile' ) {
+					opendir my $dir, "/some/path" or die "Cannot open directory: $!";
+					my @files = readdir $dir;
+					closedir $dir;
+					print join(',', @files)."\n";
+					die;
+					
 				}
+				
+				
 				if (substr($build_dir,-1,1) ne '/') {
 					$build_dir .= '/';
 				}
