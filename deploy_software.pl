@@ -644,14 +644,17 @@ sub install_package {
 				$source = $package_hash->{'git-server'}.$source;
 			}
 			
+			if (definedAndTrue($package_hash->{'source-temporary'})) {
+				$temp_dir_obj = File::Temp->newdir( TEMPLATE => 'deployXXXXX' );
+				$temp_dir = $temp_dir_obj->dirname.'/';
+				$sourcedir=$temp_dir;
+			}
+			
 			if ($st eq 'git' || $st eq 'mercurial' || $st eq 'go') {
 				
 				
 				
-				if (definedAndTrue($package_hash->{'source-temporary'})) {
-					$temp_dir_obj = File::Temp->newdir( TEMPLATE => 'deployXXXXX' );
-					$temp_dir = $temp_dir_obj->dirname.'/';
-				}
+				
 				
 				
 				if ($st eq 'git') {
@@ -737,7 +740,7 @@ sub install_package {
 				
 			} elsif ($build_type eq 'make-install'){
 				
-				my $build_dir = $temp_dir;
+				my $build_dir = $sourcedir;
 				if (defined($package_hash->{'build-subdir'})) {
 					$build_dir.=$package_hash->{'build-subdir'};
 				}
@@ -750,7 +753,7 @@ sub install_package {
 				}
 				
 				if (-e $build_dir.'Makefile') {
-					system("cd $build_dir && make && make install")== 0 or die;
+					system("cd $build_dir && make && make install")== 0 or die; #TODO make -j4
 				}
 				
 			} else {
