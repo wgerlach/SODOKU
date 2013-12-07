@@ -195,7 +195,7 @@
 		"source" : {	"url" : "http://sourceforge.net/projects/cdbfasta/files/latest/download?source=files",
 						"filename" : "cdbfasta.tar.gz",
 						"subdir" : "cdbfasta"
-					}
+					},
 		"source-extract" : 1,
 		"source-temporary" : 1,
 		"build-type" : "make-install"
