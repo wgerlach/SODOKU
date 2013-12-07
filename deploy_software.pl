@@ -738,7 +738,7 @@ sub install_package {
 			} elsif ($build_type eq 'make-install'){
 				
 				my $build_dir = $temp_dir;
-				if (defined($package_hash->{'build-subdir'}) {
+				if (defined($package_hash->{'build-subdir'})) {
 					$build_dir.=$package_hash->{'build-subdir'};
 				}
 				if (substr($build_dir,-1,1) ne '/') {
