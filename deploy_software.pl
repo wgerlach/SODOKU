@@ -768,9 +768,14 @@ sub install_package {
 					system("cd $build_dir && ./configure --prefix=$ptarget") == 0 or die;
 				}
 				
+				if (-e $build_dir.'Makefile') {
+					system("cd $build_dir && make")== 0 or die; #TODO make -j4
+				} else {
+					die "Makefile in $build_dir not found";
+				}
 				if ($build_type eq 'make-install') {
 					if (-e $build_dir.'Makefile') {
-						system("cd $build_dir && make && make install")== 0 or die; #TODO make -j4
+						system("cd $build_dir && make install")== 0 or die; #TODO make -j4
 					} else {
 						die "Makefile in $build_dir not found";
 					}
