@@ -185,6 +185,13 @@
 						 }
 						 ]
 	},
+	"jellyfish" : {
+		"source" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-1.1.5.tar.gz",
+		"source-extract" : 1,
+		"source-temporary" : 1,
+		"build-type" : "make-install",
+		"build-subdir" : "jellyfish-1.1.5"
+	}
 	"MG-RAST/databases" : {
 		"_comment" : "not needed",
 		"source" : ["ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.1",

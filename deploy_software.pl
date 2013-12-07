@@ -707,9 +707,9 @@ sub install_package {
 				
 				if (definedAndTrue($package_hash->{'source-extract'})) {
 					if ($downloaded_file =~ /\.tar\.gz$/) {
-						systemp("tar xvfz ".$downloaded_file." -C ".$ptarget);
+						systemp("tar xvfz ".$downloaded_file." -C ".$temp_dir);
 					} elsif ($downloaded_file =~ /\.tgz$/) {
-						systemp("tar xvfz ".$downloaded_file." -C ".$ptarget);
+						systemp("tar xvfz ".$downloaded_file." -C ".$temp_dir);
 					} else {
 						die "unknown archive: $downloaded_file";
 					}
@@ -735,7 +735,26 @@ sub install_package {
 				print "build-exec:\n";
 				systemp($exec) == 0 or die;
 				
-			} elsif ($build_type eq 'make'){
+			} elsif ($build_type eq 'make-install'){
+				
+				my $build_dir = $temp_dir;
+				if (defined($package_hash->{'build-subdir'}) {
+					$build_dir.=$package_hash->{'build-subdir'};
+				}
+				if (substr($build_dir,-1,1) ne '/') {
+					$build_dir .= '/';
+				}
+				
+				if (-e $build_dir.'configure') {
+					system("cd $build_dir && ./configure --prefix=$ptarget") == 0 or die;
+				}
+				
+				if (-e $build_dir.'Makefile') {
+					system("cd $build_dir && make && make install")== 0 or die;
+				}
+				
+				
+				
 				die;
 			} else {
 				# no build
