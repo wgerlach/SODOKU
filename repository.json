@@ -194,7 +194,7 @@
 		"install-type" : "copy",
 		"install-files" : ["bowtie","bowtie-build","bowtie-inspect"],
 		"ptarget" : "${target}bin"
-	}
+	},
 	"jellyfish" : {
 		"version" : [1,1,5],
 		"source" : {	"url" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-${v1}.${v2}.${v3}.tar.gz",
