@@ -693,7 +693,7 @@ sub install_package {
 							}
 						}
 						if (defined $ENV{GOPATH} && ! -d $ENV{GOPATH} ) {
-							system("mkdir -p ".$ENV{GOPATH});
+							systemp("mkdir -p ".$ENV{GOPATH});
 						}
 						
 					}
@@ -774,17 +774,17 @@ sub install_package {
 				}
 				
 				if (-e $build_dir.'configure') {
-					system("cd $build_dir && ./configure --prefix=$ptarget") == 0 or die;
+					systemp("cd $build_dir && ./configure --prefix=$ptarget") == 0 or die;
 				}
 				
 				if (-e $build_dir.'Makefile') {
-					system("cd $build_dir && make")== 0 or die; #TODO make -j4
+					systemp("cd $build_dir && make")== 0 or die; #TODO make -j4
 				} else {
 					die "Makefile in $build_dir not found";
 				}
 				if ($build_type eq 'make-install') {
 					if (-e $build_dir.'Makefile') {
-						system("cd $build_dir && make install")== 0 or die; #TODO make -j4
+						systemp("cd $build_dir && make install")== 0 or die; #TODO make -j4
 					} else {
 						die "Makefile in $build_dir not found";
 					}
@@ -813,7 +813,7 @@ sub install_package {
 								die "installation file $build_dir.$install_file not found";
 							}
 							
-							system("cp $build_dir".$install_file." $ptarget") == 0 or die;
+							systemp("cp $build_dir".$install_file." $ptarget") == 0 or die;
 							
 						}
 						
