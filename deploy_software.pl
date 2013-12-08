@@ -475,6 +475,20 @@ sub definedAndTrue {
 	return 0;
 }
 
+sub get_array {
+	my $ref = shift(@_);
+	my @array;
+	
+	if (ref($ref) eq 'ARRAY' ) {
+		@array = @{$ref};
+	} else {
+		@array = ($ref);
+	}
+	
+	return @array;
+}
+
+
 sub install_package {
 	my ($repository, $package_hash, $package, $version, $package_args_ref) = @_;
 	
@@ -596,12 +610,7 @@ sub install_package {
 	}
 
 	if (defined $package_hash->{'source'}) {
-		my @sources;
-		if (ref($package_hash->{'source'}) eq 'ARRAY') {
-			@sources = @{$package_hash->{'source'}};
-		} else {  # scalar or hash
-			@sources = ($package_hash->{'source'});
-		}
+		my @sources = get_array($package_hash->{'source'});
 		
 		my $build_type = $package_hash->{'build-type'} || 'exec';
 		
@@ -726,7 +735,7 @@ sub install_package {
 			}
 			
 			
-			
+			my $build_dir;
 			# different build-types
 			if (defined($package_hash->{'build-exec'})) {
 				my $exec = $package_hash->{'build-exec'};
@@ -742,7 +751,7 @@ sub install_package {
 				
 			} elsif ($build_type eq 'make-install' || $build_type eq 'make'){
 				
-				my $build_dir = $sourcedir;
+				$build_dir = $sourcedir;
 				
 				if (defined $source_subdir) {
 					$build_dir .= $source_subdir;
@@ -786,7 +795,35 @@ sub install_package {
 			}
 			
 			
+			if (defined($package_hash->{'install-type'})) {
 				
+				unless (defined $build_dir) {
+					die;
+				}
+				
+				if ($package_hash->{'install-type'} eq "copy") {
+					print "install-type: copy\n";
+					if (defined($package_hash->{'install-files'})) {
+						my $install_files_obj = $package_hash->{'install-files'};
+						my @install_files_array = get_array($install_files_obj);
+						
+						foreach my $install_file (@install_files_array) {
+							
+							unless (-e $build_dir.$install_file) {
+								die "installation file $build_dir.$install_file not found";
+							}
+							
+							system("cp $build_dir".$install_file." $ptarget") == 0 or die;
+							
+						}
+						
+					} else {
+						die;
+					}
+				} else {
+					die;
+				}
+			}
 			
 			
 			

@@ -186,7 +186,8 @@
 						 ]
 	},
 	"jellyfish" : {
-		"source" : { "url" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-1.1.5.tar.gz", "subdir" : "jellyfish-1.1.5" },
+		"version" : [1,1,5],
+		"source" : { "url" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-${v1}.${v2}.${v3}.tar.gz", "subdir" : "jellyfish-${v1}.${v2}.${v3}" },
 		"source-extract" : 1,
 		"source-temporary" : 1,
 		"build-type" : "make-install"
@@ -198,7 +199,10 @@
 					},
 		"source-extract" : 1,
 		"source-temporary" : 1,
-		"build-type" : "make-install"
+		"build-type" : "make",
+		"install-type" = "copy",
+		"install-files" = ["cdbfasta", "cdbyank"],
+		"ptarget" : "${target}bin"
 	},
 	"MG-RAST/databases" : {
 		"_comment" : "not needed",
