@@ -190,6 +190,8 @@
 		"source" : {	"url" : "http://sourceforge.net/projects/bowtie-bio/files/bowtie/${v1}.${v2}.${v3}/bowtie-${v1}.${v2}.${v3}-src.zip",
 						"subdir" : "bowtie-${v1}.${v2}.${v3}"
 					},
+		"source-extract" : 1,
+		"source-temporary" : 1,
 		"build-type" : "make",
 		"install-type" : "copy",
 		"install-files" : ["bowtie","bowtie-build","bowtie-inspect"],
