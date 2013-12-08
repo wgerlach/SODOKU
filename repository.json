@@ -200,8 +200,8 @@
 		"source-extract" : 1,
 		"source-temporary" : 1,
 		"build-type" : "make",
-		"install-type" = "copy",
-		"install-files" = ["cdbfasta", "cdbyank"],
+		"install-type" : "copy",
+		"install-files" : ["cdbfasta", "cdbyank"],
 		"ptarget" : "${target}bin"
 	},
 	"MG-RAST/databases" : {
