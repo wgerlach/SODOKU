@@ -723,6 +723,8 @@ sub install_package {
 						systemp("tar xvfz ".$downloaded_file." -C ".$temp_dir);
 					} elsif ($downloaded_file =~ /\.tgz$/) {
 						systemp("tar xvfz ".$downloaded_file." -C ".$temp_dir);
+					} elsif ($downloaded_file =~ /\.zip$/) {
+						systemp("unzip ".$downloaded_file." -d ".$temp_dir);
 					} else {
 						die "unknown archive: $downloaded_file";
 					}
