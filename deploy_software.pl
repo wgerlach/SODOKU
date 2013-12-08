@@ -813,7 +813,7 @@ sub install_package {
 								die "installation file $build_dir.$install_file not found";
 							}
 							
-							systemp("cp $build_dir".$install_file." $ptarget") == 0 or die;
+							systemp("cp -f $build_dir".$install_file." $ptarget") == 0 or die;
 							
 						}
 						
