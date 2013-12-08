@@ -73,7 +73,7 @@
 		"ptarget" : "${target}apps",
 		"subpackages" : [
 						 {
-							"source" : "python-biopython libcache-memcached-perl libdbi-perl bowtie",
+							"source" : "python-biopython libcache-memcached-perl libdbi-perl",
 							"source-type" : "apt"
 						 },
 						 {
@@ -96,7 +96,7 @@
 						 }
 					   ],
 		"set-env" : {"PATH" : "$PATH:${target}apps/FragGeneScan/1.16a/bin:${target}apps/pipeline/bin:${target}apps/pipeline/awecmd:${target}apps/biotools"},
-		"depends" : ["AWE", "Shock", "MG-RAST/FragGeneScan", "MG-RAST/biotools", "MG-RAST/qiime"]
+		"depends" : ["AWE", "Shock", "MG-RAST/FragGeneScan", "MG-RAST/biotools", "MG-RAST/qiime", "bowtie"]
 	},
 	"awclient-cfg" : {
 		"set-ini-values" : {
@@ -185,9 +185,21 @@
 						 }
 						 ]
 	},
+	"bowtie" : {
+		"version" : [1,0,0],
+		"source" : {	"url" : "http://sourceforge.net/projects/bowtie-bio/files/bowtie/${v1}.${v2}.${v3}/bowtie-${v1}.${v2}.${v3}-src.zip",
+						"subdir" : "bowtie-${v1}.${v2}.${v3}"
+					},
+		"build-type" : "make",
+		"install-type" : "copy",
+		"install-files" : ["bowtie","bowtie-build","bowtie-inspect"],
+		"ptarget" : "${target}bin"
+		
+	}
 	"jellyfish" : {
 		"version" : [1,1,5],
-		"source" : { "url" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-${v1}.${v2}.${v3}.tar.gz", "subdir" : "jellyfish-${v1}.${v2}.${v3}" },
+		"source" : {	"url" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-${v1}.${v2}.${v3}.tar.gz",
+						"subdir" : "jellyfish-${v1}.${v2}.${v3}" },
 		"source-extract" : 1,
 		"source-temporary" : 1,
 		"build-type" : "make-install"
