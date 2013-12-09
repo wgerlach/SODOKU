@@ -96,7 +96,7 @@
 						 }
 					   ],
 		"set-env" : {"PATH" : "$PATH:${target}apps/FragGeneScan/1.16a/bin:${target}apps/pipeline/bin:${target}apps/pipeline/awecmd:${target}apps/biotools"},
-		"depends" : ["AWE", "Shock", "MG-RAST/FragGeneScan", "MG-RAST/biotools", "MG-RAST/qiime", "bowtie", "jellyfish", "cdbfasta"]
+		"depends" : ["AWE", "Shock", "MG-RAST/FragGeneScan", "MG-RAST/biotools", "MG-RAST/qiime==1.5.0", "bowtie==1.0.0", "jellyfish==1.1.5", "cdbfasta"]
 	},
 	"aweclient/cfg" : {
 		"ptarget" : "${target}etc",
@@ -165,24 +165,25 @@
 		"ptarget" : "${target}apps/biotools"
 	},
 	"MG-RAST/qiime" : {
+		"version" : [1,5,0],
 		"subpackages" : [
 						 {
 							"source" : "libssl-dev libzmq-dev libgsl0-dev openjdk-6-jdk libxml2 libxslt1.1 libxslt1-dev ant subversion build-essential zlib1g-dev libpng12-dev libfreetype6-dev mpich2 libreadline-dev gfortran unzip libmysqlclient18 libmysqlclient-dev ghc",
 							"source-type" : "apt"
 						 },
 						 {
-							"source" : "ftp://thebeast.colorado.edu/pub/QIIME-v1.5.0-dependencies/app-deploy-qiime-1.5.0.tgz",
+							"source" : "ftp://thebeast.colorado.edu/pub/QIIME-v${v1}.${v2}.${v3}-dependencies/app-deploy-qiime-${v1}.${v2}.${v3}.tgz",
 							"source-extract" : 1,
 							"ptarget" : "${target}apps"
 						 },
 						 {
-							"source" : "http://www.mcs.anl.gov/~wtang/files/qiime_1.5.0_uclust.conf",
+							"source" : "http://www.mcs.anl.gov/~wtang/files/qiime_${v1}.${v2}.${v3}_uclust.conf",
 							"source-remove-existing-file" : 1,
-							"ptarget" : "${target}apps/app-deploy-qiime-1.5.0/etc"
+							"ptarget" : "${target}apps/app-deploy-qiime-${v1}.${v2}.${v3}/etc"
 						 },
 						 {
-							"exec" : "python app-deploy.py ${target}apps/qiime -f etc/qiime_1.5.0_uclust.conf --force-remove-failed-dirs",
-							"ptarget" : "${target}apps/app-deploy-qiime-1.5.0/"
+							"exec" : "python app-deploy.py ${target}apps/qiime -f etc/qiime_${v1}.${v2}.${v3}_uclust.conf --force-remove-failed-dirs",
+							"ptarget" : "${target}apps/app-deploy-qiime-${v1}.${v2}.${v3}/"
 						 },
 						 {
 							"source" : "http://www.mcs.anl.gov/~wtang/files/activate.sh",
