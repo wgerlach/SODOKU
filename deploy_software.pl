@@ -871,6 +871,9 @@ sub install_package {
 			print STDERR "warning: cfg_string emtpy, will not modify $inifile\n";
 		};
 		
+	} else {
+		print "set-ini-values not defined !?\n";
+		
 	}
 	
 	if (defined $package_hash->{'bashrc-append'}) {
