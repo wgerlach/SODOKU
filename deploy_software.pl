@@ -177,9 +177,11 @@ sub datastructure_walk {
 	my $sub = $arghash{'sub'};
 	my $arg = $arghash{'subarg'};
 	
+	my $show=0;
+	
 	if (ref($datastructure) eq 'HASH') {
 		while (my ($k, $v) = each %$datastructure) {
-			print "goto $k\n";
+			if ($show==1) print "goto $k\n";
 			if (ref($v) eq '') {
 				#print "scalar: ".$datastructure->{$k}."\n";
 				$datastructure->{$k} = $sub->($v, $arg);
@@ -860,6 +862,8 @@ sub install_package {
 		if ($cfg_string ne "") {
 			my $ini_hash = INI_cmds_to_hash( [ $cfg_string ] );
 			modifyINIfile($inifile, $ini_hash)
+		}else {
+			print STDERR "warning: cfg_string emtpy, will not modify $inifile\n";
 		};
 		
 	}
