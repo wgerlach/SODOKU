@@ -78,8 +78,7 @@ sub INI_cmds_to_hash {
 		my ($section, $pair_string) = $parameter =~ /^\[(\S+)\](.*)$/;
 		
 		unless (defined $section && defined $pair_string) {
-			print $parameter."\n";
-			die;
+			die "could not parse config string: $parameter, required format: [section]key=value";
 		}
 		
 		my @pairs = split('\?', $pair_string);
@@ -384,7 +383,7 @@ sub replacePtarget {
 sub parsePackageString{
 	my $package_string = shift(@_);
 	
-	print "package_string: $package_string\n";
+	#print "package_string: $package_string\n";
 	
 	my $package = undef;
 	my ($p, $package_arg_line) = $package_string =~ /^(.*)(\(.*\))$/;
@@ -392,9 +391,8 @@ sub parsePackageString{
 	my @package_args=();
 	if (defined $package_arg_line) {
 		$package = $p;
-		print "package_arg_lineA: $package_arg_line\n";
 		($package_arg_line)= $package_arg_line =~ /^\((.*)\)$/;
-		print "package_arg_lineB: $package_arg_line\n";
+		#print "package_arg_lineB: $package_arg_line\n";
 		
 		if (defined $package_arg_line && $package_arg_line ne "") {
 			@package_args = split(' ', $package_arg_line) ;
@@ -405,7 +403,7 @@ sub parsePackageString{
 		$package = $package_string;
 	}
 	
-	print "package_args_got: ".join(',', @package_args)."\n";
+	#print "package_args_got: ".join(',', @package_args)."\n";
 	
 	
 	my $argref = undef;
