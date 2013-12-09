@@ -98,7 +98,7 @@
 		"set-env" : {"PATH" : "$PATH:${target}apps/FragGeneScan/1.16a/bin:${target}apps/pipeline/bin:${target}apps/pipeline/awecmd:${target}apps/biotools"},
 		"depends" : ["AWE", "Shock", "MG-RAST/FragGeneScan", "MG-RAST/biotools", "MG-RAST/qiime", "bowtie", "jellyfish", "cdbfasta"]
 	},
-	"awclient-cfg" : {
+	"aweclient-cfg" : {
 		"set-ini-values" : {
 			"file" : "${target}/etc/awe.cfg",
 			"cfg-string" : "${arguments}"
