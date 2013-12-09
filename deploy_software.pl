@@ -392,7 +392,7 @@ sub parsePackageString{
 	my @package_args=();
 	if (defined $package_arg_line) {
 		$package = $p;
-		$package_arg_line =~ /^\((.*)\)$/;
+		$package_arg_line= $package_arg_line =~ /^\((.*)\)$/;
 		unless (defined $package_arg_line) {
 			$package_arg_line = "";
 		}
