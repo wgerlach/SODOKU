@@ -393,11 +393,11 @@ sub parsePackageString{
 	if (defined $package_arg_line) {
 		$package = $p;
 		$package_arg_line= $package_arg_line =~ /^\((.*)\)$/;
-		unless (defined $package_arg_line) {
-			$package_arg_line = "";
-		}
+		print "package_arg_line: $package_arg_line\n";
 		
-		@package_args = split(' ', $package_arg_line) ;
+		if (defined $package_arg_line && $package_arg_line ne "") {
+			@package_args = split(' ', $package_arg_line) ;
+		}
 
 		
 	} else {
