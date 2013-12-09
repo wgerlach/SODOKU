@@ -853,7 +853,7 @@ sub install_package {
 	}
 	
 	
-	if (defined(v->{'set-ini-values'})) {
+	if (defined($package_hash->{'set-ini-values'})) {
 		
 		print "set-ini-values\n";
 		
