@@ -1056,6 +1056,12 @@ foreach my $package_string (@package_list) {
 	
 	my $pack_hash = $repository->{$package};
 	unless (defined $pack_hash) {
+		print "repository:\n";
+		foreach my $p (keys(%$repository)) {
+			print "$p\n";
+		}
+		print "\n";
+		
 		die "package $package not found\n";
 	}
 	
