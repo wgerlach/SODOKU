@@ -7,7 +7,7 @@ use Cwd 'abs_path';
 use Getopt::Long;
 use File::Basename;
 eval "use JSON; 1"
-or die "perl module required, e.g.: sudo apt-get install cpanminus ; cpanm install JSON";
+or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm install JSON";
 
 use File::Temp;
 #use LWP::UserAgent;
@@ -33,7 +33,9 @@ sub systemp {
 sub modifyINIfile {
 	my ($inifile, $ini_hash) = @_;
 	
-	require Config::IniFiles; # cpanm install Config::IniFiles
+	eval "require Config::IniFiles; 1" # cpanm install Config::IniFiles
+	or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm install Config::IniFiles";
+	
 	
 	my $cfg = Config::IniFiles->new( -file => $inifile );
 	
