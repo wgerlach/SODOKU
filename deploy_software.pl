@@ -394,7 +394,7 @@ sub parsePackageString{
 		$package = $p;
 		$package_arg_line =~ /^\((.*)\)$/
 		unless (defined $package_arg_line) {
-			die;
+			$package_arg_line = "";
 		}
 		
 		@package_args = split(' ', $package_arg_line) ;
