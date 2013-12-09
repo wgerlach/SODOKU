@@ -99,8 +99,11 @@
 		"depends" : ["AWE", "Shock", "MG-RAST/FragGeneScan", "MG-RAST/biotools", "MG-RAST/qiime", "bowtie", "jellyfish", "cdbfasta"]
 	},
 	"aweclient-cfg" : {
+		"source" : "http://www.mcs.anl.gov/~wtang/files/awe.cfg",
+		"source-remove-existing-file" : 1,
+		"ptarget" : "${target}etc",
 		"set-ini-values" : {
-			"file" : "${target}/etc/awe.cfg",
+			"file" : "${ptarget}awe.cfg",
 			"cfg-string" : "${arguments}"
 		}
 	},
