@@ -36,7 +36,7 @@ sub modifyINIfile {
 	eval "require Config::IniFiles; 1" # cpanm install Config::IniFiles
 	or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm install Config::IniFiles";
 	
-	print "read INI-file $inifile\";
+	print "read INI-file $inifile\n";
 	my $cfg = Config::IniFiles->new( -file => $inifile );
 	
 	foreach my $section (keys %$ini_hash) {
@@ -49,7 +49,7 @@ sub modifyINIfile {
 		}
 	}
 	
-	print "write INI-file $inifile\";
+	print "write INI-file $inifile\n";
 	$cfg->WriteConfig($inifile);
 	
 }
