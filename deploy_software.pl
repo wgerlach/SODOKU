@@ -507,8 +507,8 @@ sub get_array {
 sub install_package {
 	my ($repository, $package_hash, $package, $version, $package_args_ref) = @_;
 	
-	print 'ref1: '.ref($version)."\n";
-	
+	#print 'ref1: '.ref($version)."\n";
+	print "$package: ". Dumper($package_hash);
 	
 	if (definedAndTrue($package_hash->{'ignore'})) {
 		print STDERR "package $package ignored.\n";
