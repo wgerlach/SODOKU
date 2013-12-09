@@ -1054,8 +1054,12 @@ foreach my $package_string (@package_list) {
 	
 	my ($package, $version, $package_args_ref) = parsePackageString($package_string);
 	
-
-	install_package($repository, $repository->{$package}, $package, $version, $package_args_ref);
+	my $pack_hash = $repository->{$package};
+	unless (defined $pack_hash) {
+		die "package $package not found\n";
+	}
+	
+	install_package($repository, $pack_hash, $package, $version, $package_args_ref);
 	
 }
 
