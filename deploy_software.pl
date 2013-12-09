@@ -853,7 +853,7 @@ sub install_package {
 	}
 	
 	
-	if (defined($package_hash->{'set-ini-values'})) {
+	if (defined(v->{'set-ini-values'})) {
 		
 		print "set-ini-values\n";
 		
@@ -873,6 +873,7 @@ sub install_package {
 		
 	} else {
 		print "set-ini-values not defined !?\n";
+		print Dumper($package_hash);
 		
 	}
 	
