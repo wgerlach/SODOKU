@@ -582,6 +582,9 @@ sub install_package {
 				print "dependency $dependency already installed\n";
 			}else {
 				print "install dependency $dependency for $dep_package...\n";
+				unless (defined $repository->{$dep_package}) {
+					die "package $dep_package not found\n";
+				}
 				install_package($repository, $repository->{$dep_package}, $dep_package, $dep_version, $dep_package_args_ref);
 			}
 		}
@@ -884,10 +887,6 @@ sub install_package {
 		}else {
 			print STDERR "warning: cfg_string emtpy, will not modify $inifile\n";
 		};
-		
-	} else {
-		print "set-ini-values not defined !?\n";
-		print Dumper($package_hash);
 		
 	}
 	
