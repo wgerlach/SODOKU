@@ -387,11 +387,16 @@ sub parsePackageString{
 	print "package_string: $package_string\n";
 	
 	my $package = undef;
-	my ($p, $package_arg_line) = $package_string =~ /^(.*)\((.*)\)$/;
+	my ($p, $package_arg_line) = $package_string =~ /^(.*)(\(.*\))$/;
 	
 	my @package_args=();
 	if (defined $package_arg_line) {
 		$package = $p;
+		$package_arg_line =~ /^\((.*)\)$/
+		unless (defined $package_arg_line) {
+			die;
+		}
+		
 		@package_args = split(' ', $package_arg_line) ;
 
 		
