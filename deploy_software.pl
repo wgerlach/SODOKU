@@ -404,6 +404,8 @@ sub parsePackageString{
 		$package = $package_string;
 	}
 	
+	print "package_args_got: ".join(',', @package_args)."\n";
+	
 	
 	my $argref = undef;
 	if (@package_args > 0) {
