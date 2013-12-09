@@ -104,7 +104,7 @@
 			"file" : "${ptarget}awe.cfg",
 			"cfg-string" : "${1}"
 		},
-		"depends" : ["aweclient-cfg-default"]
+		"depends" : ["aweclient/cfg/default"]
 	},
 	"aweclient/cfg/default" : {
 		"source" : "http://www.mcs.anl.gov/~wtang/files/awe.cfg",
