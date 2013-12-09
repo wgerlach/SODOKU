@@ -392,8 +392,9 @@ sub parsePackageString{
 	my @package_args=();
 	if (defined $package_arg_line) {
 		$package = $p;
-		$package_arg_line= $package_arg_line =~ /^\((.*)\)$/;
-		print "package_arg_line: $package_arg_line\n";
+		print "package_arg_lineA: $package_arg_line\n";
+		($package_arg_line)= $package_arg_line =~ /^\((.*)\)$/;
+		print "package_arg_lineB: $package_arg_line\n";
 		
 		if (defined $package_arg_line && $package_arg_line ne "") {
 			@package_args = split(' ', $package_arg_line) ;
