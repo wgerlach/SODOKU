@@ -870,6 +870,8 @@ sub install_package {
 		my $cfg_string = $package_hash->{'set-ini-values'}->{'cfg-string'} || "";
 		
 		if ($cfg_string ne "") {
+			
+			print "cfg_string: \"$cfg_string\"\n";
 			my $ini_hash = INI_cmds_to_hash( [ $cfg_string ] );
 			modifyINIfile($inifile, $ini_hash)
 		}else {
