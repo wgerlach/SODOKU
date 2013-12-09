@@ -181,7 +181,7 @@ sub datastructure_walk {
 	
 	if (ref($datastructure) eq 'HASH') {
 		while (my ($k, $v) = each %$datastructure) {
-			if ($show==1) print "goto $k\n";
+			if ($show==1) {print "goto $k\n";}
 			if (ref($v) eq '') {
 				#print "scalar: ".$datastructure->{$k}."\n";
 				$datastructure->{$k} = $sub->($v, $arg);
