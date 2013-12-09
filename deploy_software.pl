@@ -854,6 +854,9 @@ sub install_package {
 	
 	
 	if (defined($package_hash->{'set-ini-values'})) {
+		
+		print "set-ini-values\n";
+		
 		my $inifile = $package_hash->{'set-ini-values'}->{'file'};
 		unless (defined $inifile || ! -e $inifile) {
 			die "INI-file $inifile not defined or not found";
