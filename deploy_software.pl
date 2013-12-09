@@ -864,9 +864,14 @@ sub install_package {
 		print "set-ini-values\n";
 		
 		my $inifile = $package_hash->{'set-ini-values'}->{'file'};
-		unless (defined $inifile || ! -e $inifile) {
-			die "INI-file $inifile not defined or not found";
+		unless (defined $inifile) {
+			die "INI-file $inifile not defined";
 		}
+		
+		unless (-e $inifile) {
+			die "INI-file $inifile not found";
+		}
+		
 		
 		my $cfg_string = $package_hash->{'set-ini-values'}->{'cfg-string'} || "";
 		
