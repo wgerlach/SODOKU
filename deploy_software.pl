@@ -520,6 +520,7 @@ sub install_package {
 		die;
 	}
 	
+	
 	# replace arguments if they have been used
 	datastructure_walk('data' => $package_hash, 'sub' => \&replaceArguments, 'subarg' => $package_args_ref);
 	
