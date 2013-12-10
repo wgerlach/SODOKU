@@ -955,7 +955,7 @@ sub install_package {
 #############################################################
 
 
-GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repository=s', 'ignore=s', '--nossl');
+GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repository=s', 'ignore=s', '--nossl', 'forcetarget');
 
 unless ( @ARGV  || @ARGV > 1) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
@@ -1007,6 +1007,10 @@ unless (defined $target) {
 
 if (substr($target, -1, 1) ne "/") {
 	$target .= "/";
+}
+
+if (defined($h->{'forcetarget'}) && ! -d $target) {
+	systemp("mkdir -p ".$target);
 }
 
 if (defined $target) {
