@@ -69,7 +69,7 @@
 	"kbase_bootstrap_mgrast" : {
 		"_comment" : "target : /kb/",
 		"source" : "kbase@git.kbase.us:bootstrap",
-		"build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
+		"build-exec" : "cd ${source-dir}bootstrap ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
 		"subpackages" : [
 						 {
 							"source" : "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.tar.gz",
