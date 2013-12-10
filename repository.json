@@ -133,20 +133,21 @@
 		"set-env" : {"PATH" : "$PATH:${target}apps/FragGeneScan/1.16a/bin:${target}apps/pipeline/bin:${target}apps/pipeline/awecmd:${target}apps/biotools"},
 		"depends" : ["AWE", "Shock", "MG-RAST/FragGeneScan", "MG-RAST/biotools", "MG-RAST/qiime==1.5.0", "bowtie==1.0.0", "jellyfish==1.1.5", "cdbfasta"]
 	},
-	"aweclient/cfg" : {
+	"aweclient/cfg-awe.cfg" : {
 		"set-ini-values" : {
 			"file" : "${target}awe.cfg",
 			"cfg-string" : "${arguments}"
 		}
 	},
-	"aweclient/cfg/default-awe.cfg" : {
-		"source" : {	"url" : "http://www.mcs.anl.gov/~wtang/files/awe.cfg"
-					},
-		"source-remove-existing-file" : 1
+	"aweclient/cfg-awec.cfg" : {
+		"set-ini-values" : {
+			"file" : "${target}awec.cfg",
+			"cfg-string" : "${arguments}"
+		}
 	},
-	"aweclient/cfg/default-awec.cfg" : {
+	"aweclient/cfg/default" : {
 		"source" : {	"url" : "http://www.mcs.anl.gov/~wtang/files/awe.cfg",
-			"filename" : "awec.cfg"
+						"filename" : "${1}"
 		},
 		"source-remove-existing-file" : 1
 	},
