@@ -137,7 +137,7 @@
 		"ptarget" : "${target}etc",
 		"set-ini-values" : {
 			"file" : "${ptarget}awe.cfg",
-			"cfg-string" : "${1}"
+			"cfg-string" : "${arguments}"
 		},
 		"depends" : ["aweclient/cfg/default"]
 	},

@@ -892,7 +892,10 @@ sub install_package {
 		if ($cfg_string ne "") {
 			
 			print "cfg_string: \"$cfg_string\"\n";
-			my $ini_hash = INI_cmds_to_hash( [ $cfg_string ] );
+			
+			my @cfg_strings = split(' ', $cfg_string);
+			
+			my $ini_hash = INI_cmds_to_hash( \@cfg_strings );
 			modifyINIfile($inifile, $ini_hash)
 		}else {
 			print STDERR "warning: cfg_string emtpy, will not modify $inifile\n";
