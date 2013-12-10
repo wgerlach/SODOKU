@@ -667,7 +667,7 @@ sub install_package {
 					$st = 'git';
 				} elsif (defined($package_hash->{'git-server'})) {
 					$st = 'git';
-				} elsif ($source =~ /^http.*\.git/) {
+				} elsif ($source =~ /\@git\./) {
 					$st = 'git';
 				} elsif ($source =~ /^ssh.*\.git/) {
 					$st = 'git';

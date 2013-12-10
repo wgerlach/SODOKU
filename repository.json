@@ -20,6 +20,7 @@
 		"subpackages" : [
 						 {
 							"source" : "https://raw.github.com/wgerlach/SODOKU/master/other/qiime-1.7.0-fixed.conf",
+							"source-type" : "download",
 							"source-remove-existing-file" : 1
 						 },
 						 {
