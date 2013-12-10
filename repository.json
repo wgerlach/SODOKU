@@ -134,17 +134,21 @@
 		"depends" : ["AWE", "Shock", "MG-RAST/FragGeneScan", "MG-RAST/biotools", "MG-RAST/qiime==1.5.0", "bowtie==1.0.0", "jellyfish==1.1.5", "cdbfasta"]
 	},
 	"aweclient/cfg" : {
-		"ptarget" : "${target}etc",
 		"set-ini-values" : {
-			"file" : "${ptarget}awe.cfg",
+			"file" : "${target}awe.cfg",
 			"cfg-string" : "${arguments}"
-		},
-		"depends" : ["aweclient/cfg/default"]
+		}
 	},
-	"aweclient/cfg/default" : {
-		"source" : "http://www.mcs.anl.gov/~wtang/files/awe.cfg",
-		"source-remove-existing-file" : 1,
-		"ptarget" : "${target}etc"
+	"aweclient/cfg/default-awe.cfg" : {
+		"source" : {	"url" : "http://www.mcs.anl.gov/~wtang/files/awe.cfg"
+					},
+		"source-remove-existing-file" : 1
+	},
+	"aweclient/cfg/default-awec.cfg" : {
+		"source" : {	"url" : "http://www.mcs.anl.gov/~wtang/files/awe.cfg",
+			"filename" : "awec.cfg"
+		},
+		"source-remove-existing-file" : 1
 	},
 	"upstart-aweclient" : {
 		"_comment" : "requires root",
