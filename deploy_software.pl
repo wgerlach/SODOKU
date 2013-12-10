@@ -149,8 +149,12 @@ sub downloadFile {
 		}
 	}
 	
+	my $ssl= "";
+	if (defined $h->{'nossl'}) {
+		$ssl = "--insecure";
+	}
 	
-	systemp("cd $dir && curl -L -o $targetname --retry 1 --retry-delay 5 \"$url\"") == 0 or die;
+	systemp("cd $dir && curl $ssl -L -o $targetname --retry 1 --retry-delay 5 \"$url\"") == 0 or die;
 	
 	unless (-s $file) {
 		die "file $file was not downloaded!?";
@@ -948,7 +952,7 @@ sub install_package {
 #############################################################
 
 
-GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repository=s', 'ignore=s');
+GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repository=s', 'ignore=s', '--nossl');
 
 unless ( @ARGV  || @ARGV > 1) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
