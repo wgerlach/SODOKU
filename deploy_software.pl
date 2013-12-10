@@ -244,7 +244,7 @@ sub bashrc_append {
 }
 
 sub git_clone {
-	my ($source, $dir) = @_;
+	my ($source, $dir, $gitbranch) = @_;
 	
 	
 	my $gitname;
@@ -273,6 +273,10 @@ sub git_clone {
 		}
 	}
 	systemp("cd $dir && git clone $source") == 0 or die;
+	
+	if (defined $gitbranch) {
+		systemp("cd $dir && git checkout ".$gitbranch) == 0 or die;
+	}
 	
 	return $gitdir;
 }
@@ -640,10 +644,12 @@ sub install_package {
 			my $source;
 			my $source_filename;
 			my $source_subdir;
+			my $source_branch;
 			if (ref($source_obj) eq 'HASH') {
 				$source = $source_obj->{'url'};
 				$source_subdir = $source_obj->{'subdir'};
 				$source_filename=$source_obj->{'filename'};
+				$source_branch=$source_obj->{'branch'};
 			} else {
 				$source = $source_obj;
 			}
@@ -688,7 +694,7 @@ sub install_package {
 				
 				
 				if ($st eq 'git') {
-					$sourcedir = git_clone($source, $temp_dir);
+					$sourcedir = git_clone($source, $temp_dir, $source_branch);
 				} elsif ($st eq 'mercurial') {
 					$sourcedir = hg_clone($source, $temp_dir);
 				} elsif ($st eq 'go') {

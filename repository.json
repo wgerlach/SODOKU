@@ -53,8 +53,36 @@
 		"source" : "kbase@git.kbase.us:dev_container",
 		"source-type" : "git"
 	},
+	"kbase_dev_container_mgrast-deploy" : {
+		"_comment": "--target should be /kb/, here we used specifc branch",
+		"source" : {	"url" : "kbase@git.kbase.us:dev_container",
+						"branch" : "mgrast-deploy"},
+		"build-exec" : "cd ${source-dir} && source /kb/runtime/env/java-build-runtime.env",
+		"subpackages" : [
+						 {	"source" : ["https://github.com/kbase/awe_service", "https://github.com/kbase/mgrast_pipeline"],
+							"source-type" : "git",
+							"ptarget" : "${target}dev_container/modules"
+						 }
+						 ],
+		"source-type" : "git"
+	},
+	"kbase_bootstrap_mgrast" : {
+		"_comment" : "target : /kb/",
+		"source" : "kbase@git.kbase.us:bootstrap",
+		"build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
+		"subpackages" : [
+						 {
+							"source" : "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.tar.gz",
+							"ptarget" : "${target}bootstrap/kb_java_runtime"
+						 }
+						 ]
+	},
+	"kbase-mgrast" : {
+		"_comment": "target=/kb, require kbase-git key",
+		"depends" : ["kbase_bootstrap_mgrast", "kbase_dev_container_mgrast-deploy", "kbase"]
+	},
 	"kbase" : {
-		"_comment": "example: kbase(KBaseFBAModeling)",
+		"_comment": "example: target=/kb , kbase(KBaseFBAModeling)",
 		"exec" : [	"./bootstrap ${target}runtime",
 					". ${ptarget}user-env.sh ; make ; make deploy"],
 		"ptarget" : "${target}dev_container",
