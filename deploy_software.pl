@@ -16,7 +16,6 @@ use Data::Dumper;
 1;
 
 
-
 my $target = "/home/ubuntu/";
 
 my $default_repository = 'https://raw.github.com/wgerlach/SODOKU/master/repository.json';
