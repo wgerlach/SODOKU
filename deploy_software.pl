@@ -19,7 +19,7 @@ use Data::Dumper;
 
 my $target = "/home/ubuntu/";
 
-my $default_repository = 'https://raw.github.com/wgerlach/DeploySoftware/master/repository.json';
+my $default_repository = 'https://raw.github.com/wgerlach/SODOKU/master/repository.json';
 
 #########################################
 my %already_installed;
