@@ -69,6 +69,7 @@
 	"kbase_bootstrap_mgrast" : {
 		"_comment" : "target : /kb/",
 		"source" : "kbase@git.kbase.us:bootstrap",
+		"source-type" : "git",
 		"build-exec" : "cd ${source-dir}bootstrap ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
 		"subpackages" : [
 						 {
