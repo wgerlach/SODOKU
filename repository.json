@@ -16,6 +16,17 @@
 			}
 		]
 	},
+	"qiime-wo" : {
+		"subpackages" : [
+						 {
+							"source" : "https://raw.github.com/wgerlach/SODOKU/master/other/qiime-1.7.0-fixed.conf",
+							"source-remove-existing-file" : 1
+						 },
+						 {
+							"depends": ["qiime(${target}qiime-1.7.0-fixed.conf)"]
+						 }
+						]
+	},
 	"usearch" : {
 		"_comment" : "due to license issues of usearch the download url has to be given as a parameter",
 		"source" : {"url" : "${1}", "filename" : "usearch"},
