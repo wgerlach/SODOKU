@@ -679,7 +679,7 @@ sub install_package {
 			
 			my $temp_dir_obj = undef;
 			my $temp_dir = $ptarget;
-			my $sourcedir=undef;
+			my $sourcedir=$ptarget;
 			my $downloaded_file=undef;
 			if ($st eq 'git' && defined($package_hash->{'git-server'})) {
 				$source = $package_hash->{'git-server'}.$source;
