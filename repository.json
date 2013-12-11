@@ -45,7 +45,7 @@
 		"source" : "ftp://greengenes.microbio.me/greengenes_release/gg_${v1}_${v2}/gg_${v1}_${v2}_otus.tar.gz",
 		"source-extract" : 1,
 		"exec" : [	"mkdir -p $QIIME/../gg_otus-${v1}_${v2}-release/rep_set",
-					"ln --force -s ${target}gg_${v1}_${v2}_otus "],
+					"ln --force -s ${target}gg_${v1}_${v2}_otus $QIIME/../gg_otus-${v1}_${v2}-release/rep_set"],
 		"_comment": "creates symlink for use in QIIME"
 	},
 	"picrust_data" : {
