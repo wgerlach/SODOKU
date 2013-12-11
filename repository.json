@@ -95,6 +95,11 @@
 						 }
 						 ]
 	},
+	"kbase-mgrast-update" : {
+		"_comment": "as root",
+		"ptarget" : "/kb/dev_container/modules/mgrast_pipeline/",
+		"exec" : ". /kb/dev_container/user_env.sh ; make update"
+	},
 	"kbase-mgrast" : {
 		"_comment": "target=/kb, require kbase-git key",
 		"depends" : ["kbase_bootstrap_mgrast", "kbase_dev_container_mgrast-deploy", "kbase_dev_container-deploy"]

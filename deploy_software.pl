@@ -77,7 +77,7 @@ sub INI_cmds_to_hash {
 	foreach my $parameter (@{$strings}) {
 		my ($section, $pair_string) = $parameter =~ /^\[(\S+)\](.*)$/;
 		
-		unless (defined $section && defined $pair_string) {
+		unless (defined($section) && defined($pair_string)) {
 			die "could not parse config string: $parameter, required format: [section]key=value";
 		}
 		
@@ -550,11 +550,11 @@ sub install_package {
 	}
 	
 	if (defined $version) {
-		print 'ref2: '.ref($package_hash->{'version'})."\n";
+		#print 'ref2: '.ref($package_hash->{'version'})."\n";
 		$package_hash->{'version'} = $version;
 	}
 	if ((defined $package_hash->{'version'}) && ($package ne "subpackage")) {
-		print 'ref3: '.ref($package_hash->{'version'})."\n";
+		#print 'ref3: '.ref($package_hash->{'version'})."\n";
 		datastructure_walk('data' => $package_hash, 'sub' => \&replaceVersionNumbers, 'subarg' => $package_hash->{'version'});
 	}
 	
