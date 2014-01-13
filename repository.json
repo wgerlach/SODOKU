@@ -62,7 +62,7 @@
 	},
 	"kbase_dev_container-deploy" : {
 		"exec" : [	"./bootstrap ${target}runtime",
-				  ". ${ptarget}user-env.sh ; make ; make deploy"],
+				  ". ${ptarget}user-env.sh ; make && make deploy"],
 		"ptarget" : "${target}dev_container"
 	},
 	"kbase_dev_container" : {
