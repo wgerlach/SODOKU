@@ -61,7 +61,8 @@
 		"depends" : ["picrust_data"]
 	},
 	"kbase_dev_container-deploy" : {
-		"exec" : [	"./bootstrap ${target}runtime",
+		"exec" : [ "mkdir -p ${target}runtime",
+					"./bootstrap ${target}runtime",
 				  ". ${ptarget}user-env.sh ; make && make deploy"],
 		"ptarget" : "${target}dev_container"
 	},
