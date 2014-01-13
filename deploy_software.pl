@@ -616,7 +616,7 @@ sub install_package {
 		}
 	}
 	
-	#print "chdir $ptarget\n";
+	print "chdir $ptarget\n";
 	chdir($ptarget);
 	
 	if ($package_hash->{'depend-function'}) {
