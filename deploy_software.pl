@@ -954,6 +954,7 @@ sub install_package {
 
 #############################################################
 
+print "deploy arguments: ".join(' ', @ARGV)."\n";
 
 GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repository=s', 'ignore=s', 'nossl', 'forcetarget');
 
@@ -998,14 +999,6 @@ if (defined $ENV{'TARGET'} ) {
 
 if (defined $h->{'target'}) {
 	$target = $h->{'target'};
-}
-
-foreach my $opt ('update', 'new', 'root', 'all') {
-	if (defined $h->{$opt}) {
-		print "option $opt used\n";
-	} else {
-		print "option $opt not used\n";
-	}
 }
 
 unless (defined $target) {
