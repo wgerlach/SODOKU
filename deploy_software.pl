@@ -266,7 +266,7 @@ sub git_clone {
 	}
 	
 	my $gitdir = $dir.$gitname.'/';
-	
+	print "gitdir: $gitdir\n";
 	if (-d $gitdir) {
 		if (defined $h->{'update'}) {
 			systemp("cd $gitdir && git pull") == 0 or die;

@@ -61,8 +61,7 @@
 		"depends" : ["picrust_data"]
 	},
 	"kbase_dev_container-deploy" : {
-		"exec" : [ "mkdir -p ${target}runtime",
-					"./bootstrap ${target}runtime",
+		"exec" : [ "./bootstrap ${target}runtime",
 				  ". ${ptarget}user-env.sh ; make && make deploy"],
 		"ptarget" : "${target}dev_container"
 	},
@@ -118,7 +117,7 @@
 							 ]
 	},
 	"kbase" : {
-		"_comment": "example: target=/kb , kbase(KBaseFBAModeling)",
+		"_comment": "example: target=/kb , kbase(KBaseFBAModeling), this does not include the bootstrap! Use . /kb/deployment/user-env.sh to activate",
 		"depends" : ["kbase_dev_container", "kbase-modules(${arguments})", "kbase_dev_container-deploy"]
 	},
 	"MG-RAST" : {
