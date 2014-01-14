@@ -955,7 +955,7 @@ sub install_package {
 #############################################################
 
 
-GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repository=s', 'ignore=s', '--nossl', 'forcetarget');
+GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repository=s', 'ignore=s', 'nossl', 'forcetarget');
 
 unless ( @ARGV  || @ARGV > 1) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
@@ -1000,6 +1000,13 @@ if (defined $h->{'target'}) {
 	$target = $h->{'target'};
 }
 
+foreach my $opt ('update', 'new', 'root', 'all') {
+	if (defined $h->{$opt}) {
+		print "option $opt used\n";
+	} else {
+		print "option $opt not used\n";
+	}
+}
 
 unless (defined $target) {
 	$target = getcwd();
