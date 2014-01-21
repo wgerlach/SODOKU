@@ -742,8 +742,9 @@ sub install_package {
 				} else {
 					die;
 				}
-				
-				
+			
+			} elsif ($st eq 'pip') {
+				systemp("pip install ".$source);
 			} elsif ($st eq 'apt') {
 				systemp("sudo apt-get --force-yes -y install ".$source);
 			} elsif ($st eq 'download') {
@@ -771,7 +772,7 @@ sub install_package {
 				}
 				
 			} else {
-				die;
+				die "source_type \"$st\" unknown";
 			
 			}
 			
@@ -967,7 +968,7 @@ print "deploy arguments: ".join(' ', @ARGV)."\n";
 
 GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'nossl', 'forcetarget', 'list', 'create');
 
-unless ( @ARGV  || @ARGV > 1) {
+if ( @ARGV == 0 && ! defined $h->{'list'}) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
 	#print "default target=$target\n";
 	print "example: deploy_software.pl --target=/home/ubuntu/ aweclient\n";
