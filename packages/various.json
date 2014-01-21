@@ -1,0 +1,302 @@
+{
+	"samtools" : {
+		"source" : "http://downloads.sourceforge.net/project/samtools/samtools/${v1}.${v2}.${v3}/samtools-${v1}.${v2}.${v3}.tar.bz2",
+		"source-extract" : 1,
+		"source-temporary" : 1,
+		"build-type" : "make",
+		"install-type" : "copy",
+		"install-files" : ["samtools"],
+		"ptarget" : "${target}bin"
+	},
+	"qiime" : {
+		"_comment" : "QIIME uses a configuration file like qiime.conf for the deployment, which has to be given as an argument to this package",
+		"source" : "git://github.com/qiime/qiime-deploy.git",
+		"source-temporary" : 1,
+		"build-exec" : "cd ${source-dir} ; python qiime-deploy.py $target/qiime_software/ -f ${1} --force-remove-failed-dirs",
+		"test" : ". ${target}qiime_software/activate.sh ; print_qiime_config.py -t",
+		"subpackages" : [
+			{
+				"exec" : "sudo add-apt-repository \"deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe multiverse\"",
+				"set-env" : {"JAVA_HOME":"/usr/lib/jvm/java-6-openjdk-amd64"}
+			},
+			{
+				"source-apt" : "python-dev libncurses5-dev libssl-dev libzmq-dev libgsl0-dev openjdk-6-jdk libxml2 libxslt1.1 libxslt1-dev ant git subversion build-essential zlib1g-dev libpng12-dev libfreetype6-dev mpich2 libreadline-dev gfortran unzip libmysqlclient18 libmysqlclient-dev ghc sqlite3 libsqlite3-dev"
+			}
+		]
+	},
+	"qiime-wo" : {
+		"subpackages" : [
+						 {
+							"source" : "https://raw.github.com/wgerlach/SODOKU/master/other/qiime-1.7.0-fixed.conf",
+							"source-type" : "download",
+							"source-remove-existing-file" : 1
+						 },
+						 {
+							"depends": ["qiime(${target}qiime-1.7.0-fixed.conf)"]
+						 }
+						]
+	},
+	"usearch" : {
+		"_comment" : "due to license issues of usearch the download url has to be given as a parameter",
+		"source" : {"url" : "${1}", "filename" : "usearch"},
+		"ptarget" : "${target}bin",
+		"build-exec" : "chmod +x ${target}bin/usearch",
+		"set-env" : {"PATH" : "${target}bin:$PATH"},
+		"subpackages" : [
+			{
+				"exec" : "mkdir -p ${target}bin"
+			}
+		]
+	},
+	"gg_otus" : {
+		"version" : [13,5],
+		"source" : "ftp://greengenes.microbio.me/greengenes_release/gg_${v1}_${v2}/gg_${v1}_${v2}_otus.tar.gz",
+		"source-extract" : 1,
+		"exec" : [	"mkdir -p $QIIME/../gg_otus-${v1}_${v2}-release/rep_set",
+					"ln --force -s ${target}gg_${v1}_${v2}_otus $QIIME/../gg_otus-${v1}_${v2}-release/rep_set"],
+		"_comment": "creates symlink for use in QIIME"
+	},
+	"picrust_data" : {
+		"source" : ["ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/16S_13_5_precalculated.tab.gz",
+					"ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/ko_13_5_precalculated.tab.gz"],
+		"dir" : 1
+	},
+	"picrust_symlink" : {
+		"_comment": "makes symlink in QIIME/picrust installation to picrust_data",
+		"exec" : [	"mkdir -p $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data",
+					"ln --force -s ${target}picrust_data/16S_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/16S_13_5_precalculated.tab.gz",
+					"ln --force -s ${target}picrust_data/ko_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/ko_13_5_precalculated.tab.gz"],
+		"depends" : ["picrust_data"]
+	},
+	"kbase_dev_container-deploy" : {
+		"exec" : [ "./bootstrap ${target}runtime",
+				  ". ${ptarget}user-env.sh ; make && make deploy"],
+		"ptarget" : "${target}dev_container"
+	},
+	"kbase_dev_container" : {
+		"_comment": "--target should be /kb/",
+		"source-git" : "kbase@git.kbase.us:dev_container"
+	},
+	"kbase_dev_container_mgrast-deploy" : {
+		"_comment": "--target should be /kb/, here we used specifc branch",
+		"source-git" : {	"url" : "kbase@git.kbase.us:dev_container",
+						"branch" : "mgrast-deploy"},
+		"build-exec" : "cd ${source-dir} && source /kb/runtime/env/java-build-runtime.env",
+		"subpackages" : [
+						 {	"source-git" : ["https://github.com/kbase/awe_service", "https://github.com/kbase/mgrast_pipeline"],
+							"ptarget" : "${target}dev_container/modules"
+						 }
+						 ]
+	},
+	"kbase_bootstrap_mgrast" : {
+		"_comment" : "target : /kb/",
+		"source-git" : "kbase@git.kbase.us:bootstrap",
+		"build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
+		"subpackages" : [
+						 {
+							"source" : "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.tar.gz",
+							"ptarget" : "${target}bootstrap/kb_java_runtime"
+						 }
+						 ]
+	},
+	"kbase-mgrast-update" : {
+		"_comment": "as root",
+		"ptarget" : "/kb/dev_container/modules/mgrast_pipeline/",
+		"exec" : ". /kb/dev_container/user-env.sh ; make update"
+	},
+	"kbase-mgrast" : {
+		"_comment": "target=/kb, require kbase-git key",
+		"depends" : ["kbase_bootstrap_mgrast", "kbase_dev_container_mgrast-deploy", "kbase_dev_container-deploy"]
+	},
+	"kbase-modules" : {
+		"_comment" : "gets requested modules and dependencies",
+		"ptarget" : "${target}dev_container",
+		"depend-function" : [
+							 {
+							 "name" : "kbasemodules",
+							 "server": "kbase@git.kbase.us:",
+							 "target" : "${ptarget}modules",
+							 "package-list" : "${arguments}"
+							 }
+							 ]
+	},
+	"kbase" : {
+		"_comment": "example: target=/kb , kbase(KBaseFBAModeling), this does not include the bootstrap! Use . /kb/deployment/user-env.sh to activate",
+		"depends" : ["kbase_dev_container", "kbase-modules(${arguments})", "kbase_dev_container-deploy"]
+	},
+	"MG-RAST" : {
+		"_comment" : "target: $HOME / upstart-aweclient needs root / databases via MG-RAST/databases",
+		"ptarget" : "${target}apps",
+		"subpackages" : [
+						 {
+							"source-apt" : "python-biopython libcache-memcached-perl libdbi-perl"
+						 },
+						 {
+							"source-git" : "https://github.com/MG-RAST/pipeline"
+						 },
+						 {
+							"ptarget" : "${target}apps/bin",
+							"exec" : [
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_preprocess.pl",
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_dereplicate.pl",
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_bowtie_screen.pl",
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_genecalling.pl",
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_cluster_parallel.pl",
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_blat.py",
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_annotate.pl",
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_rna_blat.sh",
+								   "ln -sf ${target}/apps/pipeline/awecmd/awe_rna_search.pl"
+								   ]
+						 }
+					   ],
+		"set-env" : {"PATH" : "$PATH:${target}apps/FragGeneScan/1.16a/bin:${target}apps/pipeline/bin:${target}apps/pipeline/awecmd:${target}apps/biotools"},
+		"depends" : ["AWE", "Shock", "MG-RAST/FragGeneScan", "MG-RAST/biotools", "MG-RAST/qiime==1.5.0", "bowtie==1.0.0", "jellyfish==1.1.5", "cdbfasta"]
+	},
+	"aweclient/cfg-awe.cfg" : {
+		"set-ini-values" : {
+			"file" : "${target}awe.cfg",
+			"cfg-string" : "${arguments}"
+		}
+	},
+	"aweclient/cfg-awec.cfg" : {
+		"set-ini-values" : {
+			"file" : "${target}awec.cfg",
+			"cfg-string" : "${arguments}"
+		}
+	},
+	"aweclient/cfg/default" : {
+		"source" : {	"url" : "http://www.mcs.anl.gov/~wtang/files/awe.cfg",
+						"filename" : "${1}"
+		},
+		"source-remove-existing-file" : 1
+	},
+	"upstart-aweclient" : {
+		"_comment" : "requires root",
+		"exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client",
+		"source" : "http://www.mcs.anl.gov/~wtang/files/awe-client.conf",
+		"source-remove-existing-file" : 1,
+		"ptarget" : "/etc/init/"
+	},
+	"AWE" : {
+		"go" : "github.com/MG-RAST/AWE/...",
+		"subpackages" : [
+						 {
+						 "source-apt" : "mongodb-server"
+						 }
+						 ],
+		"depends" : ["go"]
+	},
+	"go" : {
+		"mercurial" : "-u release https://code.google.com/p/go",
+		"build-exec" : "cd ${target}go/src && ./all.bash",
+		"subpackages" : [
+						 {
+						 "source-apt" : "bzr make gcc mercurial git"
+						 }
+						 ],
+		"set-env" : {	"GOPATH" : "${target}gopath",
+						"PATH"   : "$PATH:${target}go/bin:${target}gopath/bin"}
+	},
+	"Shock" : {
+		"go" : "github.com/MG-RAST/Shock/...",
+		"subpackages" : [
+						 {	"source" : "http://www.mcs.anl.gov/~wtang/files/shock.cfg",
+							"ptarget" : "${target}/etc"
+						 }
+						],
+		"depends" : ["go"]
+	},
+	"MG-RAST/FragGeneScan" : {
+		"source": "http://www.mcs.anl.gov/~wtang/files/fgs.tar.gz",
+		"source-extract" : 1,
+		"ptarget" : "${target}apps/FragGeneScan"
+	},
+	"MG-RAST/biotools" : {
+		"source" : ["ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/superblat",
+					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/blat",
+					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/usearch"],
+		"build-exec" : "chmod +x ${source-file}",
+		"ptarget" : "${target}apps/biotools"
+	},
+	"MG-RAST/qiime" : {
+		"version" : [1,5,0],
+		"subpackages" : [
+						 {
+							"source-apt" : "libssl-dev libzmq-dev libgsl0-dev openjdk-6-jdk libxml2 libxslt1.1 libxslt1-dev ant subversion build-essential zlib1g-dev libpng12-dev libfreetype6-dev mpich2 libreadline-dev gfortran unzip libmysqlclient18 libmysqlclient-dev ghc"
+						 },
+						 {
+							"source" : "ftp://thebeast.colorado.edu/pub/QIIME-v${v1}.${v2}.${v3}-dependencies/app-deploy-qiime-${v1}.${v2}.${v3}.tgz",
+							"source-extract" : 1,
+							"ptarget" : "${target}apps"
+						 },
+						 {
+							"source" : "http://www.mcs.anl.gov/~wtang/files/qiime_${v1}.${v2}.${v3}_uclust.conf",
+							"source-remove-existing-file" : 1,
+							"ptarget" : "${target}apps/app-deploy-qiime-${v1}.${v2}.${v3}/etc"
+						 },
+						 {
+							"exec" : "python app-deploy.py ${target}apps/qiime -f etc/qiime_${v1}.${v2}.${v3}_uclust.conf --force-remove-failed-dirs",
+							"ptarget" : "${target}apps/app-deploy-qiime-${v1}.${v2}.${v3}/"
+						 },
+						 {
+							"source" : "http://www.mcs.anl.gov/~wtang/files/activate.sh",
+							"source-remove-existing-file" : 1,
+							"ptarget" : "${target}apps/qiime",
+							"bashrc-append" : "source ${target}apps/qiime/activate.sh"
+						 }
+						 ]
+	},
+	"bowtie" : {
+		"version" : [1,0,0],
+		"source" : {	"url" : "http://sourceforge.net/projects/bowtie-bio/files/bowtie/${v1}.${v2}.${v3}/bowtie-${v1}.${v2}.${v3}-src.zip",
+						"subdir" : "bowtie-${v1}.${v2}.${v3}"
+					},
+		"source-extract" : 1,
+		"source-temporary" : 1,
+		"build-type" : "make",
+		"install-type" : "copy",
+		"install-files" : ["bowtie","bowtie-build","bowtie-inspect"],
+		"ptarget" : "${target}bin"
+	},
+	"jellyfish" : {
+		"version" : [1,1,5],
+		"source" : {	"url" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-${v1}.${v2}.${v3}.tar.gz",
+						"subdir" : "jellyfish-${v1}.${v2}.${v3}" },
+		"source-extract" : 1,
+		"source-temporary" : 1,
+		"build-type" : "make-install"
+	},
+	"cdbfasta" : {
+		"source" : {	"url" : "http://sourceforge.net/projects/cdbfasta/files/latest/download?source=files",
+						"filename" : "cdbfasta.tar.gz",
+						"subdir" : "cdbfasta"
+					},
+		"source-extract" : 1,
+		"source-temporary" : 1,
+		"build-type" : "make",
+		"install-type" : "copy",
+		"install-files" : ["cdbfasta", "cdbyank"],
+		"ptarget" : "${target}bin"
+	},
+	"MG-RAST/databases" : {
+		"_comment" : "not needed",
+		"source" : ["ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.1",
+					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.2",
+					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr",
+					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.clust"],
+		"set-env" : {"REFDBPATH" : "${target}refdb"},
+		"subpackages" : [
+						 {
+						 "source" : "ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/h_sapiens.tar.gz",
+						 "source-extract" : 1
+						 }
+		],
+		"ptarget" : "${target}/refdb",
+		"exec": [ "for i in data logs work ; do mkdir -p ${target}awe/${i} ; chmod 777 ${target}awe/${i} ; done",
+				 "sudo mkdir -p ${target}/local",
+					"sudo chmod 777 ${target}/local",
+					"mkdir -p ${target}/local/shock/data",
+					"mkdir -p ${target}/local/shock/log",
+					"sudo chmod 777 ${target}/refdb"]
+	}
+}
