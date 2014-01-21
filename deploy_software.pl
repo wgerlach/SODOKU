@@ -777,7 +777,14 @@ sub install_package {
 			}
 			
 			
-			my $build_dir;
+			my $build_dir = $sourcedir;
+			
+			if (defined $source_subdir) {
+				$build_dir .= $source_subdir;
+			}
+
+			chdir($build_dir);
+			
 			# different build-types
 			if (defined($package_hash->{'build-exec'})) {
 				my $exec = $package_hash->{'build-exec'};
@@ -793,12 +800,7 @@ sub install_package {
 				
 			} elsif ($build_type eq 'make-install' || $build_type eq 'make'){
 				
-				$build_dir = $sourcedir;
-				
-				if (defined $source_subdir) {
-					$build_dir .= $source_subdir;
-				}
-				
+								
 				
 				# change directory if needed
 				#if (! -e $build_dir.'configure' && -e $build_dir.'Makefile' ) {
