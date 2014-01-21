@@ -286,7 +286,10 @@
    },
    "emirge" : {
       "source-temporary" : 1,
-      "source" : "https://github.com/csmiller/EMIRGE/archive/v${v1}.${v2}.tar.gz",
+      "source" : {
+         "url" : "https://github.com/csmiller/EMIRGE/archive/v${v1}.${v2}.tar.gz",
+         "subdir" : "EMIRGE-${v1}.${v2}"
+      },
       "source-extract" : 1,
       "version" : [
          0,
