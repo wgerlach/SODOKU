@@ -295,11 +295,11 @@
          0,
          60
       ],
-      "_comment" : "requires usearch version >= 6.0.203",
-      "exec" : [
+      "build-exec" : [
          "python setup.py build",
          "python setup.py install --prefix=${ptarget}"
       ],
+      "_comment" : "requires usearch version >= 6.0.203",
       "subpackages" : [
          {
             "source-apt" : "python-biopython cython"
