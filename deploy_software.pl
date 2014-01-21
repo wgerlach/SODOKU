@@ -527,7 +527,7 @@ sub array_execute {
 	foreach my $exec (@execs) {
 		
 		foreach my $key (keys(%replacements)) {
-			my $value = $replacements{$value};
+			my $value = $replacements{$key};
 			if (defined $value) {
 				$exec =~ s/\$\{$key\}/$value/g;
 			}
