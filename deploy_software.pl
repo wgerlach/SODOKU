@@ -514,6 +514,32 @@ sub get_array {
 }
 
 
+sub array_execute {
+	my ($argument, %replacements) = shift(@_);
+	
+	
+	my @execs;
+	if (ref($argument) eq 'ARRAY') {
+		@execs = @{$argument};
+	} else {
+		@execs = ($argument);
+	}
+	foreach my $exec (@execs) {
+		
+		foreach my $key (keys(%replacements)) {
+			my $value = $replacements{$value};
+			if (defined $value) {
+				$exec =~ s/\$\{$key\}/$value/g;
+			}
+		}
+		
+		print "exec:\n";
+		systemp($exec) == 0 or die;
+	}
+	
+}
+
+
 sub install_package {
 	my ($repository, $package_hash, $package, $version, $package_args_ref) = @_;
 	
@@ -787,16 +813,19 @@ sub install_package {
 			
 			# different build-types
 			if (defined($package_hash->{'build-exec'})) {
-				my $exec = $package_hash->{'build-exec'};
-				if (defined $downloaded_file) {
-					$exec =~ s/\$\{source-file\}/$downloaded_file/g;
-				}
+				#my $exec = $package_hash->{'build-exec'};
+				#if (defined $downloaded_file) {
+				#	$exec =~ s/\$\{source-file\}/$downloaded_file/g;
+				#}
 				
-				if (defined $sourcedir) {
-					$exec =~ s/\$\{source-dir\}/$sourcedir/g;
-				}
-				print "build-exec:\n";
-				systemp($exec) == 0 or die;
+				#if (defined $sourcedir) {
+				#	$exec =~ s/\$\{source-dir\}/$sourcedir/g;
+				#}
+				#print "build-exec:\n";
+				#systemp($exec) == 0 or die;
+				
+				array_execute($package_hash->{'build-exec'}, 'source-file' => $downloaded_file, 'source-dir' => $sourcedir);
+				
 				
 			} elsif ($build_type eq 'make-install' || $build_type eq 'make'){
 				
@@ -930,18 +959,7 @@ sub install_package {
 	
 	
 	if (defined $package_hash->{'exec'}) {
-		
-		my @execs;
-		if (ref($package_hash->{'exec'}) eq 'ARRAY') {
-			@execs = @{$package_hash->{'exec'}};
-		} else {
-			@execs = ($package_hash->{'exec'});
-		}
-		foreach my $exec (@execs) {
-			
-			print "exec:\n";
-			systemp($exec) == 0 or die;
-		}
+		array_execute($package_hash->{'exec'});
 	}
 	
 	if (defined $package_hash->{'test'}) {
