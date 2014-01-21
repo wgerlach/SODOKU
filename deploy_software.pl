@@ -1059,11 +1059,12 @@ chomp($repository_json);
 eval {
 	$repository = decode_json($repository_json);
 	1;
-} or do {
+};
+if ($@) {
 	my $e = $@;
 	print "$e\n";
 	exit(1);
-};
+}
 
 datastructure_walk('data' => $repository, 'sub' => \&process_scalar); # for my "environment variables"... ;-)
 
