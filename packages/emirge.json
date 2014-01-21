@@ -10,7 +10,7 @@
 				"subdir" : "EMIRGE-${v1}.${v2}"},
 		"source-extract" : 1,
 		"source-temporary" : 1,
-		"exec": ["python setup.py build",
+		"build-exec": ["python setup.py build",
 				 "python setup.py install --prefix=${ptarget}"],
 		"subpackages" : [
 						 { "source-apt" : "python-biopython cython" },
