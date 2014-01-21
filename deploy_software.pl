@@ -771,9 +771,9 @@ sub install_package {
 				}
 			
 			} elsif ($st eq 'pip') {
-				systemp("pip install ".$source);
+				systemp("pip install ".$source) == 0 or die;
 			} elsif ($st eq 'apt') {
-				systemp("sudo apt-get --force-yes -y install ".$source);
+				systemp("sudo apt-get --force-yes -y install ".$source) == 0 or die;
 			} elsif ($st eq 'download') {
 				#simple download
 				
