@@ -589,9 +589,10 @@ sub install_package {
 	if (substr($ptarget, -1, 1) ne '/') {
 		$ptarget .= '/';
 	}
-	if (defined($package_hash->{'ptarget'})) {
-		datastructure_walk('data' => $package_hash, 'sub' => \&replacePtarget, 'subarg' => $ptarget, 'nosubpackages' => 1);
-	}
+	
+	#if (defined($package_hash->{'ptarget'})) {
+	datastructure_walk('data' => $package_hash, 'sub' => \&replacePtarget, 'subarg' => $ptarget, 'nosubpackages' => 1);
+	#}
 	
 	if (definedAndTrue($package_hash->{'dir'}) && defined($package_hash->{'ptarget'})) {
 		die;
