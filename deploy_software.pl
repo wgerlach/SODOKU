@@ -12,6 +12,7 @@ or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm 
 use File::Temp;
 #use LWP::UserAgent;
 use Data::Dumper;
+use Try::Tiny;
 
 1;
 
@@ -19,7 +20,7 @@ use Data::Dumper;
 
 my $target = "/home/ubuntu/";
 
-my $default_repository = 'https://raw.github.com/wgerlach/SODOKU/master/repository.json';
+my $default_repository = 'https://raw.github.com/wgerlach/SODOKU/master/merged-json/repository.json';
 
 #########################################
 my %already_installed;
@@ -964,7 +965,7 @@ sub install_package {
 
 print "deploy arguments: ".join(' ', @ARGV)."\n";
 
-GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repository=s', 'ignore=s', 'nossl', 'forcetarget', 'list');
+GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'nossl', 'forcetarget', 'list', 'create');
 
 unless ( @ARGV  || @ARGV > 1) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
@@ -975,8 +976,62 @@ unless ( @ARGV  || @ARGV > 1) {
 	print "     --all to install all packages in repository \n";
 	print "     --ignore=package1,package2\n";
 	print "     --list\n";
+	print "     --repo_file\n";
+	print "     --repo_url\n";
+	print "     --create  write repository.json by merging multiple json files\n";
 	exit 1;
 }
+
+if (defined $h->{'create'}) {
+	
+	my $repo_file = 'repository.json';
+	
+	if (-e $repo_file) {
+		die "Repository file $repo_file already exists. Please delete old first.";
+	}
+	
+	
+	my $repository_merge={};
+	
+	foreach my $file (@ARGV) {
+
+		unless (-e $file) {
+			die "file \"$file\" not found";
+		}
+		my $cat_cmd = "cat ".$file;
+		my $repository_json = `$cat_cmd`;
+		chomp($repository_json);
+		my $repository;
+		try {
+			$repository = decode_json($repository_json);
+		} catch {
+			print STDERR "warning: could not parse json: "."$_\n";
+			next;
+		};
+		
+		foreach my $key (keys(%$repository)) {
+			if (defined $repository_merge->{$key}) {
+				die "key $key already defined";
+			}
+			$repository_merge->{$key} = $repository->{$key};
+			
+		}
+	}
+	#print Dumper($repository_merge);
+	
+	my $json = JSON->new;
+	my $repository_merge_pretty = $json->pretty->encode( $repository_merge );
+	print $repository_merge_pretty ."\n";
+	
+	open(my $fh, '>', $repo_file);
+	print $fh $repository_merge_pretty."\n";
+	close $fh;
+	
+	
+	exit(0);
+}
+
+
 
 
 if (defined $h->{'update'} && defined $h->{'new'} ) {
@@ -1045,16 +1100,29 @@ my $repository = undef;
 
 
 my $use_repository;
-if (defined $h->{'repository'}) {
-	$use_repository = $h->{'repository'};
+
+if (defined $h->{'repo_file'}) {
+	$use_repository = $h->{'repo_file'};
+	my $cat_cmd = "cat ".$use_repository;
+	$repository_json = `$cat_cmd`;
+	chomp($repository_json);
 } else {
-	$use_repository = $default_repository;
+	if (defined $h->{'repo_url'}) {
+		$use_repository = $h->{'repo_url'};
+	} else {
+		$use_repository = $default_repository;
+	}
+	
+	print "fetching repository: ".$use_repository."\n";
+	my $curl_cmd = "curl -S -s -o /dev/stdout ".$use_repository;
+	$repository_json = `$curl_cmd`;
+	chomp($repository_json);
+
 }
 
-print "fetching repository: ".$use_repository."\n";
-my $curl_cmd = "curl -S -s -o /dev/stdout ".$use_repository;
-$repository_json = `$curl_cmd`;
-chomp($repository_json);
+
+
+print $repository_json."\n";
 
 eval {
 	$repository = decode_json($repository_json);
@@ -1089,7 +1157,8 @@ if (defined($h->{'ignore'})) {
 
 
 if (defined($h->{'list'})) {
-	print join(',', keys(%$repository))."\n";
+	print "list of packages in repository:\n".join(',', keys(%$repository))."\n";
+	exit(0);
 }
 
 
@@ -1099,7 +1168,7 @@ foreach my $package_string (@package_list) {
 	
 	my $pack_hash = $repository->{$package};
 	unless (defined $pack_hash) {
-		print "repository:\n";
+		#print "repository:\n";
 		foreach my $p (keys(%$repository)) {
 			print "$p\n";
 		}
