@@ -899,7 +899,7 @@ sub install_package {
 			}
 			
 			
-			
+			chdir($ptarget);
 			#temp_dir goes out of scope here
 		}
 		
