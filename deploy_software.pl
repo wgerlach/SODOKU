@@ -1056,9 +1056,14 @@ my $curl_cmd = "curl -S -s -o /dev/stdout ".$use_repository;
 $repository_json = `$curl_cmd`;
 chomp($repository_json);
 
-
-$repository = decode_json($repository_json);
-
+eval {
+	$repository = decode_json($repository_json);
+	1;
+} or do {
+	my $e = $@;
+	print "$e\n";
+	exit(1);
+}
 
 datastructure_walk('data' => $repository, 'sub' => \&process_scalar); # for my "environment variables"... ;-)
 
