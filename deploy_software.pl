@@ -1063,7 +1063,7 @@ eval {
 	my $e = $@;
 	print "$e\n";
 	exit(1);
-}
+};
 
 datastructure_walk('data' => $repository, 'sub' => \&process_scalar); # for my "environment variables"... ;-)
 
