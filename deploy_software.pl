@@ -381,10 +381,10 @@ sub replacePtarget {
 	
 	#print 'ref: '.ref($version_numbers_ref)."\n";
 	
-	print "exec: $exec\n";
+	print "replacePtarget_A: $exec\n";
 	$exec =~ s/\$\{ptarget\}/$ptarget/g;
 	
-	print "exec: $exec\n";
+	print "replacePtarget_B: $exec\n";
 	return $exec;
 }
 
