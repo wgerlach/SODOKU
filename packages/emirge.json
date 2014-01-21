@@ -1,16 +1,7 @@
 {
 	"emirge_v0.60" : {
 		"_comment" : "fixed versions!, requires usearch version >= 6.0.203",
-		"source" : "https://github.com/csmiller/EMIRGE/archive/v0.60.tar.gz",
-		"source-extract" : 1,
-		"source-temporary" : 1,
-		"exec": ["python setup.py build",
-				 "python setup.py install --prefix=${ptarget}"],
-		"subpackages" : [
-						  { "source-apt" : "python-biopython cython" },
-						  { "source-pip" : ["pysam", "scipy", "numpy"]}
-						 ],
-		"depends" : ["bowtie==0.12.8", "samtools==0.1.18"]
+		"depends" : ["bowtie==0.12.8", "samtools==0.1.18", "emirge==0.60"]
 	},
 	"emirge" : {
 		"_comment" : "requires usearch version >= 6.0.203",
