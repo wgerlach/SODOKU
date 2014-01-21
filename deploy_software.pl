@@ -637,6 +637,14 @@ sub install_package {
 		}
 	}
 
+	# resolve short-hand notation
+	foreach my $type ('apt', 'pip', 'git', 'go', 'mercurial') {
+		if (defined $package_hash->{'source-'.$type}) {
+			$package_hash->{'source'} = $package_hash->{'source-'.$type};
+			$package_hash->{'source-type'} = $type;
+		}
+	}
+	
 	if (defined $package_hash->{'source'}) {
 		my @sources = get_array($package_hash->{'source'});
 		
@@ -956,16 +964,17 @@ sub install_package {
 
 print "deploy arguments: ".join(' ', @ARGV)."\n";
 
-GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repository=s', 'ignore=s', 'nossl', 'forcetarget');
+GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repository=s', 'ignore=s', 'nossl', 'forcetarget', 'list');
 
 unless ( @ARGV  || @ARGV > 1) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
 	#print "default target=$target\n";
 	print "example: deploy_software.pl --target=/home/ubuntu/ aweclient\n";
-	print "     --update to update existing repositories if possible \n";
-	print "     --new to delete repositories before cloning \n";
+	print "     --update to update existing packages if possible \n";
+	print "     --new to delete packages before cloning \n";
 	print "     --all to install all packages in repository \n";
 	print "     --ignore=package1,package2\n";
+	print "     --list\n";
 	exit 1;
 }
 
@@ -1073,6 +1082,9 @@ if (defined($h->{'ignore'})) {
 }
 
 
+if (defined($h->{'list'})) {
+	print join(',', keys(%$repository))."\n";
+}
 
 
 foreach my $package_string (@package_list) {
