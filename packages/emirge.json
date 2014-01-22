@@ -6,7 +6,7 @@
 	"emirge" : {
 		"_comment" : "requires usearch version >= 6.0.203",
 		"version" : [0,60],
-		"source-pip" : "https://github.com/csmiller/EMIRGE/archive/v${v1}.${v2}.tar.gz"}
+		"source-pip" : "https://github.com/csmiller/EMIRGE/archive/v${v1}.${v2}.tar.gz",
 		"subpackages" : [
 				 { "source-apt" : "python-biopython cython" },
 				 { "source-pip" : ["pysam", "scipy", "numpy"]}
