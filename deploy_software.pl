@@ -796,7 +796,7 @@ sub install_package {
 						
 						my ($tarfile) = $downloaded_file =~ /^(.*)\.bz2$/;
 						defined($tarfile) or die;
-						
+						system("rm -f ".$tarfile);
 						systemp("bzip2 -d ".$downloaded_file) ==0 or die;
 						systemp("tar xvf -d ".$tarfile." -C ".$temp_dir) ==0 or die;
 						
