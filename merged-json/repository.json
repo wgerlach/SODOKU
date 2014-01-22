@@ -404,7 +404,10 @@
    "samtools" : {
       "build-type" : "make",
       "source-temporary" : 1,
-      "source" : "http://downloads.sourceforge.net/project/samtools/samtools/${v1}.${v2}.${v3}/samtools-${v1}.${v2}.${v3}.tar.bz2",
+      "source" : {
+         "url" : "http://downloads.sourceforge.net/project/samtools/samtools/${v1}.${v2}.${v3}/samtools-${v1}.${v2}.${v3}.tar.bz2",
+         "subdir" : "samtools-${v1}.${v2}.${v3}"
+      },
       "source-extract" : 1,
       "version" : [
          0,
