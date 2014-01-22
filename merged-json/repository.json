@@ -405,12 +405,17 @@
       "build-type" : "make",
       "source-temporary" : 1,
       "source" : "http://downloads.sourceforge.net/project/samtools/samtools/${v1}.${v2}.${v3}/samtools-${v1}.${v2}.${v3}.tar.bz2",
-      "ptarget" : "${target}bin",
-      "install-type" : "copy",
       "source-extract" : 1,
+      "version" : [
+         0,
+         1,
+         18
+      ],
       "install-files" : [
          "samtools"
-      ]
+      ],
+      "ptarget" : "${target}bin",
+      "install-type" : "copy"
    },
    "cdbfasta" : {
       "build-type" : "make",
