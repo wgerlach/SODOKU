@@ -11,7 +11,7 @@
 		"source-extract" : 1,
 		"source-temporary" : 1,
 		"build-exec": ["python setup.py build",
-				 "python setup.py install --prefix=${ptarget}"],
+				"python setup.py install --prefix=${ptarget}"],
 		"subpackages" : [
 						 { "source-apt" : "python-biopython cython" },
 						 { "source-pip" : ["pysam", "scipy", "numpy"]}
