@@ -778,7 +778,7 @@ sub install_package {
 				#simple download
 				
 				$downloaded_file = downloadFile('url' => $source,
-												'target-dir' => $ptarget,
+												'target-dir' => $temp_dir, #$ptarget,
 												'target-name' => $source_filename,
 												'remove-existing-file' => $package_hash->{'source-remove-existing-file'});
 				unless (defined $downloaded_file) {
