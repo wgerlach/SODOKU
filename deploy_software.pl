@@ -803,7 +803,7 @@ sub install_package {
 							die "tarfile \"$tarfile\" not found";
 						}
 						
-						systemp("tar xvf -d ".$tarfile." -C ".$temp_dir) ==0 or die;
+						systemp("tar xvf ".$tarfile." -C ".$temp_dir) ==0 or die;
 						
 						
 					}
