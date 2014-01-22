@@ -798,6 +798,11 @@ sub install_package {
 						defined($tarfile) or die;
 						systemp("rm -f ".$tarfile);
 						systemp("bzip2 -d ".$downloaded_file) ==0 or die;
+						
+						unless (-e $tarfile) {
+							die "tarfile \"$tarfile\" not found";
+						}
+						
 						systemp("tar xvf -d ".$tarfile." -C ".$temp_dir) ==0 or die;
 						
 						
