@@ -609,7 +609,7 @@ sub install_package {
 
 	
 	#dependencies
-	if (defined $package_hash->{'depends'}) {
+	if (defined $package_hash->{'depends'} && ! defined($h->{'nodeps'})) {
 		foreach my $dependency (@{$package_hash->{'depends'}}) {
 			
 			my ($dep_package, $dep_version, $dep_package_args_ref) = parsePackageString($dependency);
@@ -1008,7 +1008,7 @@ sub install_package {
 
 print "deploy arguments: ".join(' ', @ARGV)."\n";
 
-GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'nossl', 'forcetarget', 'list', 'create');
+GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'nossl', 'forcetarget', 'list', 'create', 'nodeps');
 
 if ( @ARGV == 0 && ! defined $h->{'list'}) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
@@ -1022,6 +1022,7 @@ if ( @ARGV == 0 && ! defined $h->{'list'}) {
 	print "     --repo_file\n";
 	print "     --repo_url\n";
 	print "     --create  write repository.json by merging multiple json files\n";
+	print "     --nodeps do not install dependencies\n";
 	exit 1;
 }
 
@@ -1036,6 +1037,7 @@ if (defined $h->{'create'}) {
 	
 	my $repository_merge={};
 	
+	my @error_file=();
 	foreach my $file (@ARGV) {
 
 		unless (-e $file) {
@@ -1048,6 +1050,7 @@ if (defined $h->{'create'}) {
 		try {
 			$repository = decode_json($repository_json);
 		} catch {
+			push(@error_file, $file);
 			print STDERR "warning: could not parse json: "."$_\n";
 			next;
 		};
@@ -1070,6 +1073,10 @@ if (defined $h->{'create'}) {
 	print $fh $repository_merge_pretty."\n";
 	close $fh;
 	
+	
+	if (@error_file > 0) {
+		print "warning: problems with following files:".join(',',@error_file)."\n"
+	}
 	
 	exit(0);
 }
