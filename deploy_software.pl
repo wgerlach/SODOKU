@@ -787,12 +787,24 @@ sub install_package {
 				
 				if (definedAndTrue($package_hash->{'source-extract'})) {
 					if ($downloaded_file =~ /\.tar\.gz$/) {
-						systemp("tar xvfz ".$downloaded_file." -C ".$temp_dir);
+						systemp("tar xvfz ".$downloaded_file." -C ".$temp_dir) ==0 or die;
 					} elsif ($downloaded_file =~ /\.tgz$/) {
-						systemp("tar xvfz ".$downloaded_file." -C ".$temp_dir);
+						systemp("tar xvfz ".$downloaded_file." -C ".$temp_dir) ==0 or die;
 					} elsif ($downloaded_file =~ /\.zip$/) {
-						systemp("unzip ".$downloaded_file." -d ".$temp_dir);
-					} else {
+						systemp("unzip ".$downloaded_file." -d ".$temp_dir) ==0 or die;
+					} elsif ($downloaded_file =~ /\.tar\.bz2$/) {
+						
+						my $tarfile = $downloaded_file =~ /^(.*)\.bz2$/;
+						defined($tarfile) or die;
+						
+						systemp("bzip2 -d ".$downloaded_file) ==0 or die;
+						systemp("tar xvf -d ".$tarfile." -C ".$temp_dir) ==0 or die;
+						
+						
+					}
+
+					
+					else {
 						die "unknown archive: $downloaded_file";
 					}
 					$sourcedir=$temp_dir;
