@@ -794,7 +794,7 @@ sub install_package {
 						systemp("unzip ".$downloaded_file." -d ".$temp_dir) ==0 or die;
 					} elsif ($downloaded_file =~ /\.tar\.bz2$/) {
 						
-						my $tarfile = $downloaded_file =~ /^(.*)\.bz2$/;
+						my ($tarfile) = $downloaded_file =~ /^(.*)\.bz2$/;
 						defined($tarfile) or die;
 						
 						systemp("bzip2 -d ".$downloaded_file) ==0 or die;
