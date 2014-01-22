@@ -6,16 +6,11 @@
 	"emirge" : {
 		"_comment" : "requires usearch version >= 6.0.203",
 		"version" : [0,60],
-		"source" : {"url" : "https://github.com/csmiller/EMIRGE/archive/v${v1}.${v2}.tar.gz",
-				"subdir" : "EMIRGE-${v1}.${v2}"},
-		"source-extract" : 1,
-		"source-temporary" : 1,
-		"build-exec": ["python setup.py build",
-				"python setup.py install --prefix=${ptarget}"],
+		"source-pip" : "https://github.com/csmiller/EMIRGE/archive/v${v1}.${v2}.tar.gz"}
 		"subpackages" : [
-						 { "source-apt" : "python-biopython cython" },
-						 { "source-pip" : ["pysam", "scipy", "numpy"]}
-						 ],
+				 { "source-apt" : "python-biopython cython" },
+				 { "source-pip" : ["pysam", "scipy", "numpy"]}
+				 ],
 		"depends" : ["bowtie", "samtools"]
 	}
 }
