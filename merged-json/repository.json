@@ -17,42 +17,10 @@
          "file" : "${target}awe.cfg"
       }
    },
-   "qiime" : {
-      "source-temporary" : 1,
-      "source" : "git://github.com/qiime/qiime-deploy.git",
-      "test" : ". ${target}qiime_software/activate.sh ; print_qiime_config.py -t",
-      "build-exec" : "cd ${source-dir} ; python qiime-deploy.py $target/qiime_software/ -f ${1} --force-remove-failed-dirs",
-      "_comment" : "QIIME uses a configuration file like qiime.conf for the deployment, which has to be given as an argument to this package",
-      "subpackages" : [
-         {
-            "set-env" : {
-               "JAVA_HOME" : "/usr/lib/jvm/java-6-openjdk-amd64"
-            },
-            "exec" : "sudo add-apt-repository \"deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe multiverse\""
-         },
-         {
-            "source-apt" : "python-dev libncurses5-dev libssl-dev libzmq-dev libgsl0-dev openjdk-6-jdk libxml2 libxslt1.1 libxslt1-dev ant git subversion build-essential zlib1g-dev libpng12-dev libfreetype6-dev mpich2 libreadline-dev gfortran unzip libmysqlclient18 libmysqlclient-dev ghc sqlite3 libsqlite3-dev"
-         }
-      ]
-   },
    "kbase-mgrast-update" : {
       "ptarget" : "/kb/dev_container/modules/mgrast_pipeline/",
       "_comment" : "as root",
       "exec" : ". /kb/dev_container/user-env.sh ; make update"
-   },
-   "jellyfish" : {
-      "build-type" : "make-install",
-      "source-temporary" : 1,
-      "source" : {
-         "url" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-${v1}.${v2}.${v3}.tar.gz",
-         "subdir" : "jellyfish-${v1}.${v2}.${v3}"
-      },
-      "source-extract" : 1,
-      "version" : [
-         1,
-         1,
-         5
-      ]
    },
    "Shock" : {
       "depends" : [
@@ -89,12 +57,111 @@
          }
       ]
    },
-   "kbase-mgrast" : {
-      "_comment" : "target=/kb, require kbase-git key",
+   "kbase_dev_container-deploy" : {
+      "ptarget" : "${target}dev_container",
+      "exec" : [
+         "./bootstrap ${target}runtime",
+         ". ${ptarget}user-env.sh ; make && make deploy"
+      ]
+   },
+   "qiime-wo" : {
+      "subpackages" : [
+         {
+            "source" : "https://raw.github.com/wgerlach/SODOKU/master/other/qiime-1.7.0-fixed.conf",
+            "source-type" : "download",
+            "source-remove-existing-file" : 1
+         },
+         {
+            "depends" : [
+               "qiime(${target}qiime-1.7.0-fixed.conf)"
+            ]
+         }
+      ]
+   },
+   "picrust_data" : {
+      "source" : [
+         "ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/16S_13_5_precalculated.tab.gz",
+         "ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/ko_13_5_precalculated.tab.gz"
+      ],
+      "dir" : 1
+   },
+   "aweclient/cfg/default" : {
+      "source" : {
+         "filename" : "${1}",
+         "url" : "http://www.mcs.anl.gov/~wtang/files/awe.cfg"
+      },
+      "source-remove-existing-file" : 1
+   },
+   "MG-RAST/qiime" : {
+      "version" : [
+         1,
+         5,
+         0
+      ],
+      "subpackages" : [
+         {
+            "source-apt" : "libssl-dev libzmq-dev libgsl0-dev openjdk-6-jdk libxml2 libxslt1.1 libxslt1-dev ant subversion build-essential zlib1g-dev libpng12-dev libfreetype6-dev mpich2 libreadline-dev gfortran unzip libmysqlclient18 libmysqlclient-dev ghc"
+         },
+         {
+            "source" : "ftp://thebeast.colorado.edu/pub/QIIME-v${v1}.${v2}.${v3}-dependencies/app-deploy-qiime-${v1}.${v2}.${v3}.tgz",
+            "ptarget" : "${target}apps",
+            "source-extract" : 1
+         },
+         {
+            "source" : "http://www.mcs.anl.gov/~wtang/files/qiime_${v1}.${v2}.${v3}_uclust.conf",
+            "ptarget" : "${target}apps/app-deploy-qiime-${v1}.${v2}.${v3}/etc",
+            "source-remove-existing-file" : 1
+         },
+         {
+            "ptarget" : "${target}apps/app-deploy-qiime-${v1}.${v2}.${v3}/",
+            "exec" : "python app-deploy.py ${target}apps/qiime -f etc/qiime_${v1}.${v2}.${v3}_uclust.conf --force-remove-failed-dirs"
+         },
+         {
+            "source" : "http://www.mcs.anl.gov/~wtang/files/activate.sh",
+            "bashrc-append" : "source ${target}apps/qiime/activate.sh",
+            "ptarget" : "${target}apps/qiime",
+            "source-remove-existing-file" : 1
+         }
+      ]
+   },
+   "emirge_v0.60" : {
+      "_comment" : "fixed versions!, requires usearch version >= 6.0.203",
       "depends" : [
-         "kbase_bootstrap_mgrast",
-         "kbase_dev_container_mgrast-deploy",
-         "kbase_dev_container-deploy"
+         "bowtie==0.12.8",
+         "samtools==0.1.18",
+         "emirge==0.60"
+      ]
+   },
+   "jellyfish" : {
+      "build-type" : "make-install",
+      "source-temporary" : 1,
+      "source" : {
+         "url" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-${v1}.${v2}.${v3}.tar.gz",
+         "subdir" : "jellyfish-${v1}.${v2}.${v3}"
+      },
+      "source-extract" : 1,
+      "version" : [
+         1,
+         1,
+         5
+      ]
+   },
+   "qiime" : {
+      "source-temporary" : 1,
+      "source" : "git://github.com/qiime/qiime-deploy.git",
+      "test" : ". ${target}qiime_software/activate.sh ; print_qiime_config.py -t",
+      "build-exec" : "cd ${source-dir} ; python qiime-deploy.py $target/qiime_software/ -f ${1} --force-remove-failed-dirs",
+      "_comment" : "QIIME uses a configuration file like qiime.conf for the deployment, which has to be given as an argument to this package",
+      "subpackages" : [
+         {
+            "set-env" : {
+               "JAVA_HOME" : "/usr/lib/jvm/java-6-openjdk-amd64"
+            },
+            "exec" : "sudo add-apt-repository \"deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe multiverse\""
+         },
+         {
+            "source-apt" : "python-dev libncurses5-dev libssl-dev libzmq-dev libgsl0-dev openjdk-6-jdk libxml2 libxslt1.1 libxslt1-dev ant git subversion build-essential zlib1g-dev libpng12-dev libfreetype6-dev mpich2 libreadline-dev gfortran unzip libmysqlclient18 libmysqlclient-dev ghc sqlite3 libsqlite3-dev"
+         }
       ]
    },
    "MG-RAST/FragGeneScan" : {
@@ -102,11 +169,12 @@
       "ptarget" : "${target}apps/FragGeneScan",
       "source-extract" : 1
    },
-   "kbase_dev_container-deploy" : {
-      "ptarget" : "${target}dev_container",
-      "exec" : [
-         "./bootstrap ${target}runtime",
-         ". ${ptarget}user-env.sh ; make && make deploy"
+   "kbase-mgrast" : {
+      "_comment" : "target=/kb, require kbase-git key",
+      "depends" : [
+         "kbase_bootstrap_mgrast",
+         "kbase_dev_container_mgrast-deploy",
+         "kbase_dev_container-deploy"
       ]
    },
    "MG-RAST/biotools" : {
@@ -169,19 +237,16 @@
       "_comment" : "requires root",
       "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
    },
-   "qiime-wo" : {
+   "AWE" : {
+      "depends" : [
+         "go"
+      ],
       "subpackages" : [
          {
-            "source" : "https://raw.github.com/wgerlach/SODOKU/master/other/qiime-1.7.0-fixed.conf",
-            "source-type" : "download",
-            "source-remove-existing-file" : 1
-         },
-         {
-            "depends" : [
-               "qiime(${target}qiime-1.7.0-fixed.conf)"
-            ]
+            "source-apt" : "mongodb-server"
          }
-      ]
+      ],
+      "go" : "github.com/MG-RAST/AWE/..."
    },
    "kbase_bootstrap_mgrast" : {
       "build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
@@ -193,17 +258,6 @@
             "ptarget" : "${target}bootstrap/kb_java_runtime"
          }
       ]
-   },
-   "AWE" : {
-      "depends" : [
-         "go"
-      ],
-      "subpackages" : [
-         {
-            "source-apt" : "mongodb-server"
-         }
-      ],
-      "go" : "github.com/MG-RAST/AWE/..."
    },
    "kbase" : {
       "_comment" : "example: target=/kb , kbase(KBaseFBAModeling), this does not include the bootstrap! Use . /kb/deployment/user-env.sh to activate",
@@ -229,6 +283,30 @@
          }
       ],
       "mercurial" : "-u release https://code.google.com/p/go"
+   },
+   "emirge" : {
+      "version" : [
+         0,
+         60
+      ],
+      "source-pip" : "https://github.com/csmiller/EMIRGE/archive/v${v1}.${v2}.tar.gz",
+      "_comment" : "requires usearch version >= 6.0.203",
+      "depends" : [
+         "bowtie",
+         "samtools"
+      ],
+      "subpackages" : [
+         {
+            "source-apt" : "python-biopython cython"
+         },
+         {
+            "source-pip" : [
+               "pysam",
+               "scipy",
+               "numpy"
+            ]
+         }
+      ]
    },
    "MG-RAST" : {
       "set-env" : {
@@ -269,24 +347,6 @@
          }
       ]
    },
-   "picrust_data" : {
-      "source" : [
-         "ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/16S_13_5_precalculated.tab.gz",
-         "ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/ko_13_5_precalculated.tab.gz"
-      ],
-      "dir" : 1
-   },
-   "picrust_symlink" : {
-      "_comment" : "makes symlink in QIIME/picrust installation to picrust_data",
-      "depends" : [
-         "picrust_data"
-      ],
-      "exec" : [
-         "mkdir -p $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data",
-         "ln --force -s ${target}picrust_data/16S_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/16S_13_5_precalculated.tab.gz",
-         "ln --force -s ${target}picrust_data/ko_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/ko_13_5_precalculated.tab.gz"
-      ]
-   },
    "bowtie" : {
       "build-type" : "make",
       "source-temporary" : 1,
@@ -308,6 +368,30 @@
       "ptarget" : "${target}bin",
       "install-type" : "copy"
    },
+   "picrust_symlink" : {
+      "_comment" : "makes symlink in QIIME/picrust installation to picrust_data",
+      "depends" : [
+         "picrust_data"
+      ],
+      "exec" : [
+         "mkdir -p $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data",
+         "ln --force -s ${target}picrust_data/16S_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/16S_13_5_precalculated.tab.gz",
+         "ln --force -s ${target}picrust_data/ko_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/ko_13_5_precalculated.tab.gz"
+      ]
+   },
+   "gg_otus" : {
+      "source" : "ftp://greengenes.microbio.me/greengenes_release/gg_${v1}_${v2}/gg_${v1}_${v2}_otus.tar.gz",
+      "source-extract" : 1,
+      "version" : [
+         13,
+         5
+      ],
+      "_comment" : "creates symlink for use in QIIME",
+      "exec" : [
+         "mkdir -p $QIIME/../gg_otus-${v1}_${v2}-release/rep_set",
+         "ln --force -s ${target}gg_${v1}_${v2}_otus $QIIME/../gg_otus-${v1}_${v2}-release/rep_set"
+      ]
+   },
    "samtools" : {
       "build-type" : "make",
       "source-temporary" : 1,
@@ -327,26 +411,6 @@
       "ptarget" : "${target}bin",
       "install-type" : "copy"
    },
-   "gg_otus" : {
-      "source" : "ftp://greengenes.microbio.me/greengenes_release/gg_${v1}_${v2}/gg_${v1}_${v2}_otus.tar.gz",
-      "source-extract" : 1,
-      "version" : [
-         13,
-         5
-      ],
-      "_comment" : "creates symlink for use in QIIME",
-      "exec" : [
-         "mkdir -p $QIIME/../gg_otus-${v1}_${v2}-release/rep_set",
-         "ln --force -s ${target}gg_${v1}_${v2}_otus $QIIME/../gg_otus-${v1}_${v2}-release/rep_set"
-      ]
-   },
-   "aweclient/cfg/default" : {
-      "source" : {
-         "filename" : "${1}",
-         "url" : "http://www.mcs.anl.gov/~wtang/files/awe.cfg"
-      },
-      "source-remove-existing-file" : 1
-   },
    "cdbfasta" : {
       "build-type" : "make",
       "source-temporary" : 1,
@@ -361,38 +425,6 @@
       "install-files" : [
          "cdbfasta",
          "cdbyank"
-      ]
-   },
-   "MG-RAST/qiime" : {
-      "version" : [
-         1,
-         5,
-         0
-      ],
-      "subpackages" : [
-         {
-            "source-apt" : "libssl-dev libzmq-dev libgsl0-dev openjdk-6-jdk libxml2 libxslt1.1 libxslt1-dev ant subversion build-essential zlib1g-dev libpng12-dev libfreetype6-dev mpich2 libreadline-dev gfortran unzip libmysqlclient18 libmysqlclient-dev ghc"
-         },
-         {
-            "source" : "ftp://thebeast.colorado.edu/pub/QIIME-v${v1}.${v2}.${v3}-dependencies/app-deploy-qiime-${v1}.${v2}.${v3}.tgz",
-            "ptarget" : "${target}apps",
-            "source-extract" : 1
-         },
-         {
-            "source" : "http://www.mcs.anl.gov/~wtang/files/qiime_${v1}.${v2}.${v3}_uclust.conf",
-            "ptarget" : "${target}apps/app-deploy-qiime-${v1}.${v2}.${v3}/etc",
-            "source-remove-existing-file" : 1
-         },
-         {
-            "ptarget" : "${target}apps/app-deploy-qiime-${v1}.${v2}.${v3}/",
-            "exec" : "python app-deploy.py ${target}apps/qiime -f etc/qiime_${v1}.${v2}.${v3}_uclust.conf --force-remove-failed-dirs"
-         },
-         {
-            "source" : "http://www.mcs.anl.gov/~wtang/files/activate.sh",
-            "bashrc-append" : "source ${target}apps/qiime/activate.sh",
-            "ptarget" : "${target}apps/qiime",
-            "source-remove-existing-file" : 1
-         }
       ]
    }
 }
