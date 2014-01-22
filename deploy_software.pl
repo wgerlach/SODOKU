@@ -771,7 +771,11 @@ sub install_package {
 				}
 			
 			} elsif ($st eq 'pip') {
-				systemp("pip install ".$source) == 0 or die;
+				my $pip_options = "";
+				unless (defined($h->{'root'})) {
+					$pip_options = " --user ".$ENV{'USER'};
+				}
+				systemp("pip install ".$source.$pip_options) == 0 or die;
 			} elsif ($st eq 'apt') {
 				systemp("sudo apt-get --force-yes -y install ".$source) == 0 or die;
 			} elsif ($st eq 'download') {
