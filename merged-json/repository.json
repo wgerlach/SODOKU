@@ -23,6 +23,7 @@
       "exec" : ". /kb/dev_container/user-env.sh ; make update"
    },
    "Shock" : {
+      "source-go" : "github.com/MG-RAST/Shock/...",
       "depends" : [
          "go"
       ],
@@ -31,8 +32,7 @@
             "source" : "http://www.mcs.anl.gov/~wtang/files/shock.cfg",
             "ptarget" : "${target}/etc"
          }
-      ],
-      "go" : "github.com/MG-RAST/Shock/..."
+      ]
    },
    "aweclient/cfg-awec.cfg" : {
       "set-ini-values" : {
@@ -186,6 +186,9 @@
       "ptarget" : "${target}apps/biotools",
       "build-exec" : "chmod +x ${source-file}"
    },
+   "emirge-data" : {
+      "source" : "https://googledrive.com/host/0B7hz7JVEE15dbUtkRmxKVlhtd1U/SSURef_111_candidate_db.fasta.gz"
+   },
    "usearch" : {
       "source" : {
          "filename" : "usearch",
@@ -238,6 +241,7 @@
       "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
    },
    "AWE" : {
+      "source-go" : "github.com/MG-RAST/AWE/...",
       "depends" : [
          "go"
       ],
@@ -245,8 +249,7 @@
          {
             "source-apt" : "mongodb-server"
          }
-      ],
-      "go" : "github.com/MG-RAST/AWE/..."
+      ]
    },
    "kbase_bootstrap_mgrast" : {
       "build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
