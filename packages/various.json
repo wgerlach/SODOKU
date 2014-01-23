@@ -180,7 +180,7 @@
 		"ptarget" : "/etc/init/"
 	},
 	"AWE" : {
-		"go" : "github.com/MG-RAST/AWE/...",
+		"source-go" : "github.com/MG-RAST/AWE/...",
 		"subpackages" : [
 						 {
 						 "source-apt" : "mongodb-server"
@@ -200,7 +200,7 @@
 						"PATH"   : "$PATH:${target}go/bin:${target}gopath/bin"}
 	},
 	"Shock" : {
-		"go" : "github.com/MG-RAST/Shock/...",
+		"source-go" : "github.com/MG-RAST/Shock/...",
 		"subpackages" : [
 						 {	"source" : "http://www.mcs.anl.gov/~wtang/files/shock.cfg",
 							"ptarget" : "${target}/etc"
