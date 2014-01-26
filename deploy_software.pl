@@ -1052,13 +1052,17 @@ if (defined $h->{'create'}) {
 		my $repository_json = `$cat_cmd`;
 		chomp($repository_json);
 		my $repository;
-		try {
+		
+		#try {
 			$repository = decode_json($repository_json);
-		} catch {
-			push(@error_file, $file);
-			print STDERR "warning: could not parse json: "."$_\n";
-			next;
-		};
+		#}
+		#catch {
+			#warn "caught error: $_"; # not $@
+			#print Dumper($repository);
+		#	print STDERR "warning: could not parse json in $file\n";
+		#	push(@error_file, $file);
+			#next;
+		#};
 		
 		foreach my $key (keys(%$repository)) {
 			if (defined $repository_merge->{$key}) {
