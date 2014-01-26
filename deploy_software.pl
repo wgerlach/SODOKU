@@ -470,7 +470,7 @@ sub function_kbasemodules {
 			
 			print "kbase module requested: ".$module."\n";
 			
-			if ($module eq 'awe_server') {
+			if ($module eq 'awe_service') {
 				#default "kbase@git.kbase.us:"
 				$this_server = "https://github.com/kbase/";
 			}
