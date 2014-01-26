@@ -12,7 +12,8 @@ or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm 
 use File::Temp;
 #use LWP::UserAgent;
 use Data::Dumper;
-use Try::Tiny;
+eval "use Try::Tiny; 1"
+or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm install Try::Tiny";
 
 1;
 
@@ -465,10 +466,14 @@ sub function_kbasemodules {
 	while (@kbase_modules > 0) {
 		my $module = shift(@kbase_modules);
 		unless (defined $downloaded_modules->{$module}) {
-			my $gitdir = git_clone($server.$module, $target);
+			my $this_server = $server;
+			if ($module eq 'awe_server') {
+				#default "kbase@git.kbase.us:"
+				$this_server = "https://github.com/kbase/";
+			}
+			
+			my $gitdir = git_clone($this_server.$module, $target);
 			$downloaded_modules->{$module} = 1;
-			
-			
 			
 			my $filename = $gitdir.'DEPENDENCIES';
 			if (-e $filename) {
