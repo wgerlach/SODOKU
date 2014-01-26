@@ -12,5 +12,10 @@
 				 { "source-pip" : ["pysam", "scipy", "numpy"]}
 				 ],
 		"depends" : ["bowtie", "samtools"]
+	},
+	"emirge-data" : {
+		"_comment" : "compile with bowtie-build SSU_candidate_db.fasta SSU_candidate_db_btindex"
+		"source" : "https://googledrive.com/host/0B7hz7JVEE15dbUtkRmxKVlhtd1U/SSURef_111_candidate_db.fasta.gz",
+		"source-extract" : 1
 	}
 }
