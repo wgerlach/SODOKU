@@ -467,6 +467,9 @@ sub function_kbasemodules {
 		my $module = shift(@kbase_modules);
 		unless (defined $downloaded_modules->{$module}) {
 			my $this_server = $server;
+			
+			print "kbase module requested: ".$module."\n";
+			
 			if ($module eq 'awe_server') {
 				#default "kbase@git.kbase.us:"
 				$this_server = "https://github.com/kbase/";
