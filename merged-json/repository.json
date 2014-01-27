@@ -83,6 +83,7 @@
          "ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/16S_13_5_precalculated.tab.gz",
          "ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/ko_13_5_precalculated.tab.gz"
       ],
+      "data" : 1,
       "dir" : 1
    },
    "aweclient/cfg/default" : {
@@ -222,6 +223,7 @@
       "set-env" : {
          "REFDBPATH" : "${target}refdb"
       },
+      "data" : 1,
       "_comment" : "not needed",
       "exec" : [
          "for i in data logs work ; do mkdir -p ${target}awe/${i} ; chmod 777 ${target}awe/${i} ; done",
@@ -394,6 +396,7 @@
          13,
          5
       ],
+      "data" : 1,
       "_comment" : "creates symlink for use in QIIME",
       "exec" : [
          "mkdir -p $QIIME/../gg_otus-${v1}_${v2}-release/rep_set",
