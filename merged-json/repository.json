@@ -189,7 +189,10 @@
    "emirge-data" : {
       "source" : "https://googledrive.com/host/0B7hz7JVEE15dbUtkRmxKVlhtd1U/SSURef_111_candidate_db.fasta.gz",
       "source-extract" : 1,
-      "_comment" : "compile with bowtie-build SSU_candidate_db.fasta SSU_candidate_db_btindex"
+      "build-exec" : "bowtie-build SSURef_111_candidate_db.fasta SSU_candidate_db_btindex",
+      "data" : 1,
+      "_comment" : "compile with bowtie-build SSU_candidate_db.fasta SSU_candidate_db_btindex",
+      "dir" : 1
    },
    "usearch" : {
       "source" : {
