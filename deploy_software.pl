@@ -19,11 +19,13 @@ or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm 
 
 
 
-my $target = "/home/ubuntu/";
-
 my $default_repository = 'https://raw.github.com/wgerlach/SODOKU/master/merged-json/repository.json';
 
 #########################################
+
+my $target = undef;
+my $data_target = undef;
+
 my %already_installed;
 my $h = {};
 
@@ -169,11 +171,14 @@ sub downloadFile {
 	
 }
 
+# process global variables
 sub process_scalar {
 	my $text = shift;
 	
 	$text =~ s/\$target/$target/g ;
 	$text =~ s/\$\{target\}/$target/g ;
+	
+	$text =~ s/\$\{data_target\}/$data_target/g ;
 	
 	return $text;
 }
@@ -1144,6 +1149,9 @@ if (defined $h->{'target'}) {
 	$target = $h->{'target'};
 }
 
+
+
+
 unless (defined $target) {
 	$target = getcwd();
 }
@@ -1164,7 +1172,14 @@ if (defined $target) {
 	die;
 }
 
-
+if (defined $h->{'data_target'}) {
+	$data_target = $h->{'data_target'};
+	if (substr($data_target, -1, 1) ne "/") {
+		$data_target .= "/";
+	}
+} else {
+	$data_target = $target;
+}
 
 
 
