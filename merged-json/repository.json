@@ -180,9 +180,9 @@
    },
    "emirge-data-cached" : {
       "source" : "http://dunkirk.mcs.anl.gov/~wgerlach/SSURef_111.tar.gz",
+      "ptarget" : "${data_target}emirge-data",
       "source-extract" : 1,
-      "data" : 1,
-      "dir" : 1
+      "data" : 1
    },
    "MG-RAST/biotools" : {
       "source" : [
