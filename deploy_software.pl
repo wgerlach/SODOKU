@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Cwd 'abs_path';
+use Cwd; #'abs_path getcwd'
 use Getopt::Long;
 use File::Basename;
 eval "use JSON; 1"
