@@ -824,7 +824,13 @@ sub install_package {
 						systemp("tar xvf ".$tarfile." -C ".$temp_dir) ==0 or die;
 						
 						
-					}
+					} elsif ($downloaded_file =~ /\.gz$/) {
+						my ($uncompressed) = /^(.*)\.gz$/;
+						if (defined $h->{'new'}) {
+							systemp("rm -f ".$temp_dir.$uncompressed);
+						}
+						
+						systemp("gzip -d ".$downloaded_file." && mv -n ".$uncompressed.' '.$temp_dir) ==0 or die;
 
 					
 					else {
