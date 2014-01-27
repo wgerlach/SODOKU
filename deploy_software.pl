@@ -825,7 +825,7 @@ sub install_package {
 						
 						
 					} elsif ($downloaded_file =~ /\.gz$/) {
-						my ($uncompressed) = /^(.*)\.gz$/;
+						my ($uncompressed) = $downloaded_file =~ /^(.*)\.gz$/;
 						if (defined $h->{'new'}) {
 							systemp("rm -f ".$temp_dir.$uncompressed);
 						}
