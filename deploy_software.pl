@@ -832,8 +832,7 @@ sub install_package {
 						
 						systemp("gzip -d ".$downloaded_file." && mv -n ".$uncompressed.' '.$temp_dir) ==0 or die;
 
-					
-					else {
+					} else {
 						die "unknown archive: $downloaded_file";
 					}
 					$sourcedir=$temp_dir;
