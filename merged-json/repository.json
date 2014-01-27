@@ -178,6 +178,12 @@
          "kbase_dev_container-deploy"
       ]
    },
+   "emirge-data-cached" : {
+      "source" : "http://dunkirk.mcs.anl.gov/~wgerlach/SSURef_111.tar.gz",
+      "source-extract" : 1,
+      "data" : 1,
+      "dir" : 1
+   },
    "MG-RAST/biotools" : {
       "source" : [
          "ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/superblat",
