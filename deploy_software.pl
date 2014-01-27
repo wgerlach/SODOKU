@@ -830,8 +830,10 @@ sub install_package {
 							systemp("rm -f ".$temp_dir.$uncompressed);
 						}
 						
-						systemp("gzip -d ".$downloaded_file." && mv -n ".$uncompressed.' '.$temp_dir) ==0 or die;
-
+						systemp("gzip -d ".$downloaded_file) ==0 or die;
+						
+						
+						
 					} else {
 						die "unknown archive: $downloaded_file";
 					}
