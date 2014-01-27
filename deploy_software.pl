@@ -1028,7 +1028,7 @@ if ( @ARGV == 0 && ! defined $h->{'list'}) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
 	#print "default target=$target\n";
 	print "example: deploy_software.pl --target=/home/ubuntu/ aweclient\n";
-	print "     --data_target different target for packages marked with data=1\n"
+	print "     --data_target different target for packages marked with data=1\n";
 	print "     --update to update existing packages if possible \n";
 	print "     --new to delete packages before cloning \n";
 	print "     --all to install all packages in repository \n";
