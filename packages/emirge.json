@@ -25,6 +25,6 @@
 		"source" : "http://dunkirk.mcs.anl.gov/~wgerlach/SSURef_111.tar.gz",
 		"source-extract" : 1,
 		"data" : 1,
-		"dir" : 1
+		"ptarget" : "${data_target}emirge-data"
 	}
 }
