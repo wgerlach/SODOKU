@@ -604,6 +604,9 @@ sub install_package {
 	if ( defined($h->{'data_target'}) && definedAndTrue($package_hash->{'data'}) ) {
 		unless ( defined($package_hash->{'ptarget'}) ) {
 			$ptarget = $h->{'data_target'};
+			print "ptarget not defined: use data_target\n";
+		} else {
+			print "ptarget defined: $ptarget\n";
 		}
 		print "is data package\n";
 	} else {
