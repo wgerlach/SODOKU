@@ -53,6 +53,7 @@
 	"gg_otus" : {
 		"version" : [13,5],
 		"source" : "ftp://greengenes.microbio.me/greengenes_release/gg_${v1}_${v2}/gg_${v1}_${v2}_otus.tar.gz",
+		"data" : 1,
 		"source-extract" : 1,
 		"exec" : [	"mkdir -p $QIIME/../gg_otus-${v1}_${v2}-release/rep_set",
 					"ln --force -s ${target}gg_${v1}_${v2}_otus $QIIME/../gg_otus-${v1}_${v2}-release/rep_set"],
@@ -61,6 +62,7 @@
 	"picrust_data" : {
 		"source" : ["ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/16S_13_5_precalculated.tab.gz",
 					"ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/ko_13_5_precalculated.tab.gz"],
+		"data" : 1,
 		"dir" : 1
 	},
 	"picrust_symlink" : {
@@ -286,6 +288,7 @@
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.2",
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr",
 					"ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.clust"],
+		"data" : 1,
 		"set-env" : {"REFDBPATH" : "${target}refdb"},
 		"subpackages" : [
 						 {
