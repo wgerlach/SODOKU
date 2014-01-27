@@ -20,5 +20,11 @@
 		"source-extract" : 1,
 		"dir" : 1,
 		"build-exec" : "bowtie-build SSURef_111_candidate_db.fasta SSU_candidate_db_btindex"
+	},
+	"emirge-data-cached": {
+		source" : "http://dunkirk.mcs.anl.gov/~wgerlach/SSURef_111.tar.gz",
+		"source-extract" : 1,
+		"data" : 1,
+		"dir" : 1
 	}
 }
