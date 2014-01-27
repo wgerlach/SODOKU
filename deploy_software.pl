@@ -601,8 +601,10 @@ sub install_package {
 	my $ptarget = $package_hash->{'ptarget'} || $target;
 	
 	# package is a data package ?
-	if (defined($h->{'data_target'}) && definedAndTrue($package_hash->{'data'}) ) {
-		$ptarget = $h->{'data_target'};
+	if (defined($h->{'data_target'}) && definedAndTrue($package_hash->{'data'}))) {
+		unless (defined($package_hash->{'ptarget'})) {
+			$ptarget = $h->{'data_target'};
+		}
 		print "is data package\n";
 	} else {
 		print "is normal software package\n";
