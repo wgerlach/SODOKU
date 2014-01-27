@@ -594,6 +594,12 @@ sub install_package {
 	}
 	
 	my $ptarget = $package_hash->{'ptarget'} || $target;
+	
+	# package is a data package ?
+	if (defined $h->{'data_target'} && definedAndTrue($package_hash->{'data'}) ) {
+		$ptarget = $h->{'data_target'};
+	}
+	
 	if (substr($ptarget, -1, 1) ne '/') {
 		$ptarget .= '/';
 	}
@@ -1016,12 +1022,13 @@ sub install_package {
 
 print "deploy arguments: ".join(' ', @ARGV)."\n";
 
-GetOptions ($h, 'target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'nossl', 'forcetarget', 'list', 'create', 'nodeps');
+GetOptions ($h, 'target=s', 'data_target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'nossl', 'forcetarget', 'list', 'create', 'nodeps');
 
 if ( @ARGV == 0 && ! defined $h->{'list'}) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
 	#print "default target=$target\n";
 	print "example: deploy_software.pl --target=/home/ubuntu/ aweclient\n";
+	print "     --data_target different target for packages marked with data=1\n"
 	print "     --update to update existing packages if possible \n";
 	print "     --new to delete packages before cloning \n";
 	print "     --all to install all packages in repository \n";
