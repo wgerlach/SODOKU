@@ -755,11 +755,6 @@ sub install_package {
 			
 			if ($st eq 'git' || $st eq 'mercurial' || $st eq 'go') {
 				
-				
-				
-				
-				
-				
 				if ($st eq 'git') {
 					$sourcedir = git_clone($source, $temp_dir, $source_branch);
 				} elsif ($st eq 'mercurial') {
@@ -774,9 +769,19 @@ sub install_package {
 						}
 					}
 					
+					# try to delete previous repository
 					if (defined $h->{'new'}) {
 					#rm -rf gopath/src/github.com/
-						if (defined $ENV{GOPATH} && -d $ENV{GOPATH} ) {
+						unless (defined $ENV{'GOPATH'}) {
+							die "GOPATH environment variable not found";
+						}
+
+						if ($ENV{'GOPATH'} eq '') {
+							die "GOPATH environment variable empty";
+						}
+
+						
+						if (-d $ENV{'GOPATH'} ) {
 							my $src_dir = $ENV{GOPATH}.'/src/'.$source;
 							while (substr($src_dir, -1, 1) eq'.') {
 								chop($src_dir);
@@ -784,17 +789,17 @@ sub install_package {
 							if (-d $src_dir) {
 								systemp("rm -rf ".$src_dir)
 							}
-						}
-						if (defined $ENV{GOPATH} && ! -d $ENV{GOPATH} ) {
+						} else {
 							systemp("mkdir -p ".$ENV{GOPATH});
 						}
 						
 					}
+					
 					if ($update_works == 0) {
 						systemp("go get ".$source) == 0 or die;
 					}
 				} else {
-					die;
+					die "repository type unknown";
 				}
 			
 			} elsif ($st eq 'pip') {
