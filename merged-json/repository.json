@@ -41,13 +41,15 @@
       }
    },
    "kbase_dev_container_mgrast-deploy" : {
-      "build-exec" : "cd ${source-dir} && source /kb/runtime/env/java-build-runtime.env",
-      "source-git" : {
-         "url" : "kbase@git.kbase.us:dev_container",
-         "branch" : "mgrast-deploy"
-      },
       "_comment" : "--target should be /kb/, here we used specifc branch",
       "subpackages" : [
+         {
+            "build-exec" : "cd ${source-dir} && source /kb/runtime/env/java-build-runtime.env",
+            "source-git" : {
+               "url" : "kbase@git.kbase.us:dev_container",
+               "branch" : "mgrast-deploy"
+            }
+         },
          {
             "ptarget" : "${target}dev_container/modules",
             "source-git" : [
@@ -200,6 +202,17 @@
       "data" : 1,
       "_comment" : "compile with bowtie-build SSU_candidate_db.fasta SSU_candidate_db_btindex",
       "dir" : 1
+   },
+   "bowtie2" : {
+      "source" : {
+         "url" : "http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/${v1}.${v2}.${v3}/bowtie2-${v1}.${v2}.${v3}-linux-x86_64.zip",
+         "subdir" : "bowtie2-${v1}.${v2}.${v3}"
+      },
+      "version" : [
+         2,
+         2,
+         0
+      ]
    },
    "usearch" : {
       "source" : {
