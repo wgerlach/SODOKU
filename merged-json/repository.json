@@ -44,6 +44,10 @@
       "_comment" : "--target should be /kb/, here we used specifc branch",
       "subpackages" : [
          {
+            "set-env" : {
+               "JAVA_HOME" : "/home/ubuntu",
+               "CATALINA_HOME" : "/home/ubuntu"
+            },
             "build-exec" : "cd ${source-dir} && echo . /kb/runtime/env/java-build-runtime.env",
             "source-git" : {
                "url" : "kbase@git.kbase.us:dev_container",
