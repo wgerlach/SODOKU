@@ -289,6 +289,7 @@ sub git_clone {
 		systemp("cd $gitdir && git checkout ".$gitbranch) == 0 or die;
 	}
 	
+	print "git_clone returns $gitdir\n";
 	return $gitdir;
 }
 
@@ -884,6 +885,7 @@ sub install_package {
 				#}
 				#print "build-exec:\n";
 				#systemp($exec) == 0 or die;
+				print "sourcedir: $sourcedir\n";
 				
 				array_execute($package_hash->{'build-exec'}, 'source-file' => $downloaded_file, 'source-dir' => $sourcedir);
 				
