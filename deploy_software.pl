@@ -529,7 +529,7 @@ sub get_array {
 
 
 sub array_execute {
-	my ($argument, %replacements) = shift(@_);
+	my ($argument, %replacements) = @_;
 	
 	
 	my @execs;
