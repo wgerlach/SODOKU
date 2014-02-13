@@ -83,14 +83,17 @@
 	},
 	"kbase_dev_container_mgrast-deploy" : {
 		"_comment": "--target should be /kb/, here we used specifc branch",
-		"source-git" : {	"url" : "kbase@git.kbase.us:dev_container",
-						"branch" : "mgrast-deploy"},
-		"build-exec" : "cd ${source-dir} && source /kb/runtime/env/java-build-runtime.env",
 		"subpackages" : [
-						 {	"source-git" : ["https://github.com/kbase/awe_service", "https://github.com/kbase/mgrast_pipeline"],
-							"ptarget" : "${target}dev_container/modules"
-						 }
-						 ]
+				{
+					"source-git" : {	"url" : "kbase@git.kbase.us:dev_container",
+								"branch" : "mgrast-deploy"
+							},
+					"build-exec" : "cd ${source-dir} && source /kb/runtime/env/java-build-runtime.env"
+				},
+				 {	"source-git" : ["https://github.com/kbase/awe_service", "https://github.com/kbase/mgrast_pipeline"],
+					"ptarget" : "${target}dev_container/modules"
+				 }
+		 ]
 	},
 	"kbase_bootstrap_mgrast" : {
 		"_comment" : "target : /kb/",
@@ -249,6 +252,12 @@
 							"bashrc-append" : "source ${target}apps/qiime/activate.sh"
 						 }
 						 ]
+	},
+	"bowtie2" : {
+		"version" : [2,2,0],
+		"source" : {	"url" : "http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/${v1}.${v2}.${v3}/bowtie2-${v1}.${v2}.${v3}-linux-x86_64.zip",
+						"subdir" : "bowtie2-${v1}.${v2}.${v3}"
+				}
 	},
 	"bowtie" : {
 		"version" : [1,0,0],
