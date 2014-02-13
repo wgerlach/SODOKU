@@ -44,7 +44,7 @@
       "_comment" : "--target should be /kb/, here we used specifc branch",
       "subpackages" : [
          {
-            "build-exec" : "cd ${source-dir} && source /kb/runtime/env/java-build-runtime.env",
+            "build-exec" : "cd ${source-dir} && . /kb/runtime/env/java-build-runtime.env",
             "source-git" : {
                "url" : "kbase@git.kbase.us:dev_container",
                "branch" : "mgrast-deploy"
