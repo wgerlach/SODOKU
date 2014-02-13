@@ -286,7 +286,7 @@ sub git_clone {
 	systemp("cd $dir && git clone $source") == 0 or die;
 	
 	if (defined $gitbranch) {
-		systemp("cd $dir && git checkout ".$gitbranch) == 0 or die;
+		systemp("cd $gitdir && git checkout ".$gitbranch) == 0 or die;
 	}
 	
 	return $gitdir;
