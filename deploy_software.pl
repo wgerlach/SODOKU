@@ -561,6 +561,14 @@ sub array_execute {
 	
 }
 
+sub chdirp {
+	my $ptarget = shift(@_);
+	if ($d) {
+		print 'cmd: cd '.$ptarget."\n";
+	} else {
+		chdir($ptarget);
+	}
+}
 
 sub install_package {
 	my ($repository, $package_hash, $package, $version, $package_args_ref) = @_;
@@ -666,9 +674,9 @@ sub install_package {
 	
 	
 		
+	chdirp($ptarget);
+
 	
-	#print "chdir $ptarget\n";
-	chdir($ptarget);
 	
 	#subpackages
 	if (defined $package_hash->{'subpackages'}) {
@@ -682,8 +690,8 @@ sub install_package {
 		}
 	}
 	
-	print "chdir $ptarget\n";
-	chdir($ptarget);
+	
+	chdirp($ptarget);
 	
 	if ($package_hash->{'depend-function'}) {
 		
@@ -881,7 +889,7 @@ sub install_package {
 				$build_dir .= $source_subdir;
 			}
 
-			chdir($build_dir);
+			chdirp($build_dir);
 			
 			# different build-types
 			if (defined($package_hash->{'build-exec'})) {
@@ -972,7 +980,7 @@ sub install_package {
 			}
 			
 			
-			chdir($ptarget);
+			chdirp($ptarget);
 			#temp_dir goes out of scope here
 		}
 		
