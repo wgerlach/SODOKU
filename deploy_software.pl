@@ -29,6 +29,9 @@ my $data_target = undef;
 my %already_installed;
 my $h = {};
 
+my $d=undef; # docker inidicator
+
+
 sub systemp {
 	print "cmd: ".join(' ', @_)."\n";
 	
@@ -165,7 +168,7 @@ sub downloadFile {
 	
 	systemp("cd $dir && curl $ssl -L -o $targetname --retry 1 --retry-delay 5 \"$url\"") == 0 or die;
 	
-	unless (-s $file) {
+	unless (-s $file || $d) {
 		die "file $file was not downloaded!?";
 	}
 	
@@ -565,7 +568,7 @@ sub install_package {
 	#print 'ref1: '.ref($version)."\n";
 	#print "$package: ". Dumper($package_hash);
 	
-	my $d = $h->{'docker'};
+	
 	
 	if (definedAndTrue($package_hash->{'ignore'})) {
 		print STDERR "package $package ignored.\n";
@@ -1074,6 +1077,8 @@ if ( @ARGV == 0 && ! defined $h->{'list'}) {
 	print "     --nodeps do not install dependencies\n";
 	exit 1;
 }
+
+$d = $h->{'docker'} || 0;
 
 if (defined $h->{'create'}) {
 	
