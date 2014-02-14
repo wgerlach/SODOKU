@@ -1180,7 +1180,7 @@ if (defined $h->{'update'} && defined $h->{'new'} ) {
 	die;
 }
 
-my $is_root_user = ($< == 0)?1:0;
+$is_root_user = ($< == 0)?1:0;
 
 
 unless ($d) {
