@@ -761,6 +761,7 @@ sub install_package {
 			
 			my $temp_dir_obj = undef;
 			my $temp_dir = $ptarget;
+			
 			my $sourcedir=$ptarget;
 			my $downloaded_file=undef;
 			if ($st eq 'git' && defined($package_hash->{'git-server'})) {
@@ -768,8 +769,15 @@ sub install_package {
 			}
 			
 			if (definedAndTrue($package_hash->{'source-temporary'})) {
-				$temp_dir_obj = File::Temp->newdir( TEMPLATE => 'deployXXXXX' );
-				$temp_dir = $temp_dir_obj->dirname.'/';
+				
+				if ($d) {
+					$temp_dir = '/tmp/sodoku_deploy/';
+					systemp('rm -rf '.$temp_dir);
+					systemp('mkdir -p '.$temp_dir);
+				} else {
+					$temp_dir_obj = File::Temp->newdir( TEMPLATE => 'deployXXXXX' );
+					$temp_dir = $temp_dir_obj->dirname.'/';
+				}
 			}
 			
 			if ($st eq 'git' || $st eq 'mercurial' || $st eq 'go') {
@@ -979,6 +987,9 @@ sub install_package {
 				}
 			}
 			
+			if (definedAndTrue($package_hash->{'source-temporary'})  && $d) {
+				systemp('rm -rf '.$temp_dir)
+			}
 			
 			chdirp($ptarget);
 			#temp_dir goes out of scope here
