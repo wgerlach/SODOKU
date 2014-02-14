@@ -565,6 +565,8 @@ sub install_package {
 	#print 'ref1: '.ref($version)."\n";
 	#print "$package: ". Dumper($package_hash);
 	
+	my $d = $h->{'docker'};
+	
 	if (definedAndTrue($package_hash->{'ignore'})) {
 		print STDERR "package $package ignored.\n";
 		return;
@@ -950,7 +952,7 @@ sub install_package {
 						
 						foreach my $install_file (@install_files_array) {
 							
-							unless (-e $build_dir.$install_file) {
+							unless (-e $build_dir.$install_file || $d) {
 								die "installation file $build_dir.$install_file not found";
 							}
 							
