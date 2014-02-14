@@ -846,7 +846,7 @@ sub install_package {
 						systemp("rm -f ".$tarfile);
 						systemp("bzip2 -d ".$downloaded_file) ==0 or die;
 						
-						unless (-e $tarfile) {
+						unless (-e $tarfile || $d) {
 							die "tarfile \"$tarfile\" not found";
 						}
 						
@@ -923,13 +923,13 @@ sub install_package {
 					systemp("cd $build_dir && ./configure --prefix=$ptarget") == 0 or die;
 				}
 				
-				if (-e $build_dir.'Makefile') {
+				if (-e $build_dir.'Makefile' || $d) {
 					systemp("cd $build_dir && make")== 0 or die; #TODO make -j4
 				} else {
 					die "Makefile in $build_dir not found";
 				}
 				if ($build_type eq 'make-install') {
-					if (-e $build_dir.'Makefile') {
+					if (-e $build_dir.'Makefile'  || $d) {
 						systemp("cd $build_dir && make install")== 0 or die; #TODO make -j4
 					} else {
 						die "Makefile in $build_dir not found";
@@ -996,7 +996,7 @@ sub install_package {
 			die "INI-file $inifile not defined";
 		}
 		
-		unless (-e $inifile) {
+		unless (-e $inifile || $d) {
 			die "INI-file $inifile not found";
 		}
 		
@@ -1189,7 +1189,7 @@ if (defined($h->{'forcetarget'}) && ! -d $target) {
 }
 
 if (defined $target) {
-	unless (-d $target) {
+	unless (-d $target  || $d) {
 		die "target \"$target\" not found!\n";
 	}
 } else {
