@@ -742,12 +742,13 @@ sub install_package {
 		}
 		
 		my $source_dir=$ptarget;
+		my $source_subdir;
 		
 		foreach my $source_obj (@sources) {
 			
 			my $source;
 			my $source_filename;
-			my $source_subdir;
+			
 			my $source_branch;
 			if (ref($source_obj) eq 'HASH') {
 				$source = $source_obj->{'url'};
@@ -907,6 +908,11 @@ sub install_package {
 		my $build_dir = $source_dir;
 		
 		if (defined $source_subdir) {
+			
+			if (@sources > 1 ) {
+				die "source_subdir: not sure that this makes sense";
+			}
+			
 			$build_dir .= $source_subdir;
 		}
 
