@@ -33,7 +33,7 @@ sub systemp {
 	print "cmd: ".join(' ', @_)."\n";
 	
 	if (defined $h->{'docker'}) {
-		return;
+		return 0;
 	}
 	
 	return system(@_);
