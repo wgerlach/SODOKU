@@ -99,6 +99,14 @@
       },
       "source-remove-existing-file" : 1
    },
+   "emirge_v0.60" : {
+      "_comment" : "fixed versions!, requires usearch version >= 6.0.203",
+      "depends" : [
+         "bowtie==0.12.8",
+         "samtools==0.1.18",
+         "emirge==0.60"
+      ]
+   },
    "MG-RAST/qiime" : {
       "version" : [
          1,
@@ -131,28 +139,6 @@
          }
       ]
    },
-   "emirge_v0.60" : {
-      "_comment" : "fixed versions!, requires usearch version >= 6.0.203",
-      "depends" : [
-         "bowtie==0.12.8",
-         "samtools==0.1.18",
-         "emirge==0.60"
-      ]
-   },
-   "jellyfish" : {
-      "build-type" : "make-install",
-      "source-temporary" : 1,
-      "source" : {
-         "url" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-${v1}.${v2}.${v3}.tar.gz",
-         "subdir" : "jellyfish-${v1}.${v2}.${v3}"
-      },
-      "source-extract" : 1,
-      "version" : [
-         1,
-         1,
-         5
-      ]
-   },
    "qiime" : {
       "source-temporary" : 1,
       "source" : "git://github.com/qiime/qiime-deploy.git",
@@ -171,10 +157,19 @@
          }
       ]
    },
-   "MG-RAST/FragGeneScan" : {
-      "source" : "http://www.mcs.anl.gov/~wtang/files/fgs.tar.gz",
-      "ptarget" : "${target}apps/FragGeneScan",
-      "source-extract" : 1
+   "jellyfish" : {
+      "build-type" : "make-install",
+      "source-temporary" : 1,
+      "source" : {
+         "url" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-${v1}.${v2}.${v3}.tar.gz",
+         "subdir" : "jellyfish-${v1}.${v2}.${v3}"
+      },
+      "source-extract" : 1,
+      "version" : [
+         1,
+         1,
+         5
+      ]
    },
    "kbase-mgrast" : {
       "_comment" : "target=/kb, require kbase-git key",
@@ -183,6 +178,11 @@
          "kbase_dev_container_mgrast-deploy",
          "kbase_dev_container-deploy"
       ]
+   },
+   "MG-RAST/FragGeneScan" : {
+      "source" : "http://www.mcs.anl.gov/~wtang/files/fgs.tar.gz",
+      "ptarget" : "${target}apps/FragGeneScan",
+      "source-extract" : 1
    },
    "emirge-data-cached" : {
       "source" : "http://dunkirk.mcs.anl.gov/~wgerlach/SSURef_111.tar.gz",
@@ -235,6 +235,13 @@
          }
       ]
    },
+   "upstart-aweclient" : {
+      "source" : "http://www.mcs.anl.gov/~wtang/files/awe-client.conf",
+      "ptarget" : "/etc/init/",
+      "source-remove-existing-file" : 1,
+      "_comment" : "requires root",
+      "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
+   },
    "MG-RAST/databases" : {
       "source" : [
          "ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.1",
@@ -263,12 +270,19 @@
          }
       ]
    },
-   "upstart-aweclient" : {
-      "source" : "http://www.mcs.anl.gov/~wtang/files/awe-client.conf",
-      "ptarget" : "/etc/init/",
-      "source-remove-existing-file" : 1,
-      "_comment" : "requires root",
-      "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
+   "kbase_bootstrap_mgrast" : {
+      "build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
+      "source-git" : "kbase@git.kbase.us:bootstrap",
+      "_comment" : "target : /kb/",
+      "subpackages" : [
+         {
+            "source" : "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.tar.gz",
+            "ptarget" : "${target}bootstrap/kb_java_runtime"
+         }
+      ]
+   },
+   "deploy-deps" : {
+      "source-apt" : "git make build-essential cpanminus python-setuptools python-dev checkinstall"
    },
    "AWE" : {
       "source-go" : "github.com/MG-RAST/AWE/...",
@@ -278,17 +292,6 @@
       "subpackages" : [
          {
             "source-apt" : "mongodb-server"
-         }
-      ]
-   },
-   "kbase_bootstrap_mgrast" : {
-      "build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
-      "source-git" : "kbase@git.kbase.us:bootstrap",
-      "_comment" : "target : /kb/",
-      "subpackages" : [
-         {
-            "source" : "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.tar.gz",
-            "ptarget" : "${target}bootstrap/kb_java_runtime"
          }
       ]
    },
