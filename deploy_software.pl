@@ -30,12 +30,12 @@ my %already_installed;
 my $h = {};
 
 my $d=undef; # docker inidicator
-
+my $is_root_user = undef;
 
 sub systemp {
 	print "cmd: ".join(' ', @_)."\n";
 	
-	if (defined $h->{'docker'}) {
+	if ($d) {
 		return 0;
 	}
 	
@@ -725,6 +725,24 @@ sub install_package {
 		my $build_type = $package_hash->{'build-type'} || 'exec';
 		
 		my $source_type = $package_hash->{'source-type'} || 'auto';
+		
+		my $temp_dir_obj = undef;
+		my $temp_dir = $ptarget;
+		
+		if (definedAndTrue($package_hash->{'source-temporary'})) {
+			
+			if ($d) {
+				$temp_dir = '/tmp/sodoku_deploy/';
+				systemp('rm -rf '.$temp_dir);
+				systemp('mkdir -p '.$temp_dir);
+			} else {
+				$temp_dir_obj = File::Temp->newdir( TEMPLATE => 'deployXXXXX' );
+				$temp_dir = $temp_dir_obj->dirname.'/';
+			}
+		}
+		
+		my $source_dir=$ptarget;
+		
 		foreach my $source_obj (@sources) {
 			
 			my $source;
@@ -759,33 +777,26 @@ sub install_package {
 				
 			}
 			
-			my $temp_dir_obj = undef;
-			my $temp_dir = $ptarget;
 			
-			my $sourcedir=$ptarget;
+			
+			$source_dir=$ptarget;
 			my $downloaded_file=undef;
 			if ($st eq 'git' && defined($package_hash->{'git-server'})) {
 				$source = $package_hash->{'git-server'}.$source;
 			}
 			
-			if (definedAndTrue($package_hash->{'source-temporary'})) {
-				
-				if ($d) {
-					$temp_dir = '/tmp/sodoku_deploy/';
-					systemp('rm -rf '.$temp_dir);
-					systemp('mkdir -p '.$temp_dir);
-				} else {
-					$temp_dir_obj = File::Temp->newdir( TEMPLATE => 'deployXXXXX' );
-					$temp_dir = $temp_dir_obj->dirname.'/';
-				}
-			}
+			
 			
 			if ($st eq 'git' || $st eq 'mercurial' || $st eq 'go') {
+				if (@sources > 1 ) {
+					die "only one $st-source per package possible";
+				}
+				
 				
 				if ($st eq 'git') {
-					$sourcedir = git_clone($source, $temp_dir, $source_branch);
+					$source_dir = git_clone($source, $temp_dir, $source_branch);
 				} elsif ($st eq 'mercurial') {
-					$sourcedir = hg_clone($source, $temp_dir);
+					$source_dir = hg_clone($source, $temp_dir);
 				} elsif ($st eq 'go') {
 					#-fix -u  github.com/MG-RAST/AWE/...
 					
@@ -882,7 +893,7 @@ sub install_package {
 					} else {
 						die "unknown archive: $downloaded_file";
 					}
-					$sourcedir=$temp_dir;
+					$source_dir=$temp_dir;
 				}
 				
 			} else {
@@ -890,111 +901,115 @@ sub install_package {
 			
 			}
 			
-			
-			my $build_dir = $sourcedir;
-			
-			if (defined $source_subdir) {
-				$build_dir .= $source_subdir;
-			}
+		} # end @sources
+	
+		
+		my $build_dir = $source_dir;
+		
+		if (defined $source_subdir) {
+			$build_dir .= $source_subdir;
+		}
 
-			chdirp($build_dir);
+		chdirp($build_dir);
+		
+		### BUILD INSTRUCTIONS ###
+		
+		# different build-types
+		if (defined($package_hash->{'build-exec'})) {
 			
-			# different build-types
-			if (defined($package_hash->{'build-exec'})) {
-				#my $exec = $package_hash->{'build-exec'};
-				#if (defined $downloaded_file) {
-				#	$exec =~ s/\$\{source-file\}/$downloaded_file/g;
-				#}
-				
-				#if (defined $sourcedir) {
-				#	$exec =~ s/\$\{source-dir\}/$sourcedir/g;
-				#}
-				#print "build-exec:\n";
-				#systemp($exec) == 0 or die;
-				print "sourcedir: $sourcedir\n";
-				
-				array_execute($package_hash->{'build-exec'}, 'source-file' => $downloaded_file, 'source-dir' => $sourcedir);
-				
-				
-			} elsif ($build_type eq 'make-install' || $build_type eq 'make'){
-				
-								
-				
-				# change directory if needed
-				#if (! -e $build_dir.'configure' && -e $build_dir.'Makefile' ) {
-				#	opendir my $dir, "/some/path" or die "Cannot open directory: $!";
-				#	my @files = readdir $dir;
-				#	closedir $dir;
-				#	print join(',', @files)."\n";
-				#	die;
-				#
-				#}
-				
-				
-				if (substr($build_dir,-1,1) ne '/') {
-					$build_dir .= '/';
-				}
-				
-				if (-e $build_dir.'configure') {
-					systemp("cd $build_dir && ./configure --prefix=$ptarget") == 0 or die;
-				}
-				
-				if (-e $build_dir.'Makefile' || $d) {
-					systemp("cd $build_dir && make")== 0 or die; #TODO make -j4
+			print "sourcedir: $source_dir\n";
+			
+			array_execute($package_hash->{'build-exec'}, 'source-file' => $downloaded_file, 'source-dir' => $source_dir);
+			
+			
+		} elsif ($build_type eq 'make-install' || $build_type eq 'make'){
+			
+			if (@sources > 1 ) {
+				die "make/make-install: not sure that this makes sense";
+			}
+			
+			# change directory if needed
+			#if (! -e $build_dir.'configure' && -e $build_dir.'Makefile' ) {
+			#	opendir my $dir, "/some/path" or die "Cannot open directory: $!";
+			#	my @files = readdir $dir;
+			#	closedir $dir;
+			#	print join(',', @files)."\n";
+			#	die;
+			#
+			#}
+			
+			
+			if (substr($build_dir,-1,1) ne '/') {
+				$build_dir .= '/';
+			}
+			
+			if (-e $build_dir.'configure') {
+				systemp("cd $build_dir && ./configure --prefix=$ptarget") == 0 or die;
+			}
+			
+			if (-e $build_dir.'Makefile' || $d) {
+				systemp("cd $build_dir && make")== 0 or die; #TODO make -j4
+			} else {
+				die "Makefile in $build_dir not found";
+			}
+			if ($build_type eq 'make-install') {
+				if (-e $build_dir.'Makefile'  || $d) {
+					systemp("cd $build_dir && make install")== 0 or die; #TODO make -j4
 				} else {
 					die "Makefile in $build_dir not found";
 				}
-				if ($build_type eq 'make-install') {
-					if (-e $build_dir.'Makefile'  || $d) {
-						systemp("cd $build_dir && make install")== 0 or die; #TODO make -j4
-					} else {
-						die "Makefile in $build_dir not found";
-					}
-				}
-				
-			} else {
-				# no build
 			}
 			
-			
-			if (defined($package_hash->{'install-type'})) {
+		} else {
+			# no build
+		}
+		
+		
+		### INSTALL INSTRUCTIONS ###
+
+		foreach my $inst_type ('copy', 'binary') {
+			if (defined($package_hash->{'install-'.$inst_type})) {
+				print "install-type: ".$inst_type."\n";
+				my @install_files_array = get_array($package_hash->{'install-'.$inst_type});
+				
+				my $install_target = $ptarget;
+				
+				if ($inst_type eq 'binary') {
+					if ($is_root_user || $d) {
+						$install_target = '/usr/local/bin/';
+					} else {
+						$install_target = $ENV{"HOME"}.'/bin/';
+					}
+				}
 				
 				unless (defined $build_dir) {
 					die;
 				}
-				
-				if ($package_hash->{'install-type'} eq "copy") {
-					print "install-type: copy\n";
-					if (defined($package_hash->{'install-files'})) {
-						my $install_files_obj = $package_hash->{'install-files'};
-						my @install_files_array = get_array($install_files_obj);
-						
-						foreach my $install_file (@install_files_array) {
 							
-							unless (-e $build_dir.$install_file || $d) {
-								die "installation file $build_dir.$install_file not found";
-							}
-							
-							systemp("cp -f $build_dir".$install_file." $ptarget") == 0 or die;
-							
-						}
-						
-					} else {
-						die;
+				foreach my $install_file (@install_files_array) {
+					
+					unless (-e $build_dir.$install_file || $d) {
+						die "installation file $build_dir.$install_file not found";
 					}
-				} else {
-					die;
+					
+					systemp('cp -f '.$build_dir.$install_file.' '.$install_target) == 0 or die;
+					
 				}
+	
 			}
-			
-			if (definedAndTrue($package_hash->{'source-temporary'})  && $d) {
-				systemp('rm -rf '.$temp_dir)
-			}
-			
-			chdirp($ptarget);
-			#temp_dir goes out of scope here
 		}
 		
+		
+		
+		
+		
+		if (definedAndTrue($package_hash->{'source-temporary'})  && $d) {
+			systemp('rm -rf '.$temp_dir)
+		}
+		
+		chdirp($ptarget);
+		#temp_dir goes out of scope here
+
 	}
 
 
@@ -1165,17 +1180,22 @@ if (defined $h->{'update'} && defined $h->{'new'} ) {
 	die;
 }
 
+my $is_root_user = ($< == 0);
 
-if ( ! defined($h->{'root'}) && ($< == 0) ) {
-	print "error: please do not run me as root unless you know what you are doing.\n";
-	exit(0);
+
+unless ($d) {
+
+	if ( ! defined($h->{'root'}) && $is_root_user ) {
+		print "error: please do not run me as root unless you know what you are doing.\n";
+		exit(0);
+	}
+
+	if (defined($h->{'root'}) &&  ! $is_root_user) {
+		print "error: you gave option --root but you are not root.\n";
+		exit(0);
+	}
+
 }
-
-if (defined($h->{'root'}) &&  ($< != 0) ) {
-	print "error: you gave option --root but you are not root.\n";
-	exit(0);
-}
-
 #my $target = "/kb/runtime/";
 
 # in case we use cached installation
