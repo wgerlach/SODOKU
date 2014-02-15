@@ -743,6 +743,7 @@ sub install_package {
 		
 		my $source_dir=$ptarget;
 		my $source_subdir;
+		my $downloaded_file=undef;
 		
 		foreach my $source_obj (@sources) {
 			
@@ -781,7 +782,7 @@ sub install_package {
 			
 			
 			$source_dir=$ptarget;
-			my $downloaded_file=undef;
+			
 			if ($st eq 'git' && defined($package_hash->{'git-server'})) {
 				$source = $package_hash->{'git-server'}.$source;
 			}
