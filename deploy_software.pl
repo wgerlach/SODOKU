@@ -1003,6 +1003,10 @@ sub install_package {
 					
 					systemp('cp -f '.$build_dir.$install_file.' '.$install_target) == 0 or die;
 					
+					if ($inst_type eq 'binary') {
+						systemp('chmod +x '.$install_target.$install_file) == 0 or die;
+					}
+					
 				}
 	
 			}
