@@ -396,13 +396,11 @@
          0,
          0
       ],
-      "install-files" : [
+      "install-binary" : [
          "bowtie",
          "bowtie-build",
          "bowtie-inspect"
-      ],
-      "ptarget" : "${target}bin",
-      "install-type" : "copy"
+      ]
    },
    "picrust_symlink" : {
       "_comment" : "makes symlink in QIIME/picrust installation to picrust_data",
@@ -442,11 +440,9 @@
          1,
          18
       ],
-      "install-files" : [
+      "install-binary" : [
          "samtools"
-      ],
-      "ptarget" : "${target}bin",
-      "install-type" : "copy"
+      ]
    },
    "cdbfasta" : {
       "build-type" : "make",
@@ -456,10 +452,8 @@
          "url" : "http://sourceforge.net/projects/cdbfasta/files/latest/download?source=files",
          "subdir" : "cdbfasta"
       },
-      "ptarget" : "${target}bin",
-      "install-type" : "copy",
       "source-extract" : 1,
-      "install-files" : [
+      "install-binary" : [
          "cdbfasta",
          "cdbyank"
       ]
