@@ -925,9 +925,11 @@ sub install_package {
 			
 			print "sourcedir: $source_dir\n";
 			
-			array_execute($package_hash->{'build-exec'}, 'source-file' => $downloaded_file, 'source-dir' => $source_dir);
-			
-			
+			if (@sources > 1 ) {
+				array_execute($package_hash->{'build-exec'});
+			} else {
+				array_execute($package_hash->{'build-exec'}, 'source-file' => $downloaded_file, 'source-dir' => $source_dir);
+			}
 		} elsif ($build_type eq 'make-install' || $build_type eq 'make'){
 			
 			if (@sources > 1 ) {
