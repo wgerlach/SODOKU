@@ -1449,7 +1449,7 @@ if ($d) {
 		die "not supported";
 	}
 	
-	my ($package, $version) = shift(@packages_installed);
+	my ($package, $version) = @{shift(@packages_installed)};
 	
 	createDockerFile($package, $version);
 }
