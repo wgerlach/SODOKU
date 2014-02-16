@@ -30,12 +30,25 @@ my %already_installed;
 my $h = {};
 
 my $d=undef; # docker inidicator
+my @docker_file_content=('FROM ubuntu');
+
 my $is_root_user = undef;
+
+
+sub addDockerCmd {
+	my $cmd = 'RUN '.join(' ', @_);
+	unless ($docker_file_content[-1] eq $cmd) {
+		push(@docker_file_content, $cmd);
+	}
+	
+}
 
 sub systemp {
 	print "cmd: ".join(' ', @_)."\n";
 	
 	if ($d) {
+		addDockerCmd(@_);
+		
 		return 0;
 	}
 	
@@ -1351,8 +1364,12 @@ foreach my $package_string (@package_list) {
 	
 }
 
-print "all packages installed.\n";
 
+if ($d) {
+	print split(/\n/, @docker_file_content)."\n";
+} else {
+	print "all packages installed.\n";
+}
 
 
 
