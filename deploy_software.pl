@@ -36,7 +36,8 @@ my %already_installed;
 my $h = {};
 
 my $d=undef; # docker inidicator
-my @docker_file_content=('FROM ubuntu', 'MAINTAINER Wolfgang Gerlach');
+my @docker_file_header=('FROM ubuntu', 'MAINTAINER Wolfgang Gerlach');
+my @docker_file_content=();
 my $docker_deps={};
 
 my $is_root_user = undef;
@@ -1400,7 +1401,10 @@ if ($d) {
 		}
 	}
 	
-	print "apt-get install -y ".join(' ', keys(%$dep_packages)) ."\n";
+	
+	print join("\n", @docker_file_header)."\n";
+	
+	print "RUN apt-get install -y ".join(' ', keys(%$dep_packages)) ."\n";
 	
 	print join("\n", @docker_file_content)."\n";
 	
