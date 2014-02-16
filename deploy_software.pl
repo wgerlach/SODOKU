@@ -85,7 +85,7 @@ sub createDockerFile {
 	
 	#$package
 	
-	my $docker_build_cmd = "docker build -q=true --no-cache=true -t wgerlach/$package:$version -";
+	my $docker_build_cmd = "docker build -q=true --no-cache=true -t wgerlach/$package:$version_str -";
 	
 	print "docker_build_cmd: $docker_build_cmd\n";
 	
