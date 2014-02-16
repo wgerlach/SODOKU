@@ -51,6 +51,7 @@ my $is_root_user = undef;
 
 
 sub createDockerFile {
+	my $package = shift(@_);
 	print "deps: ".join(',', keys(%$docker_deps)) ."\n";
 	
 	my $dep_packages={};
@@ -61,12 +62,23 @@ sub createDockerFile {
 		}
 	}
 	
+	my $dockerfile='';
 	
-	print join("\n", @docker_file_header)."\n";
+	$dockerfile .= join("\n", @docker_file_header)."\n";
+	$dockerfile .= "RUN apt-get install -y ".join(' ', keys(%$dep_packages)) ."\n";
+	$dockerfile .= join("\n", @docker_file_content)."\n";
 	
-	print "RUN apt-get install -y ".join(' ', keys(%$dep_packages)) ."\n";
+	print $dockerfile;
 	
-	print join("\n", @docker_file_content)."\n";
+	#$package
+	
+	my $docker_build_cmd = "docker build -q=true --no-cache=true -t wgerlach/$package -";
+	
+	open(my $fh, "|-", $docker_build_cmd)
+		or die "cannot run docker: $!";
+	
+	print $fh $dockerfile;
+	close ($fh);
 	
 }
 
@@ -1395,6 +1407,7 @@ if (defined($h->{'list'})) {
 }
 
 
+my @packages_installed=();
 foreach my $package_string (@package_list) {
 	
 	my ($package, $version, $package_args_ref) = parsePackageString($package_string);
@@ -1411,18 +1424,23 @@ foreach my $package_string (@package_list) {
 	}
 	
 	install_package($repository, $pack_hash, $package, $version, $package_args_ref);
-	
+	push(@packages_installed,$package );
 }
-
 
 
 if ($d) {
 	
-	createDockerFile();
+	if (@packages_installed > 1) {
+		die "not supported";
+	}
 	
-		
+	my $package = shift(@packages_installed);
 	
-} else {
+	createDockerFile($package);
+}
+
+
+unless ($d) {
 	print "all packages installed.\n";
 }
 
