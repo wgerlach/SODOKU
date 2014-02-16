@@ -42,7 +42,7 @@ sub addDockerCmd {
 		my $cmd = shift(@_);
 		my @cmd_array = split(/\s+/, $cmd);
 		my $cmd = $cmd_array[0];
-		print "command found: ".$cmd."\n";
+		#print "command found: ".$cmd."\n";
 		$docker_deps->{$cmd}=1;
 		
 		push(@docker_file_content, $docker_line);
@@ -1374,6 +1374,8 @@ foreach my $package_string (@package_list) {
 
 if ($d) {
 	print join("\n", @docker_file_content)."\n";
+	
+	print "deps: ".join(',', keys(%$docker_deps)) ."\n";
 } else {
 	print "all packages installed.\n";
 }
