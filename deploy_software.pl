@@ -30,7 +30,7 @@ my %already_installed;
 my $h = {};
 
 my $d=undef; # docker inidicator
-my @docker_file_content=('FROM ubuntu');
+my @docker_file_content=('FROM ubuntu', 'MAINTAINER Wolfgang Gerlach');
 my $docker_deps={};
 
 my $is_root_user = undef;
@@ -39,12 +39,14 @@ my $is_root_user = undef;
 sub addDockerCmd {
 	my $docker_line = 'RUN '.join(' ', @_);
 	unless ($docker_file_content[-1] eq $docker_line) {
-		my $cmd = shift(@_);
-		my @cmd_array = split(/\s+/, $cmd);
-		my $cmd = $cmd_array[0];
-		#print "command found: ".$cmd."\n";
-		$docker_deps->{$cmd}=1;
-		
+		my $cmd_lines = shift(@_);
+		my @cmds = split(/\&\&|\;/,$cmd_lines);
+		foreach my $cmd (@cmds) {
+			my @cmd_array = split(/\s+/, $cmd);
+			my $cmd = $cmd_array[0];
+			print "command found: ".$cmd."\n";
+			$docker_deps->{$cmd}=1;
+		}
 		push(@docker_file_content, $docker_line);
 	}
 	
@@ -258,6 +260,13 @@ sub datastructure_walk {
 
 sub setenv {
 	my ($key, $value) = @_;
+	
+	if ($d) {
+		push(@docker_file_content, "ENV $key $value");
+		return;
+	}
+	
+	
 	my $envline = "export $key=$value";
 	#systemp("grep -q -e '$envline' ~/.bashrc || echo '$envline' >> ~/.bashrc");
 	
