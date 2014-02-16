@@ -12,8 +12,8 @@ or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm 
 use File::Temp;
 #use LWP::UserAgent;
 use Data::Dumper;
-eval "use Try::Tiny; 1"
-or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm install Try::Tiny";
+#eval "use Try::Tiny; 1"
+#or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm install Try::Tiny";
 
 1;
 
@@ -24,7 +24,8 @@ my $default_repository = 'https://raw.github.com/wgerlach/SODOKU/master/merged-j
 my $ubuntu_cmd2package = {
 	'curl' => 'curl',
 	'make' => 'make build-essential',
-	'git' => 'git'
+	'git' => 'git',
+	'unzip' => 'unzip'
 };
 
 #########################################
@@ -36,12 +37,38 @@ my %already_installed;
 my $h = {};
 
 my $d=undef; # docker inidicator
-my @docker_file_header=('FROM ubuntu', 'MAINTAINER Wolfgang Gerlach');
+my @docker_file_header=(
+	'FROM ubuntu',
+	'MAINTAINER Wolfgang Gerlach'
+	'RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list',
+	'RUN apt-get update',
+	'RUN apt-get install libterm-readline-gnu-perl'
+	);
 my @docker_file_content=();
 my $docker_deps={};
 
 my $is_root_user = undef;
 
+
+sub createDockerFile {
+	print "deps: ".join(',', keys(%$docker_deps)) ."\n";
+	
+	my $dep_packages={};
+	foreach my $dep (keys(%$docker_deps)) {
+		my $pack = $ubuntu_cmd2package->{$dep};
+		if (defined $pack) {
+			$dep_packages->{$pack}=1;
+		}
+	}
+	
+	
+	print join("\n", @docker_file_header)."\n";
+	
+	print "RUN apt-get install -y ".join(' ', keys(%$dep_packages)) ."\n";
+	
+	print join("\n", @docker_file_content)."\n";
+	
+}
 
 sub addDockerCmd {
 	my $docker_line = 'RUN '.join(' ', @_);
@@ -1388,26 +1415,12 @@ foreach my $package_string (@package_list) {
 }
 
 
+
 if ($d) {
 	
+	createDockerFile();
 	
-	print "deps: ".join(',', keys(%$docker_deps)) ."\n";
-	
-	my $dep_packages={};
-	foreach my $dep (keys(%$docker_deps)) {
-		my $pack = $ubuntu_cmd2package->{$dep};
-		if (defined $pack) {
-			$dep_packages->{$pack}=1;
-		}
-	}
-	
-	
-	print join("\n", @docker_file_header)."\n";
-	
-	print "RUN apt-get install -y ".join(' ', keys(%$dep_packages)) ."\n";
-	
-	print join("\n", @docker_file_content)."\n";
-	
+		
 	
 } else {
 	print "all packages installed.\n";
