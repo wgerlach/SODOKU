@@ -21,6 +21,12 @@ or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm 
 
 my $default_repository = 'https://raw.github.com/wgerlach/SODOKU/master/merged-json/repository.json';
 
+my $ubuntu_cmd2package = {
+	'curl' => 'curl',
+	'make' => 'make build-essential',
+	'git' => 'git'
+};
+
 #########################################
 
 my $target = undef;
@@ -1385,6 +1391,17 @@ if ($d) {
 	print join("\n", @docker_file_content)."\n";
 	
 	print "deps: ".join(',', keys(%$docker_deps)) ."\n";
+	
+	my $dep_packages={};
+	foreach my $dep (keys(%$docker_deps)) {
+		my $pack = $ubuntu_cmd2package->{$dep};
+		if (defined $pack) {
+			$dep_packages->{$pack}=1;
+		}
+	}
+	
+	print "ubuntu packages: ".join(',', keys(%$dep_packages)) ."\n";
+	
 } else {
 	print "all packages installed.\n";
 }
