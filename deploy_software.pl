@@ -1366,7 +1366,7 @@ foreach my $package_string (@package_list) {
 
 
 if ($d) {
-	print join(/\n/, @docker_file_content)."\n";
+	print join("\n", @docker_file_content)."\n";
 } else {
 	print "all packages installed.\n";
 }
