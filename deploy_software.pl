@@ -50,7 +50,12 @@ my $is_root_user = undef;
 
 
 sub createDockerFile {
-	my $package = shift(@_);
+	my ($package, $version) = @_;
+	
+	unless (defined $version) {
+		$version = 'latest';
+	}
+	
 	print "deps: ".join(',', keys(%$docker_deps)) ."\n";
 	
 	my $dep_packages={};
@@ -71,7 +76,9 @@ sub createDockerFile {
 	
 	#$package
 	
-	my $docker_build_cmd = "docker build -q=true --no-cache=true -t wgerlach/$package -";
+	my $docker_build_cmd = "docker build -q=true --no-cache=true -t wgerlach/$package:$version -";
+	
+	print "docker_build_cmd: $docker_build_cmd\n";
 	
 	open(my $fh, "|-", $docker_build_cmd)
 		or die "cannot run docker: $!";
@@ -1423,7 +1430,7 @@ foreach my $package_string (@package_list) {
 	}
 	
 	install_package($repository, $pack_hash, $package, $version, $package_args_ref);
-	push(@packages_installed,$package );
+	push(@packages_installed,[$package, $version] );
 }
 
 
@@ -1433,9 +1440,9 @@ if ($d) {
 		die "not supported";
 	}
 	
-	my $package = shift(@packages_installed);
+	my ($package, $version) = shift(@packages_installed);
 	
-	createDockerFile($package);
+	createDockerFile($package, $version);
 }
 
 
