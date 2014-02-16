@@ -31,14 +31,21 @@ my $h = {};
 
 my $d=undef; # docker inidicator
 my @docker_file_content=('FROM ubuntu');
+my $docker_deps={};
 
 my $is_root_user = undef;
 
 
 sub addDockerCmd {
-	my $cmd = 'RUN '.join(' ', @_);
-	unless ($docker_file_content[-1] eq $cmd) {
-		push(@docker_file_content, $cmd);
+	my $docker_line = 'RUN '.join(' ', @_);
+	unless ($docker_file_content[-1] eq $docker_line) {
+		my $cmd = shift(@_);
+		my @cmd_array = split(/\s+/, $cmd);
+		my $cmd = $cmd_array[0];
+		print "command found: ".$cmd."\n";
+		$docker_deps->{$cmd}=1;
+		
+		push(@docker_file_content, $docker_line);
 	}
 	
 }
