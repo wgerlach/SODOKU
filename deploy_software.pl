@@ -52,8 +52,17 @@ my $is_root_user = undef;
 sub createDockerFile {
 	my ($package, $version) = @_;
 	
-	unless (defined $version) {
-		$version = 'latest';
+	my $version_str = undef;
+	if (defined $version) {
+		$version_str = join('.', @{$version});
+	}
+	
+	unless (defined $version_str) {
+		$version_str = 'latest';
+	}
+	
+	if ( $version_str eq '') {
+		$version_str = 'latest';
 	}
 	
 	print "deps: ".join(',', keys(%$docker_deps)) ."\n";
