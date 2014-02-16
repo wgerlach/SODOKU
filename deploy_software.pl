@@ -40,7 +40,7 @@ sub addDockerCmd {
 	my $docker_line = 'RUN '.join(' ', @_);
 	unless ($docker_file_content[-1] eq $docker_line) {
 		my $cmd_lines = shift(@_);
-		my @cmds = split(/\&\&|\;/,$cmd_lines);
+		my @cmds = split(/\s*\&\&\s*|\s*\;\s*/,$cmd_lines);
 		foreach my $cmd (@cmds) {
 			my @cmd_array = split(/\s+/, $cmd);
 			my $cmd = $cmd_array[0];
