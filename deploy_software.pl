@@ -41,8 +41,7 @@ my @docker_file_header=(
 	'FROM ubuntu',
 	'MAINTAINER Wolfgang Gerlach',
 	'RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list',
-	'RUN apt-get update',
-	'RUN apt-get install libterm-readline-gnu-perl'
+	'RUN apt-get update'
 	);
 my @docker_file_content=();
 my $docker_deps={};
