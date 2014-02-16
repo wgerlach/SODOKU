@@ -1388,7 +1388,7 @@ foreach my $package_string (@package_list) {
 
 
 if ($d) {
-	print join("\n", @docker_file_content)."\n";
+	
 	
 	print "deps: ".join(',', keys(%$docker_deps)) ."\n";
 	
@@ -1400,7 +1400,10 @@ if ($d) {
 		}
 	}
 	
-	print "ubuntu packages: ".join(',', keys(%$dep_packages)) ."\n";
+	print "apt-get install -y ".join(' ', keys(%$dep_packages)) ."\n";
+	
+	print join("\n", @docker_file_content)."\n";
+	
 	
 } else {
 	print "all packages installed.\n";
