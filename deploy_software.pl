@@ -138,12 +138,18 @@ sub dockerSocket {
 	$cmd = "bash -c '$cmd'";
 	print "cmd: $cmd\n";
 	my $return_value = `$cmd`;
+	chomp($return_value);
 	print "return_value: \"$return_value\"\n";
-	my @return_lines = split("\n", $return_value);
+	
+	my ($return_header, $return_body) = split(/\n\s*\n/, $return_value);
+	
+	print "return_header: \"$return_header\"\n";
+	print "return_body: \"$return_body\"\n";
+	my @return_body_lines = split("\n", $return_body);
 	
 	my $hash=undef;
-	if (@return_lines > 0 && $return_lines[-1] =~ /\}/) {
-		$hash = decode_json($return_lines[-1]);
+	if (@return_body_lines > 0 && $return_body_lines[-1] =~ /\}/) {
+		$hash = decode_json($return_body_lines[-1]);
 	}
 
 
