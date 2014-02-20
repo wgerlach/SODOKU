@@ -66,6 +66,12 @@
          }
       ]
    },
+   "Shock-git" : {
+      "set-env" : {
+         "PERL5LIB" : "${ptarget}Shock/libs/:$PERL5LIB"
+      },
+      "source-git" : "https://github.com/MG-RAST/Shock"
+   },
    "kbase_dev_container-deploy" : {
       "ptarget" : "${target}dev_container",
       "exec" : [
@@ -73,8 +79,11 @@
          ". ${ptarget}user-env.sh ; make && make deploy"
       ]
    },
+   "AMETHST" : {
+      "source-git" : "https://github.com/MG-RAST/AMETHST"
+   },
    "ubuntu-base" : {
-      "source-apt" : "golang curl wget git mercurial bzr"
+      "source-apt" : "golang curl wget git mercurial bzr make build-essential cpanminus python-setuptools python-dev checkinstall"
    },
    "qiime-wo" : {
       "subpackages" : [
@@ -104,14 +113,6 @@
          "url" : "http://www.mcs.anl.gov/~wtang/files/awe.cfg"
       },
       "source-remove-existing-file" : 1
-   },
-   "emirge_v0.60" : {
-      "_comment" : "fixed versions!, requires usearch version >= 6.0.203",
-      "depends" : [
-         "bowtie==0.12.8",
-         "samtools==0.1.18",
-         "emirge==0.60"
-      ]
    },
    "MG-RAST/qiime" : {
       "version" : [
@@ -145,6 +146,34 @@
          }
       ]
    },
+   "emirge_v0.60" : {
+      "_comment" : "fixed versions!, requires usearch version >= 6.0.203",
+      "depends" : [
+         "bowtie==0.12.8",
+         "samtools==0.1.18",
+         "emirge==0.60"
+      ]
+   },
+   "jellyfish" : {
+      "build-type" : "make-install",
+      "source-temporary" : 1,
+      "source" : {
+         "url" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-${v1}.${v2}.${v3}.tar.gz",
+         "subdir" : "jellyfish-${v1}.${v2}.${v3}"
+      },
+      "source-extract" : 1,
+      "version" : [
+         1,
+         1,
+         5
+      ]
+   },
+   "MG-RAST-Tools" : {
+      "set-env" : {
+         "PERL5LIB" : "${ptarget}MG-RAST-Tools/tools/lib/:$PERL5LIB"
+      },
+      "source-git" : "https://github.com/MG-RAST/MG-RAST-Tools"
+   },
    "qiime" : {
       "source-temporary" : 1,
       "source" : "git://github.com/qiime/qiime-deploy.git",
@@ -161,20 +190,6 @@
          {
             "source-apt" : "python-dev libncurses5-dev libssl-dev libzmq-dev libgsl0-dev openjdk-6-jdk libxml2 libxslt1.1 libxslt1-dev ant git subversion build-essential zlib1g-dev libpng12-dev libfreetype6-dev mpich2 libreadline-dev gfortran unzip libmysqlclient18 libmysqlclient-dev ghc sqlite3 libsqlite3-dev"
          }
-      ]
-   },
-   "jellyfish" : {
-      "build-type" : "make-install",
-      "source-temporary" : 1,
-      "source" : {
-         "url" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-${v1}.${v2}.${v3}.tar.gz",
-         "subdir" : "jellyfish-${v1}.${v2}.${v3}"
-      },
-      "source-extract" : 1,
-      "version" : [
-         1,
-         1,
-         5
       ]
    },
    "go-deprecated" : {
@@ -289,19 +304,11 @@
       "_comment" : "requires root",
       "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
    },
-   "kbase_bootstrap_mgrast" : {
-      "build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
-      "source-git" : "kbase@git.kbase.us:bootstrap",
-      "_comment" : "target : /kb/",
-      "subpackages" : [
-         {
-            "source" : "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.tar.gz",
-            "ptarget" : "${target}bootstrap/kb_java_runtime"
-         }
-      ]
-   },
-   "deploy-deps" : {
-      "source-apt" : "git cpanminus python-setuptools python-dev checkinstall"
+   "AWE-git" : {
+      "set-env" : {
+         "PERL5LIB" : "${ptarget}AWE/utils/lib:$PERL5LIB"
+      },
+      "source-git" : "https://github.com/MG-RAST/AWE"
    },
    "AWE" : {
       "ROOT_set-env" : {
@@ -317,6 +324,20 @@
       "subpackages" : [
          {
             "source-apt" : "mongodb-server"
+         }
+      ]
+   },
+   "deploy-deps" : {
+      "source-apt" : "git cpanminus python-setuptools python-dev checkinstall"
+   },
+   "kbase_bootstrap_mgrast" : {
+      "build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
+      "source-git" : "kbase@git.kbase.us:bootstrap",
+      "_comment" : "target : /kb/",
+      "subpackages" : [
+         {
+            "source" : "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.tar.gz",
+            "ptarget" : "${target}bootstrap/kb_java_runtime"
          }
       ]
    },
@@ -398,6 +419,17 @@
    "golang" : {
       "source-apt" : "golang git mercurial bzr"
    },
+   "picrust_symlink" : {
+      "_comment" : "makes symlink in QIIME/picrust installation to picrust_data",
+      "depends" : [
+         "picrust_data"
+      ],
+      "exec" : [
+         "mkdir -p $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data",
+         "ln --force -s ${target}picrust_data/16S_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/16S_13_5_precalculated.tab.gz",
+         "ln --force -s ${target}picrust_data/ko_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/ko_13_5_precalculated.tab.gz"
+      ]
+   },
    "bowtie" : {
       "build-type" : "make",
       "source-temporary" : 1,
@@ -417,31 +449,6 @@
          "bowtie-inspect"
       ]
    },
-   "picrust_symlink" : {
-      "_comment" : "makes symlink in QIIME/picrust installation to picrust_data",
-      "depends" : [
-         "picrust_data"
-      ],
-      "exec" : [
-         "mkdir -p $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data",
-         "ln --force -s ${target}picrust_data/16S_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/16S_13_5_precalculated.tab.gz",
-         "ln --force -s ${target}picrust_data/ko_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/ko_13_5_precalculated.tab.gz"
-      ]
-   },
-   "gg_otus" : {
-      "source" : "ftp://greengenes.microbio.me/greengenes_release/gg_${v1}_${v2}/gg_${v1}_${v2}_otus.tar.gz",
-      "source-extract" : 1,
-      "version" : [
-         13,
-         5
-      ],
-      "data" : 1,
-      "_comment" : "creates symlink for use in QIIME",
-      "exec" : [
-         "mkdir -p $QIIME/../gg_otus-${v1}_${v2}-release/rep_set",
-         "ln --force -s ${target}gg_${v1}_${v2}_otus $QIIME/../gg_otus-${v1}_${v2}-release/rep_set"
-      ]
-   },
    "samtools" : {
       "build-type" : "make",
       "source-temporary" : 1,
@@ -457,6 +464,20 @@
       ],
       "install-binary" : [
          "samtools"
+      ]
+   },
+   "gg_otus" : {
+      "source" : "ftp://greengenes.microbio.me/greengenes_release/gg_${v1}_${v2}/gg_${v1}_${v2}_otus.tar.gz",
+      "source-extract" : 1,
+      "version" : [
+         13,
+         5
+      ],
+      "data" : 1,
+      "_comment" : "creates symlink for use in QIIME",
+      "exec" : [
+         "mkdir -p $QIIME/../gg_otus-${v1}_${v2}-release/rep_set",
+         "ln --force -s ${target}gg_${v1}_${v2}_otus $QIIME/../gg_otus-${v1}_${v2}-release/rep_set"
       ]
    },
    "cdbfasta" : {
