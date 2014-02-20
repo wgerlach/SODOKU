@@ -97,7 +97,9 @@ sub createDockerFile {
 	
 	my $res = decode_json($res_json);
 	print Dumper($res);
-	
+	if (defined $res->{'id'}) {
+		print "ID: ".$res->{'id'}." $tag\n";
+	}
 	
 	exit(0);
 	
