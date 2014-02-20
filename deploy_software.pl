@@ -203,10 +203,16 @@ sub createDockerFile {
 	#check token
 	#check server
 	
+	require SHOCK::Client;
+	
+	
 	if (!defined($ENV{'GLOBUSONLINE'}) ||  $ENV{'GLOBUSONLINE'} eq '') {
 		die 'GLOBUSONLINE token not found';
 	}
+
+	my $shock = new SHOCK::Client($ENV{'GLOBUSONLINE'});
 	
+		
 	
 	
 		
@@ -220,12 +226,18 @@ sub createDockerFile {
 	
 	system('echo "'.$shock_json.'" > sodoku_docker.json');
 	
+	#$shock->
 	
-	
-	
+	# upload image
 	my $curl_cmd = 'curl -X POST -H "Authorization: OAuth $GLOBUSONLINE"  -F "attributes=@sodoku_docker.json" -F "upload=@'.$image_tarfile.'" "'.$shock_server.'/node"';
 	print "cmd: ".$curl_cmd."\n";
 	system($curl_cmd)== 0 or die;
+	
+	# make image readable
+	$curl_cmd = 'curl -X DELETE -H "Authorization: OAuth $GLOBUSONLINE" '.$shock_server.'/node"';
+	print "cmd: ".$curl_cmd."\n";
+	system($curl_cmd)== 0 or die;
+
 	
 	exit(0);
 }
@@ -460,6 +472,7 @@ sub datastructure_walk {
 		
 		
 		if ($user_specific == 1 ) {
+			### replace keyword names and delete subtrees
 			my @keys = keys(%$datastructure);
 			foreach my $key (@keys) {
 				print "key: $key\n";
@@ -516,7 +529,7 @@ sub datastructure_walk {
 				
 				my %newhash = @_;
 				$newhash{'data'} = $datastructure->[$i];
-				$newhash{'sub'} = undef;
+			
 				datastructure_walk(%newhash); # 'data' => $datastructure->[$i], 'sub' => $sub, 'subarg' => $arg
 			}
 		}
