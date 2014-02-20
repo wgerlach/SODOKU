@@ -297,7 +297,7 @@ sub datastructure_walk {
 	if (ref($datastructure) eq 'HASH') {
 		
 		
-		if (defined $user_specific && $user_specific == 1 ) {
+		if ($user_specific == 1 ) {
 			my @keys = keys(%$datastructure);
 			foreach my $key (@keys) {
 				print "key: $key\n";
@@ -322,11 +322,22 @@ sub datastructure_walk {
 			if ($show==1) {print "goto $k\n";}
 			if (ref($v) eq '') {
 				#print "scalar: ".$datastructure->{$k}."\n";
-				$datastructure->{$k} = $sub->($v, $arg);
+				if (defined $sub) {
+					$datastructure->{$k} = $sub->($v, $arg);
+				}
 				#print "scalar: ".$datastructure->{$k}."\n";
 			} else {
 				unless (defined($arghash{'nosubpackages'}) && $k eq "subpackages") {
-					datastructure_walk('data' => $v, 'sub' => $sub, 'subarg' => $arg);
+					my %newhash = @_;
+					$newhash{'data'} = $v;
+					datastructure_walk(%newhash); #'data' => $v, 'sub' => $sub, 'subarg' => $arg
+				} else  {
+					if ($user_specific == 1 ) {
+						my %newhash = @_;
+						$newhash{'data'} = $v;
+						
+						
+					}
 				}
 			}
 		}
@@ -334,10 +345,16 @@ sub datastructure_walk {
 		for (my $i = 0 ; $i < @$datastructure ; $i++ ) {
 			if (ref($datastructure->[$i]) eq '') {
 				#print "scalar: ".$datastructure->[$i]."\n";
-				$datastructure->[$i] = $sub->($datastructure->[$i], $arg);
+				if (defined $sub) {
+					$datastructure->[$i] = $sub->($datastructure->[$i], $arg);
+				}
 				#print "scalar: ".$datastructure->[$i]."\n";
 			} else {
-				datastructure_walk('data' => $datastructure->[$i], 'sub' => $sub, 'subarg' => $arg);
+				
+				my %newhash = @_;
+				$newhash{'data'} = $datastructure->[$i];
+				$newhash{'sub'} = undef;
+				datastructure_walk(%newhash); # 'data' => $datastructure->[$i], 'sub' => $sub, 'subarg' => $arg
 			}
 		}
 	
