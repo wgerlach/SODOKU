@@ -78,7 +78,9 @@ sub createDockerFile {
 	my $dockerfile='';
 	
 	$dockerfile .= join("\n", @docker_file_header)."\n";
-	$dockerfile .= "RUN apt-get install -y ".join(' ', keys(%$dep_packages)) ."\n";
+	if (keys(%$dep_packages) > 0) {
+		$dockerfile .= "RUN apt-get install -y ".join(' ', keys(%$dep_packages)) ."\n";
+	}
 	$dockerfile .= join("\n", @docker_file_content)."\n";
 	
 	print "------\nDockerfile\n";
