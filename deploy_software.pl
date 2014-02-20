@@ -998,9 +998,17 @@ sub install_package {
 				#unless (defined($h->{'root'})) {
 				#	$pip_options = " --user ".$ENV{'USER'}; # does not work!
 				#}
-				systemp("sudo pip install ".$source.$pip_options) == 0 or die;
+				my $pip_cmd = "pip install ".$source.$pip_options;
+				unless ($is_root_user) {
+					$pip_cmd = "sudo ".$pip_cmd;
+				}
+				systemp($pip_cmd) == 0 or die;
 			} elsif ($st eq 'apt') {
-				systemp("sudo apt-get --force-yes -y install ".$source) == 0 or die;
+				my $apt_cmd =  "apt-get --force-yes -y install ".$source;
+				unless ($is_root_user) {
+					$apt_cmd = "sudo ".$apt_cmd;
+				}
+				systemp($apt_cmd) == 0 or die;
 			} elsif ($st eq 'download') {
 				#simple download
 				
@@ -1344,11 +1352,13 @@ if (defined $h->{'update'} && defined $h->{'new'} ) {
 	die;
 }
 
-$is_root_user = ($< == 0)?1:0;
 
 
-unless ($d) {
-
+if ($d) {
+	$is_root_user = 1;
+} else {
+	$is_root_user = ($< == 0)?1:0;
+	
 	if ( ! defined($h->{'root'}) && $is_root_user ) {
 		print "error: please do not run me as root unless you know what you are doing.\n";
 		exit(0);
