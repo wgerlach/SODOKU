@@ -74,7 +74,20 @@
       ]
    },
    "AMETHST" : {
-      "source-git" : "https://github.com/MG-RAST/AMETHST"
+      "set-env" : {
+         "PATH" : "${ptarget}AMETHST:$PATH"
+      },
+      "source-git" : "https://github.com/MG-RAST/AMETHST",
+      "depends" : [
+         "wgerlach/MG-RAST-Tools",
+         "wgerlach/AWE-git",
+         "wgerlach/Shock-git"
+      ],
+      "subpackages" : [
+         {
+            "source-pip" : "qcli"
+         }
+      ]
    },
    "ubuntu-base" : {
       "source-apt" : "golang curl wget git mercurial bzr make build-essential cpanminus python-setuptools python-dev checkinstall"
