@@ -143,7 +143,7 @@ sub dockerSocket {
 	
 	my $hash=undef;
 	if (@return_lines > 0 && $return_lines[-1] =~ /\}/) {
-		$hash = decode_json($res_json);
+		$hash = decode_json($return_lines[-1]);
 	}
 
 
