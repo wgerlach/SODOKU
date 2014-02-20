@@ -23,9 +23,12 @@
       "exec" : ". /kb/dev_container/user-env.sh ; make update"
    },
    "Shock" : {
+      "set-env" : {
+         "GOPATH" : "$HOME/gocode:$GOPATH"
+      },
       "source-go" : "github.com/MG-RAST/Shock/...",
       "depends" : [
-         "go"
+         "golang"
       ],
       "subpackages" : [
          {
@@ -171,6 +174,19 @@
          5
       ]
    },
+   "go-deprecated" : {
+      "set-env" : {
+         "PATH" : "$PATH:${target}go/bin:${target}gopath/bin",
+         "GOPATH" : "${target}gopath"
+      },
+      "build-exec" : "cd ${target}go/src && ./all.bash",
+      "source-mercurial" : "-u release https://code.google.com/p/go",
+      "subpackages" : [
+         {
+            "source-apt" : "bzr make gcc mercurial git"
+         }
+      ]
+   },
    "kbase-mgrast" : {
       "_comment" : "target=/kb, require kbase-git key",
       "depends" : [
@@ -235,13 +251,6 @@
          }
       ]
    },
-   "upstart-aweclient" : {
-      "source" : "http://www.mcs.anl.gov/~wtang/files/awe-client.conf",
-      "ptarget" : "/etc/init/",
-      "source-remove-existing-file" : 1,
-      "_comment" : "requires root",
-      "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
-   },
    "MG-RAST/databases" : {
       "source" : [
          "ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.1",
@@ -270,6 +279,13 @@
          }
       ]
    },
+   "upstart-aweclient" : {
+      "source" : "http://www.mcs.anl.gov/~wtang/files/awe-client.conf",
+      "ptarget" : "/etc/init/",
+      "source-remove-existing-file" : 1,
+      "_comment" : "requires root",
+      "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
+   },
    "kbase_bootstrap_mgrast" : {
       "build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
       "source-git" : "kbase@git.kbase.us:bootstrap",
@@ -282,12 +298,18 @@
       ]
    },
    "deploy-deps" : {
-      "source-apt" : "git make build-essential cpanminus python-setuptools python-dev checkinstall"
+      "source-apt" : "git ` cpanminus python-setuptools python-dev checkinstall"
    },
    "AWE" : {
+      "ROOT_set-env" : {
+         "GOPATH" : "/usr/local/go/:$GOPATH"
+      },
+      "USER_set-env" : {
+         "GOPATH" : "$HOME/gopath:$GOPATH"
+      },
       "source-go" : "github.com/MG-RAST/AWE/...",
       "depends" : [
-         "go"
+         "golang"
       ],
       "subpackages" : [
          {
@@ -306,19 +328,6 @@
    "kbase_dev_container" : {
       "source-git" : "kbase@git.kbase.us:dev_container",
       "_comment" : "--target should be /kb/"
-   },
-   "go" : {
-      "set-env" : {
-         "PATH" : "$PATH:${target}go/bin:${target}gopath/bin",
-         "GOPATH" : "${target}gopath"
-      },
-      "build-exec" : "cd ${target}go/src && ./all.bash",
-      "subpackages" : [
-         {
-            "source-apt" : "bzr make gcc mercurial git"
-         }
-      ],
-      "mercurial" : "-u release https://code.google.com/p/go"
    },
    "emirge" : {
       "version" : [
@@ -382,6 +391,9 @@
             ]
          }
       ]
+   },
+   "golang" : {
+      "source-apt" : "golang"
    },
    "bowtie" : {
       "build-type" : "make",
