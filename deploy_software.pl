@@ -95,19 +95,31 @@ sub createDockerFile {
 	my $tag = 'wgerlach/'.$package.':'.$version_str;
 	
 	
-	my $res = dockerSocket('GET', "/images/$tag/json");
+	my ($result_hash, $result_body) = dockerSocket('GET', "/images/$tag/json");
 	
+	
+	if (defined $result_hash) {
+		unless (defined $result_hash->{'id'}) {
+			die "hash defined, buty not id!?";
+		}
+		print Dumper($result_hash);
+		print "image already exists:\n";
+		print "ID: ".$result_hash->{'id'}." $tag\n";
+		print "to delete it run docker rmi ".$result_hash->{'id'}."\n";
+		exit(1);
+	}
+
+	
+	if (defined $result_body) {
+		unless ($result_body =~ /inspect: No such image:/) {
+			die "Error: Some error other than image not found: $result_body";
+		}
+	}
 		
 	
 	
-	print Dumper($res);
-	if (defined $res->{'id'}) {
-		print "image already exists:\n";
-		print "ID: ".$res->{'id'}." $tag\n";
-		print "to delete it run docker rmi ".$res->{'id'}."\n";
-		exit(1);
-	}
 	
+		
 	exit(0);
 	
 	my $docker_build_cmd = 'docker build -q=true --no-cache=true --rm --tag='.$tag.' -';
@@ -144,8 +156,8 @@ sub dockerSocket {
 	my ($return_header, $return_body) = split(/\n\s*\n/, $return_value);
 	chomp($return_header);
 	
-	print "return_header:\n \"$return_header\"\n";
-	print "return_body:\n \"$return_body\"\n";
+	print "return_header:\n\"$return_header\"\n";
+	print "return_body:\n\"$return_body\"\n";
 	my @return_body_lines = split("\n", $return_body);
 	
 	my $hash=undef;
@@ -153,8 +165,16 @@ sub dockerSocket {
 		$hash = decode_json($return_body_lines[-1]);
 	}
 
+	my $body = undef;
+	unless (defined $hash) {
+		$body = $return_body;
+	}
 
-	return $hash;
+	unless (defined $hash || defined $body) {
+		die;
+	}
+
+	return ($hash, $body);
 }
 
 
