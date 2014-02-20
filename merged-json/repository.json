@@ -313,7 +313,7 @@
       ],
       "subpackages" : [
          {
-            "source-apt" : "mongodb-server"
+            "source-apt" : "mongodb-server git"
          }
       ]
    },
