@@ -73,6 +73,9 @@
          ". ${ptarget}user-env.sh ; make && make deploy"
       ]
    },
+   "ubuntu-base" : {
+      "source-apt" : "golang curl wget git mercurial bzr"
+   },
    "qiime-wo" : {
       "subpackages" : [
          {
@@ -298,7 +301,7 @@
       ]
    },
    "deploy-deps" : {
-      "source-apt" : "git ` cpanminus python-setuptools python-dev checkinstall"
+      "source-apt" : "git cpanminus python-setuptools python-dev checkinstall"
    },
    "AWE" : {
       "ROOT_set-env" : {
@@ -313,7 +316,7 @@
       ],
       "subpackages" : [
          {
-            "source-apt" : "mongodb-server git"
+            "source-apt" : "mongodb-server"
          }
       ]
    },
@@ -393,7 +396,7 @@
       ]
    },
    "golang" : {
-      "source-apt" : "golang"
+      "source-apt" : "golang git mercurial bzr"
    },
    "bowtie" : {
       "build-type" : "make",
