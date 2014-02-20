@@ -114,7 +114,7 @@ sub createDockerFile {
 }
 
 sub dockerSocket {
-	my ($request_type, $endpoint)
+	my ($request_type, $endpoint) = @_;
 	my $cmd = 'echo -e "'.$request_type.' '.$endpoint.' HTTP/1.0\r\n" | nc -U /var/run/docker.sock  | tail -n 1';
 	print "cmd: $cmd\n";
 	my $json = `$cmd`;
