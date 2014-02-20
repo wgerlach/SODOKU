@@ -88,7 +88,9 @@ sub createDockerFile {
 	
 	#$package
 	
-	my $docker_build_cmd = 'docker build -q=true --no-cache=true --rm --tag=wgerlach/'.$package.':'.$version_str.' -';
+	my $tag = 'wgerlach/'.$package.':'.$version_str;
+	
+	my $docker_build_cmd = 'docker build -q=true --no-cache=true --rm --tag='.$tag.' -';
 	
 	print "docker_build_cmd: $docker_build_cmd\n";
 	
@@ -101,8 +103,25 @@ sub createDockerFile {
 	
 		print $fh $dockerfile;
 		close ($fh);
+		
+		sleep(3);
+		
+		#echo -e "GET /images/wgerlach/AWE/json HTTP/1.0\r\n" | nc -U /var/run/docker.sock  | tail -n 1 | json_pp
+		my $res = dockerSocket('GET', "/images/$tag/json");
+		print Dumper($res);
+		
 	}
 }
+
+sub dockerSocket {
+	my ($request_type, $endpoint)
+	my $cmd = 'echo -e "'.$request_type.' '.$endpoint.' HTTP/1.0\r\n" | nc -U /var/run/docker.sock  | tail -n 1';
+	print "cmd: $cmd\n";
+	my $json = `$cmd`;
+	chomp $json;
+	return $json;
+}
+
 
 sub addDockerCmd {
 	my $docker_line = 'RUN '.join(' ', @_);
