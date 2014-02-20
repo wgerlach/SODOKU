@@ -142,9 +142,10 @@ sub dockerSocket {
 	print "return_value: \"$return_value\"\n";
 	
 	my ($return_header, $return_body) = split(/\n\s*\n/, $return_value);
+	chomp($return_header);
 	
-	print "return_header: \"$return_header\"\n";
-	print "return_body: \"$return_body\"\n";
+	print "return_header:\n \"$return_header\"\n";
+	print "return_body:\n \"$return_body\"\n";
 	my @return_body_lines = split("\n", $return_body);
 	
 	my $hash=undef;
