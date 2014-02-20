@@ -40,7 +40,7 @@ my $d=undef; # docker inidicator
 my @docker_file_header=(
 	'FROM ubuntu:13.10',
 	'MAINTAINER Wolfgang Gerlach',
-	'RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list',
+	#'RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list',
 	'RUN apt-get update'
 	);
 my @docker_file_content=();
