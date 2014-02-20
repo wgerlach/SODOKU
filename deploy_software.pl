@@ -81,6 +81,7 @@ sub createDockerFile {
 	$dockerfile .= "RUN apt-get install -y ".join(' ', keys(%$dep_packages)) ."\n";
 	$dockerfile .= join("\n", @docker_file_content)."\n";
 	
+	print "------\nDockerfile\n";
 	print $dockerfile;
 	
 	#$package
@@ -89,8 +90,8 @@ sub createDockerFile {
 	
 	print "docker_build_cmd: $docker_build_cmd\n";
 	
-	print "Dockerfile\n";
-	print $dockerfile;
+	
+	
 	
 	unless (defined $h->{'docker_show_only'}) {
 		open(my $fh, "|-", $docker_build_cmd)
@@ -103,17 +104,22 @@ sub createDockerFile {
 
 sub addDockerCmd {
 	my $docker_line = 'RUN '.join(' ', @_);
-	unless ($docker_file_content[-1] eq $docker_line) {
-		my $cmd_lines = shift(@_);
-		my @cmds = split(/\s*\&\&\s*|\s*\;\s*/,$cmd_lines);
-		foreach my $cmd (@cmds) {
-			my @cmd_array = split(/\s+/, $cmd);
-			my $cmd = $cmd_array[0];
-			print "command found: ".$cmd."\n";
-			$docker_deps->{$cmd}=1;
-		}
-		push(@docker_file_content, $docker_line);
+	
+	if ((@docker_file_content > 0) && ($docker_file_content[-1] eq $docker_line)) {
+		return;
 	}
+	
+	
+	my $cmd_lines = shift(@_);
+	my @cmds = split(/\s*\&\&\s*|\s*\;\s*/,$cmd_lines);
+	foreach my $cmd (@cmds) {
+		my @cmd_array = split(/\s+/, $cmd);
+		my $cmd = $cmd_array[0];
+		print "command found: ".$cmd."\n";
+		$docker_deps->{$cmd}=1;
+	}
+	push(@docker_file_content, $docker_line);
+
 	
 }
 
