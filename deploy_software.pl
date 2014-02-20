@@ -93,7 +93,7 @@ sub createDockerFile {
 	
 	my $res_json = dockerSocket('GET', "/images/$tag/json");
 	
-	print "res_json: $res_json\n";
+	print "res_json: \"$res_json\"\n";
 	
 	my $res = decode_json($res_json);
 	print Dumper($res);
@@ -128,6 +128,7 @@ sub dockerSocket {
 	my $cmd = 'echo -e "'.$request_type.' '.$endpoint.' HTTP/1.0\r\n" | nc -U /var/run/docker.sock  | tail -n 1';
 	print "cmd: $cmd\n";
 	my $json = `$cmd`;
+	print "json: \"$json\"\n";
 	chomp $json;
 	return $json;
 }
