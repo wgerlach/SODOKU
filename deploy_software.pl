@@ -191,7 +191,7 @@ sub createDockerFile {
 	#check token
 	#check server
 	
-	if ($ENV{'GLOBUSONLINE'} eq '') {
+	if (!defined($ENV{'GLOBUSONLINE'}) ||  $ENV{'GLOBUSONLINE'} eq '') {
 		die 'GLOBUSONLINE token not found';
 	}
 	
@@ -211,7 +211,7 @@ sub createDockerFile {
 	
 	
 	
-	my $curl_cmd = 'curl -X POST -H "Authorization: OAuth $GLOBUSONLINE"  -F "attributes=@sodoku_docker.json" -F "upload=@'.$image_tarfile.'" "'.$shock_server.'/node';
+	my $curl_cmd = 'curl -X POST -H "Authorization: OAuth $GLOBUSONLINE"  -F "attributes=@sodoku_docker.json" -F "upload=@'.$image_tarfile.'" "'.$shock_server.'/node"';
 	print "cmd: ".$curl_cmd."\n";
 	system($curl_cmd)== 0 or die;
 	
