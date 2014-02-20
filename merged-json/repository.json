@@ -66,12 +66,6 @@
          }
       ]
    },
-   "Shock-git" : {
-      "set-env" : {
-         "PERL5LIB" : "${ptarget}Shock/libs/:$PERL5LIB"
-      },
-      "source-git" : "https://github.com/MG-RAST/Shock"
-   },
    "kbase_dev_container-deploy" : {
       "ptarget" : "${target}dev_container",
       "exec" : [
@@ -84,6 +78,12 @@
    },
    "ubuntu-base" : {
       "source-apt" : "golang curl wget git mercurial bzr make build-essential cpanminus python-setuptools python-dev checkinstall"
+   },
+   "wgerlach/Shock-git" : {
+      "set-env" : {
+         "PERL5LIB" : "${ptarget}Shock/libs/:$PERL5LIB"
+      },
+      "source-git" : "https://github.com/wgerlach/Shock"
    },
    "qiime-wo" : {
       "subpackages" : [
@@ -106,6 +106,12 @@
       ],
       "data" : 1,
       "dir" : 1
+   },
+   "wgerlach/AWE-git" : {
+      "set-env" : {
+         "PERL5LIB" : "${ptarget}AWE/utils/lib:$PERL5LIB"
+      },
+      "source-git" : "https://github.com/wgerlach/AWE"
    },
    "aweclient/cfg/default" : {
       "source" : {
@@ -303,12 +309,6 @@
       "source-remove-existing-file" : 1,
       "_comment" : "requires root",
       "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
-   },
-   "AWE-git" : {
-      "set-env" : {
-         "PERL5LIB" : "${ptarget}AWE/utils/lib:$PERL5LIB"
-      },
-      "source-git" : "https://github.com/MG-RAST/AWE"
    },
    "AWE" : {
       "ROOT_set-env" : {
