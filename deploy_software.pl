@@ -100,13 +100,18 @@ sub createDockerFile {
 	
 	if (defined $result_hash) {
 		unless (defined $result_hash->{'id'}) {
-			die "hash defined, buty not id!?";
+			die "hash defined, but not id!?";
 		}
 		print Dumper($result_hash);
 		print "image already exists:\n";
 		print "ID: ".$result_hash->{'id'}." $tag\n";
-		print "to delete it run docker rmi ".$result_hash->{'id'}."\n";
-		exit(1);
+		
+		unless (defined $h->{'docker_reuse_image'}) {
+			print "to delete it run docker rmi ".$result_hash->{'id'}."\n";
+			exit(1);
+		}
+		
+		
 	}
 
 	
@@ -1343,7 +1348,7 @@ sub install_package {
 
 print "deploy arguments: ".join(' ', @ARGV)."\n";
 
-GetOptions ($h, 'target=s', 'data_target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'docker', 'docker_show_only', 'nossl', 'forcetarget', 'list', 'create', 'nodeps');
+GetOptions ($h, 'target=s', 'data_target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'docker', 'docker_show_only', 'docker_reuse_image', 'nossl', 'forcetarget', 'list', 'create', 'nodeps');
 
 if ( @ARGV == 0 && ! defined $h->{'list'}) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
