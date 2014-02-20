@@ -90,6 +90,15 @@ sub createDockerFile {
 	
 	my $tag = 'wgerlach/'.$package.':'.$version_str;
 	
+	
+	my $res_json = dockerSocket('GET', "/images/$tag/json");
+	
+	my $res = decode_json($res_json);
+	print Dumper($res);
+	
+	
+	exit(0);
+	
 	my $docker_build_cmd = 'docker build -q=true --no-cache=true --rm --tag='.$tag.' -';
 	
 	print "docker_build_cmd: $docker_build_cmd\n";
@@ -107,8 +116,7 @@ sub createDockerFile {
 		sleep(3);
 		
 		#echo -e "GET /images/wgerlach/AWE/json HTTP/1.0\r\n" | nc -U /var/run/docker.sock  | tail -n 1 | json_pp
-		my $res = dockerSocket('GET', "/images/$tag/json");
-		print Dumper($res);
+		
 		
 	}
 }
