@@ -300,8 +300,13 @@ sub datastructure_walk {
 		if (defined $user_specific && $user_specific == 1 ) {
 			my @keys = keys(%$datastructure);
 			foreach my $key (@keys) {
+				
 				my ($user, $keyword) = $key =~ /^(USER|ROOT)\_(.*)$/;
 				if (defined $keyword) {
+					print "key: $key\n";
+					print "user: $user\n";
+					print "keyword: $keyword\n";
+					
 					if ( ($user eq 'USER' && $is_root_user==0) || ($user eq 'ROOT' && $is_root_user==1) ) {
 						$datastructure->{$keyword} = delete $datastructure->{$key};
 						print "replace $key with $keyword\n";
