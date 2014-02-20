@@ -92,7 +92,7 @@ sub createDockerFile {
 	print "Dockerfile\n";
 	print $dockerfile;
 	
-	unless (defined $h{'docker_show_only'}) {
+	unless (defined $h->{'docker_show_only'}) {
 		open(my $fh, "|-", $docker_build_cmd)
 			or die "cannot run docker: $!";
 	
