@@ -93,6 +93,8 @@ sub createDockerFile {
 	
 	my $res_json = dockerSocket('GET', "/images/$tag/json");
 	
+	print "res_json: $res_json\n";
+	
 	my $res = decode_json($res_json);
 	print Dumper($res);
 	
