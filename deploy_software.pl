@@ -171,7 +171,7 @@ sub createDockerFile {
 	### save image as tar archive file
 	
 	my $tag_converted = $tag;
-	$tag_converted =~ s/[\/\:]/\_/g;
+	$tag_converted =~ s/[\/]/\_/g;
 	my $image_tarfile = $image_id.'_'.$docker_base_image.'_'.$tag_converted;
 	
 	unless (defined $h->{'docker_reuse_image'}) {
