@@ -172,7 +172,7 @@ sub createDockerFile {
 	
 	my $tag_converted = $tag;
 	$tag_converted =~ s/[\/\:]/\_/g;
-	my $image_tarfile = $image_id.'_'.$docker_base_image.'_'.$tag;
+	my $image_tarfile = $image_id.'_'.$docker_base_image.'_'.$tag_converted;
 	
 	unless (defined $h->{'docker_reuse_image'}) {
 		if (-e $image_tarfile) {
