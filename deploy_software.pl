@@ -120,7 +120,7 @@ sub createDockerFile {
 	
 	
 		
-	exit(0);
+	
 	
 	my $docker_build_cmd = 'docker build -q=true --no-cache=true --rm --tag='.$tag.' -';
 	
