@@ -864,6 +864,13 @@ sub install_package {
 		}
 	}
 
+	if (defined $package_hash->{'set-env'}) {
+		my $env_pairs = $package_hash->{'set-env'};
+		foreach my $key (keys %{$env_pairs} ) {
+			setenv($key, $env_pairs->{$key}) ;
+		}
+	}
+	
 	# resolve short-hand notation
 	foreach my $type ('apt', 'pip', 'git', 'go', 'mercurial') {
 		if (defined $package_hash->{'source-'.$type}) {
@@ -1187,12 +1194,7 @@ sub install_package {
 	}
 
 
-	if (defined $package_hash->{'set-env'}) {
-		my $env_pairs = $package_hash->{'set-env'};
-		foreach my $key (keys %{$env_pairs} ) {
-			setenv($key, $env_pairs->{$key}) ;
-		}
-	}
+	
 	
 	
 	if (defined($package_hash->{'set-ini-values'})) {
