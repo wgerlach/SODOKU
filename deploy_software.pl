@@ -85,7 +85,7 @@ sub createDockerFile {
 	
 	#$package
 	
-	my $docker_build_cmd = 'docker build -q=true --no-cache=true -t wgerlach/'.$package.':'.$version_str.' -';
+	my $docker_build_cmd = 'docker build -q=true --no-cache=true --rm --tag=wgerlach/'.$package.':'.$version_str.' -';
 	
 	print "docker_build_cmd: $docker_build_cmd\n";
 	
@@ -277,12 +277,32 @@ sub process_scalar {
 sub datastructure_walk {
     my %arghash = @_;
 	my $datastructure = $arghash{'data'};
-	my $sub = $arghash{'sub'};
+	my $sub = $arghash{'sub'}; # function sub will applied to all scalars
 	my $arg = $arghash{'subarg'};
+	
+	my $user_specific = $arghash{'user_specific'} || 0;
 	
 	my $show=0;
 	
 	if (ref($datastructure) eq 'HASH') {
+		
+		
+		if (defined $user_specific && $user_specific == 1 ) {
+			my @keys = keys(%$datastructure);
+			foreach my $key (@keys) {
+				my ($user, $keyword) = $key =~ /^(USER|ROOT)\_(.*)$/;
+				if (defined $keyword) {
+					if ( ($user eq 'USER' && $is_root_user==0) || ($user eq 'ROOT' && $is_root_user==1) ) {
+						$datastructure->{$keyword} = delete $datastructure->{$key};
+						print "replace $key with $keyword\n";
+					} else {
+						delete $datastructure->{$key};
+					}
+				}
+				
+			}
+		}
+		
 		while (my ($k, $v) = each %$datastructure) {
 			if ($show==1) {print "goto $k\n";}
 			if (ref($v) eq '') {
@@ -348,9 +368,17 @@ sub setenv {
 sub bashrc_append {
 	my $line = shift(@_);
 	
-	systemp("grep -q -e '$line' ~/.bashrc || echo '$line' >> ~/.bashrc");
 	
+	my $bashrc = '~/.bashrc';
+	
+	if ($is_root_user) {
+		$bashrc = '/etc/profile';
+	}
+	
+	my $cmd = "grep -q -e '$line' $bashrc || echo '$line' >> $bashrc";
+	systemp($cmd);
 }
+
 
 sub git_clone {
 	my ($source, $dir, $gitbranch) = @_;
@@ -1394,7 +1422,7 @@ if ($@) {
 	exit(1);
 }
 
-datastructure_walk('data' => $repository, 'sub' => \&process_scalar); # for my "environment variables"... ;-)
+datastructure_walk('data' => $repository, 'sub' => \&process_scalar, 'user_specific' => 1); # for my "environment variables"... ;-)
 
 
 
