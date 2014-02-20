@@ -37,6 +37,22 @@
          }
       ]
    },
+   "KBase/AMETHST" : {
+      "set-env" : {
+         "PATH" : "${ptarget}AMETHST:$PATH"
+      },
+      "source-git" : "https://github.com/MG-RAST/AMETHST",
+      "depends" : [
+         "wgerlach/MG-RAST-Tools",
+         "wgerlach/AWE-git",
+         "wgerlach/Shock-git"
+      ],
+      "subpackages" : [
+         {
+            "source-pip" : "qcli"
+         }
+      ]
+   },
    "aweclient/cfg-awec.cfg" : {
       "set-ini-values" : {
          "cfg-string" : "${arguments}",
@@ -71,22 +87,6 @@
       "exec" : [
          "./bootstrap ${target}runtime",
          ". ${ptarget}user-env.sh ; make && make deploy"
-      ]
-   },
-   "AMETHST" : {
-      "set-env" : {
-         "PATH" : "${ptarget}AMETHST:$PATH"
-      },
-      "source-git" : "https://github.com/MG-RAST/AMETHST",
-      "depends" : [
-         "wgerlach/MG-RAST-Tools",
-         "wgerlach/AWE-git",
-         "wgerlach/Shock-git"
-      ],
-      "subpackages" : [
-         {
-            "source-pip" : "qcli"
-         }
       ]
    },
    "ubuntu-base" : {
