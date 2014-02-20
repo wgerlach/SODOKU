@@ -32,6 +32,9 @@ my $ubuntu_cmd2package = {
 my $docker_base_image = 'ubuntu:13.10';
 my $author = 'Wolfgang Gerlach';
 
+my $shock_server = 'http://shock.metagenomics.anl.gov:80';
+
+
 #########################################
 
 my $target = undef;
@@ -97,17 +100,19 @@ sub createDockerFile {
 	
 	my ($result_hash, $result_body) = dockerSocket('GET', "/images/$tag/json");
 	
-	
+	my $image_id = undef;
 	if (defined $result_hash) {
-		unless (defined $result_hash->{'id'}) {
+		$image_id = $result_hash->{'id'};
+		unless (defined $image_id) {
 			die "hash defined, but not id!?";
 		}
+		
 		print Dumper($result_hash);
 		print "image already exists:\n";
-		print "ID: ".$result_hash->{'id'}." $tag\n";
+		print "ID: ".$image_id." $tag\n";
 		
 		unless (defined $h->{'docker_reuse_image'}) {
-			print "to delete it run docker rmi ".$result_hash->{'id'}."\n";
+			print "to delete it run docker rmi ".$image_id."\n";
 			exit(1);
 		}
 		
@@ -126,6 +131,7 @@ sub createDockerFile {
 	
 		
 	
+	### create docker image ###
 	
 	my $docker_build_cmd = 'docker build -q=true --no-cache=true --rm --tag='.$tag.' -';
 	
@@ -134,7 +140,7 @@ sub createDockerFile {
 	
 	
 	
-	unless (defined $h->{'docker_show_only'}) {
+	unless (defined($h->{'docker_show_only'}) || defined($image_id) ) {
 		open(my $fh, "|-", $docker_build_cmd)
 			or die "cannot run docker: $!";
 	
@@ -143,10 +149,71 @@ sub createDockerFile {
 		
 		sleep(3);
 		
-		#echo -e "GET /images/wgerlach/AWE/json HTTP/1.0\r\n" | nc -U /var/run/docker.sock  | tail -n 1 | json_pp
 		
+		$result_hash = undef;
+		$result_body = undef;
+		($result_hash, $result_body) = dockerSocket('GET', "/images/$tag/json");
+		
+		
+		if (defined $result_hash) {
+			$image_id = $result_hash->{'id'};
+						
+		} else {
+			die "result_hash not defined";
+		}
 		
 	}
+	
+	unless (defined $image_id) {
+		die "image ID not found";
+	}
+
+	### save image as tar archive file
+	
+	my $tag_converted = $tag;
+	$tag_converted =~ /[\/\:]/\_/g;
+	my $image_tarfile = $image_id.'_'.$docker_base_image.'_'.$tag;
+	
+	unless (defined $h->{'docker_reuse_image'}) {
+		if (-e $image_tarfile) {
+			die "docker image file $image_tarfile already exists";
+		}
+	}
+	
+	
+	my $docker_save_cmd = 'docker save '.$image_id.' > '.$image_tarfile;
+	print "cmd: ".$docker_save_cmd."\n";
+	system($docker_save_cmd);
+	
+	### upload image to SHOCK ###
+	#check token
+	#check server
+	
+	if ($ENV{'GLOBUSONLINE'} eq '') {
+		die 'GLOBUSONLINE token not found';
+	}
+	
+	
+	
+		
+	my $shock_json =	'{'.
+						' "temporary":"1",'.
+						' "docker_image_name":"'.$tag.'",'.
+						' "docker_image_id":"'.$image_id.'"'.
+						' "docker_base_image":"'.$docker_base_image.'"'.
+						'}';
+	$shock_json =~ /\"/\\\"/g;
+	
+	system('echo "'.$shock_json.'" > sodoku_docker.json');
+	
+	
+	
+	
+	my $curl_cmd = 'curl -X POST -H "Authorization: OAuth $GLOBUSONLINE"  -F "attributes=@sodoku_docker.json" -F "upload=@'.$image_tarfile.'" "'.$shock_server.'/node';
+	print "cmd: ".$curl_cmd."\n";
+	system($curl_cmd)== 0 or die;
+	
+	exit(0);
 }
 
 sub dockerSocket {
