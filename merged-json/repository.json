@@ -174,12 +174,6 @@
          5
       ]
    },
-   "MG-RAST-Tools" : {
-      "set-env" : {
-         "PERL5LIB" : "${ptarget}MG-RAST-Tools/tools/lib/:$PERL5LIB"
-      },
-      "source-git" : "https://github.com/MG-RAST/MG-RAST-Tools"
-   },
    "qiime" : {
       "source-temporary" : 1,
       "source" : "git://github.com/qiime/qiime-deploy.git",
@@ -310,6 +304,20 @@
       "_comment" : "requires root",
       "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
    },
+   "deploy-deps" : {
+      "source-apt" : "git cpanminus python-setuptools python-dev checkinstall"
+   },
+   "kbase_bootstrap_mgrast" : {
+      "build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
+      "source-git" : "kbase@git.kbase.us:bootstrap",
+      "_comment" : "target : /kb/",
+      "subpackages" : [
+         {
+            "source" : "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.tar.gz",
+            "ptarget" : "${target}bootstrap/kb_java_runtime"
+         }
+      ]
+   },
    "AWE" : {
       "ROOT_set-env" : {
          "GOPATH" : "/usr/local/go/:$GOPATH"
@@ -327,20 +335,6 @@
          }
       ]
    },
-   "deploy-deps" : {
-      "source-apt" : "git cpanminus python-setuptools python-dev checkinstall"
-   },
-   "kbase_bootstrap_mgrast" : {
-      "build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
-      "source-git" : "kbase@git.kbase.us:bootstrap",
-      "_comment" : "target : /kb/",
-      "subpackages" : [
-         {
-            "source" : "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.tar.gz",
-            "ptarget" : "${target}bootstrap/kb_java_runtime"
-         }
-      ]
-   },
    "kbase" : {
       "_comment" : "example: target=/kb , kbase(KBaseFBAModeling), this does not include the bootstrap! Use . /kb/deployment/user-env.sh to activate",
       "depends" : [
@@ -348,6 +342,12 @@
          "kbase-modules(${arguments})",
          "kbase_dev_container-deploy"
       ]
+   },
+   "wgerlach/MG-RAST-Tools" : {
+      "set-env" : {
+         "PERL5LIB" : "${ptarget}MG-RAST-Tools/tools/lib/:$PERL5LIB"
+      },
+      "source-git" : "https://github.com/wgerlach/MG-RAST-Tools"
    },
    "kbase_dev_container" : {
       "source-git" : "kbase@git.kbase.us:dev_container",
