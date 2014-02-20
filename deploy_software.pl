@@ -98,7 +98,9 @@ sub createDockerFile {
 	my $res = decode_json($res_json);
 	print Dumper($res);
 	if (defined $res->{'id'}) {
+		print "image already exists:\n";
 		print "ID: ".$res->{'id'}." $tag\n";
+		exit(1);
 	}
 	
 	exit(0);
