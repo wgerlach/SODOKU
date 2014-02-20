@@ -202,7 +202,7 @@ sub createDockerFile {
 						' "docker_image_id":"'.$image_id.'"'.
 						' "docker_base_image":"'.$docker_base_image.'"'.
 						'}';
-	$shock_json =~ /\"/\\\"/g;
+	$shock_json =~ s/\"/\\\"/g;
 	
 	system('echo "'.$shock_json.'" > sodoku_docker.json');
 	
