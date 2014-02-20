@@ -176,16 +176,28 @@ sub createDockerFile {
 	$docker_base_image_converted =~ s/[\/]/\_/g;
 	my $image_tarfile = $image_id.'_'.$docker_base_image_converted.'_'.$tag_converted;
 	
-	unless (defined $h->{'docker_reuse_image'}) {
+	my $skip_saving = 0;
+	
+	
+	if (defined $h->{'docker_reuse_image'}) {
+		if (-e $image_tarfile) {
+			$skip_saving = 1;
+		}
+	} else {
 		if (-e $image_tarfile) {
 			die "docker image file $image_tarfile already exists";
 		}
 	}
 	
+	if ($skip_saving == 0) {
+		my $docker_save_cmd = 'docker save '.$image_id.' > '.$image_tarfile;
+		print "cmd: ".$docker_save_cmd."\n";
+		system($docker_save_cmd);
+	}
 	
-	my $docker_save_cmd = 'docker save '.$image_id.' > '.$image_tarfile;
-	print "cmd: ".$docker_save_cmd."\n";
-	system($docker_save_cmd);
+	
+	
+	
 	
 	### upload image to SHOCK ###
 	#check token
