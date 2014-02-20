@@ -89,12 +89,16 @@ sub createDockerFile {
 	
 	print "docker_build_cmd: $docker_build_cmd\n";
 	
-	open(my $fh, "|-", $docker_build_cmd)
-		or die "cannot run docker: $!";
+	print "Dockerfile\n";
+	print $dockerfile;
 	
-	print $fh $dockerfile;
-	close ($fh);
+	unless (defined $h{'docker_show_only'}) {
+		open(my $fh, "|-", $docker_build_cmd)
+			or die "cannot run docker: $!";
 	
+		print $fh $dockerfile;
+		close ($fh);
+	}
 }
 
 sub addDockerCmd {
@@ -1224,7 +1228,7 @@ sub install_package {
 
 print "deploy arguments: ".join(' ', @ARGV)."\n";
 
-GetOptions ($h, 'target=s', 'data_target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'docker', 'nossl', 'forcetarget', 'list', 'create', 'nodeps');
+GetOptions ($h, 'target=s', 'data_target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'docker', 'docker_show_only', 'nossl', 'forcetarget', 'list', 'create', 'nodeps');
 
 if ( @ARGV == 0 && ! defined $h->{'list'}) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
