@@ -300,10 +300,10 @@ sub datastructure_walk {
 		if (defined $user_specific && $user_specific == 1 ) {
 			my @keys = keys(%$datastructure);
 			foreach my $key (@keys) {
-				
+				print "key: $key\n";
 				my ($user, $keyword) = $key =~ /^(USER|ROOT)\_(.*)$/;
 				if (defined $keyword) {
-					print "key: $key\n";
+					
 					print "user: $user\n";
 					print "keyword: $keyword\n";
 					
