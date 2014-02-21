@@ -1,6 +1,27 @@
 {
 	"deploy-deps" : {
-		"source-apt" : "git make build-essential cpanminus python-setuptools python-dev checkinstall"
+		"source-apt" : "git cpanminus python-setuptools python-dev checkinstall"
+	},
+	"ubuntu-base" : {
+		"source-apt" : "golang curl wget git mercurial bzr make build-essential cpanminus python-setuptools python-dev checkinstall"
+	},
+	"KBase/AMETHST": {
+		"source-git" : "https://github.com/MG-RAST/AMETHST",
+		"subpackages" : [ {"source-pip": "qcli"} ],
+		"set-env" : {"PATH":"${ptarget}AMETHST:$PATH"},
+		"depends" : ["wgerlach/MG-RAST-Tools","wgerlach/AWE-git","wgerlach/Shock-git"]
+	},
+	"wgerlach/MG-RAST-Tools": {
+		"source-git" : "https://github.com/wgerlach/MG-RAST-Tools",
+		"set-env" : {"PERL5LIB":"${ptarget}MG-RAST-Tools/tools/lib/:$PERL5LIB"}
+	},
+	"wgerlach/AWE-git": {
+		"source-git" : "https://github.com/wgerlach/AWE",
+		"set-env" : {"PERL5LIB":"${ptarget}AWE/utils/lib:$PERL5LIB"}
+	},
+	"wgerlach/Shock-git": {
+		"source-git" : "https://github.com/wgerlach/Shock",
+		"set-env" : {"PERL5LIB":"${ptarget}Shock/libs/:$PERL5LIB"}
 	},
 	"samtools" : {
 		"version" : [0,1,18],
@@ -193,10 +214,15 @@
 						 "source-apt" : "mongodb-server"
 						 }
 						 ],
-		"depends" : ["go"]
+		"depends" : ["golang"],
+		"ROOT_set-env" : { "GOPATH" : "/usr/local/go/:$GOPATH" },
+		"USER_set-env" : { "GOPATH" : "$HOME/gopath:$GOPATH" }
 	},
-	"go" : {
-		"mercurial" : "-u release https://code.google.com/p/go",
+	"golang" : {
+		"source-apt" : "golang git mercurial bzr"
+	},
+	"go-deprecated" : {
+		"source-mercurial" : "-u release https://code.google.com/p/go",
 		"build-exec" : "cd ${target}go/src && ./all.bash",
 		"subpackages" : [
 						 {
@@ -213,7 +239,8 @@
 							"ptarget" : "${target}/etc"
 						 }
 						],
-		"depends" : ["go"]
+		"depends" : ["golang"],
+		"set-env" : {	"GOPATH" : "$HOME/gocode:$GOPATH" }
 	},
 	"MG-RAST/FragGeneScan" : {
 		"source": "http://www.mcs.anl.gov/~wtang/files/fgs.tar.gz",
@@ -258,8 +285,12 @@
 	"bowtie2" : {
 		"version" : [2,2,0],
 		"source" : {	"url" : "http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/${v1}.${v2}.${v3}/bowtie2-${v1}.${v2}.${v3}-linux-x86_64.zip",
-						"subdir" : "bowtie2-${v1}.${v2}.${v3}"
-				}
+				"subdir" : "bowtie2-${v1}.${v2}.${v3}"
+			},
+		"source-extract" : 1,
+		"source-temporary" : 1,
+		"build-type" : "make",
+		"install-binary" : ["bowtie2","bowtie2-build","bowtie2-inspect"]
 	},
 	"bowtie" : {
 		"version" : [1,0,0],
