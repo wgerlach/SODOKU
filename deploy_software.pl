@@ -1737,7 +1737,7 @@ if ($d) {
 	}
 	my $shock_node_id = upload_docker_image_to_shock($image_tarfile, $tag, $image_id, $docker_base_image) || die;
 	
-	return;
+
 }
 
 
