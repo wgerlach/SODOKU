@@ -233,6 +233,15 @@ sub createDockerFile {
 	
 	print Dumper($node_accls);
 	
+	my $node_accls_read_users = $node_accls->{'data'}->{'read'} || die;
+	
+	print "make node world readable\n";
+	if (@{$node_accls_read_users} > 0) {
+		my $node_accls_delete = $shock->delete('node/'.$shock_node_id.'/acl/read/?users='.join(',', @{$node_accls_read_users})) || die;
+		print Dumper($node_accls_delete);
+		
+	}
+	
 	
 	exit(0);
 	
