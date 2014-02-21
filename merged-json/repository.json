@@ -227,6 +227,11 @@
          }
       ]
    },
+   "MG-RAST/FragGeneScan" : {
+      "source" : "http://www.mcs.anl.gov/~wtang/files/fgs.tar.gz",
+      "ptarget" : "${target}apps/FragGeneScan",
+      "source-extract" : 1
+   },
    "kbase-mgrast" : {
       "_comment" : "target=/kb, require kbase-git key",
       "depends" : [
@@ -235,10 +240,19 @@
          "kbase_dev_container-deploy"
       ]
    },
-   "MG-RAST/FragGeneScan" : {
-      "source" : "http://www.mcs.anl.gov/~wtang/files/fgs.tar.gz",
-      "ptarget" : "${target}apps/FragGeneScan",
-      "source-extract" : 1
+   "docker" : {
+      "ptarget" : "$GOPATH/src/github.com/dotcloud/docker",
+      "source-go" : "github.com/dotcloud/docker/...",
+      "build-exec" : "sudo ln -s $GOPATH/bin/docker /usr/local/bin/docker",
+      "subpackages" : [
+         {
+            "source-apt" : "lxc curl xz-utils git mercurial"
+         },
+         {
+            "ptarget" : "$GOPATH/src/github.com/dotcloud",
+            "source-git" : "https://github.com/dotcloud/docker.git"
+         }
+      ]
    },
    "emirge-data-cached" : {
       "source" : "http://dunkirk.mcs.anl.gov/~wgerlach/SSURef_111.tar.gz",
@@ -348,9 +362,6 @@
          }
       ]
    },
-   "deploy-deps" : {
-      "source-apt" : "git cpanminus python-setuptools python-dev checkinstall"
-   },
    "kbase_bootstrap_mgrast" : {
       "build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
       "source-git" : "kbase@git.kbase.us:bootstrap",
@@ -361,6 +372,9 @@
             "ptarget" : "${target}bootstrap/kb_java_runtime"
          }
       ]
+   },
+   "deploy-deps" : {
+      "source-apt" : "git cpanminus python-setuptools python-dev checkinstall"
    },
    "kbase" : {
       "_comment" : "example: target=/kb , kbase(KBaseFBAModeling), this does not include the bootstrap! Use . /kb/deployment/user-env.sh to activate",
@@ -447,6 +461,7 @@
       "source" : "http://go.googlecode.com/files/go${v1}.${v2}.linux-amd64.tar.gz",
       "set-env" : {
          "GOROOT" : "${ptarget}go/",
+         "GOPATH" : "${ptarget}gopath/",
          "PATH" : "${GOROOT}/bin:${PATH}"
       },
       "source-extract" : 1,
