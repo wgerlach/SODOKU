@@ -10,7 +10,7 @@ eval "use JSON; 1"
 or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm install JSON";
 
 
-use SHOCK::Client;
+#use SHOCK::Client;
 
 use File::Temp;
 #use LWP::UserAgent;
@@ -1530,19 +1530,33 @@ if ( @ARGV == 0 && ! defined $h->{'list'}) {
 
 
 
-my $error   = '';
-my $package = 'SHOCK::Client';
-{
-	no strict;
-	eval "require $package;";
-	$error = $@;
-}
-if ($error) {
-	$shock_client_module_available = 0;
-} else {
-	#my $resource_obj = $package->new($params);
+#my $error   = '';
+#my $package = 'SHOCK::Client';
+#{
+#	no strict;
+#	eval "require $package;";
+#	$error = $@;
+#}
+#if ($error) {
+#	$shock_client_module_available = 0;
+#} else {
+#	#my $resource_obj = $package->new($params);
+#	$shock_client_module_available = 1;
+#}
+
+eval {
+    require My::Module;
+    My::Module->import();
 	$shock_client_module_available = 1;
-}
+	print "success\n";
+    1;
+} or do {
+	my $error = $@;
+	print "error\n";
+	# Module load failed. You could recover, try loading
+	# an alternate module, die with $error...
+	# whatever's appropriate
+};
 
 
 print "shock_client_module_available: $shock_client_module_available\n";
