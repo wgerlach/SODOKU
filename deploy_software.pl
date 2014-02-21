@@ -230,7 +230,7 @@ sub createDockerFile {
 	
 	my $node_accls = $shock->get("node/$shock_node_id/acl") || die;
 	
-	print Dumper($node_accls)
+	print Dumper($node_accls);
 	
 	
 	exit(0);
