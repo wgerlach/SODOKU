@@ -1243,7 +1243,7 @@ sub install_package {
 								chop($src_dir);
 							}
 							if (-d $src_dir) {
-								systemp("rm -rf ".$src_dir)
+								systemp("rm -rf ".$src_dir);
 							}
 						} else {
 							systemp("mkdir -p ".$ENV{GOPATH});
