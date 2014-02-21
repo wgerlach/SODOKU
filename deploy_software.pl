@@ -195,10 +195,15 @@ sub createDockerFile {
 		system($docker_save_cmd);
 	}
 	
+	return $image_tarfile;
 	
 	
+}
+
+
+sub upload_docker_image_to_shock {
 	
-	
+	my ($image_tarfile, $tag, $image_id, $docker_base_image) = @_;
 	### upload image to SHOCK ###
 	#check token
 	#check server
@@ -209,10 +214,10 @@ sub createDockerFile {
 	if (!defined($ENV{'GLOBUSONLINE'}) ||  $ENV{'GLOBUSONLINE'} eq '') {
 		die 'GLOBUSONLINE token not found';
 	}
-
+	
 	my $shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
 	
-			
+	
 	my $shock_json =	'{'.
 						' "temporary":"1",'.
 						' "docker":"1",'.
@@ -225,38 +230,40 @@ sub createDockerFile {
 	my $up_result = $shock->upload('file' => $image_tarfile, 'attr' => $shock_json) || die;
 	#same as: my $curl_cmd = 'curl -X POST -H "Authorization: OAuth $GLOBUSONLINE"  -F "attributes=@sodoku_docker.json" -F "upload=@'.$image_tarfile.'" "'.$shock_server.'/node"';
 	print Dumper($up_result);
+	unless ($up_result->{'status'} == 200) {
+		die;
+	}
 	
 	my $shock_node_id = $up_result->{'data'}->{'id'} || die "SHOCK node id not found for uploaded image";
 	
 	
 	my $node_accls = $shock->get("node/$shock_node_id/acl") || die;
+	unless ($node_accls->{'status'} == 200) {
+		die;
+	}
 	
 	print Dumper($node_accls);
 	
 	my $node_accls_read_users = $node_accls->{'data'}->{'read'} || die;
+	unless ($node_accls_read_users->{'status'} == 200) {
+		die;
+	}
 	
 	print "make node world readable\n";
 	if (@{$node_accls_read_users} > 0) {
 		my $node_accls_delete = $shock->delete('node/'.$shock_node_id.'/acl/read/?users='.join(',', @{$node_accls_read_users})) || die;
 		print Dumper($node_accls_delete);
-		
+		unless ($node_accls_delete->{'status'} == 200) {
+			die;
+		}
 	}
 	
 	
-	exit(0);
+		
+	return $shock_node_id;
 	
-	
-	
-	
-	
-	# make image readable
-	my $curl_cmd = 'curl -X DELETE -H "Authorization: OAuth $GLOBUSONLINE" '.$shock_server.'/node"';
-	print "cmd: ".$curl_cmd."\n";
-	system($curl_cmd)== 0 or die;
-
-	
-	exit(0);
 }
+
 
 sub dockerSocket {
 	my ($request_type, $endpoint) = @_;
@@ -1715,7 +1722,10 @@ if ($d) {
 	
 	my ($package, $version) = @{shift(@packages_installed)};
 	
-	createDockerFile($package, $version);
+	my $image_tarfile = createDockerFile($package, $version) || die;
+	my $shock_node_id = upload_docker_image_to_shock($image_tarfile, $tag, $image_id, $docker_base_image) || die;
+	
+	return;
 }
 
 
