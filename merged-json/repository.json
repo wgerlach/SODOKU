@@ -82,6 +82,15 @@
          }
       ]
    },
+   "docker-update" : {
+      "source" : {
+         "filename" : "docker",
+         "url" : "https://get.docker.io/builds/Linux/x86_64/docker-latest"
+      },
+      "build-exec" : [
+         "sudo stop docker ; chmod +x docker ; sudo mv docker /usr/bin; sudo start docker"
+      ]
+   },
    "golang-deprecated" : {
       "ROOT_set-env" : {
          "GOPATH" : "/usr/local/go/:$GOPATH"
@@ -101,12 +110,6 @@
    "ubuntu-base" : {
       "source-apt" : "golang curl wget git mercurial bzr make build-essential cpanminus python-setuptools python-dev checkinstall"
    },
-   "wgerlach/Shock-git" : {
-      "set-env" : {
-         "PERL5LIB" : "${ptarget}Shock/libs/:$PERL5LIB"
-      },
-      "source-git" : "https://github.com/wgerlach/Shock"
-   },
    "qiime-wo" : {
       "subpackages" : [
          {
@@ -120,6 +123,12 @@
             ]
          }
       ]
+   },
+   "wgerlach/Shock-git" : {
+      "set-env" : {
+         "PERL5LIB" : "${ptarget}Shock/libs/:$PERL5LIB"
+      },
+      "source-git" : "https://github.com/wgerlach/Shock"
    },
    "picrust_data" : {
       "source" : [
@@ -238,26 +247,6 @@
          "kbase_bootstrap_mgrast",
          "kbase_dev_container_mgrast-deploy",
          "kbase_dev_container-deploy"
-      ]
-   },
-   "docker" : {
-      "ptarget" : "${GOPATH}/src/github.com/dotcloud/docker",
-      "source-go" : "github.com/dotcloud/docker/...",
-      "build-exec" : "sudo ln -s $GOPATH/bin/docker /usr/local/bin/docker",
-      "subpackages" : [
-         {
-            "source-apt" : "lxc curl xz-utils git mercurial libsqlite3-dev"
-         },
-         {
-            "exec" : [
-               "if [ ! -d $GOPATH ] ; then exit 1 ; fi",
-               "mkdir -p $GOPATH/src/github.com/dotcloud/docker"
-            ]
-         },
-         {
-            "ptarget" : "${GOPATH}/src/github.com/dotcloud",
-            "source-git" : "https://github.com/dotcloud/docker.git"
-         }
       ]
    },
    "emirge-data-cached" : {
