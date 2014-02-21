@@ -1545,17 +1545,14 @@ if ( @ARGV == 0 && ! defined $h->{'list'}) {
 #}
 
 eval {
-    require My::Module;
-    My::Module->import();
+    require SHOCK::Client;
+   SHOCK::Client->import();
 	$shock_client_module_available = 1;
 	print "success\n";
     1;
 } or do {
 	my $error = $@;
 	print "error\n";
-	# Module load failed. You could recover, try loading
-	# an alternate module, die with $error...
-	# whatever's appropriate
 };
 
 
