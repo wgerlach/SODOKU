@@ -45,7 +45,7 @@ my $h = {};
 
 my $shock=undef;
 
-$shock_client_module_available = 0;
+my $shock_client_module_available = 0;
 
 my $d=undef; # docker inidicator
 my @docker_file_header=(
