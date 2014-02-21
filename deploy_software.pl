@@ -200,7 +200,7 @@ sub createDockerFile {
 	}
 	
 	print "return $image_tarfile, $tag, $image_id, $docker_base_image\n";
-	return ($image_tarfile, $tag, $image_id, $docker_base_image);
+	return [$image_tarfile, $tag, $image_id, $docker_base_image];
 }
 
 
@@ -1731,7 +1731,7 @@ if ($d) {
 	
 	my ($package, $version) = @{shift(@packages_installed)};
 	
-	my ($image_tarfile, $tag, $image_id, $docker_base_image) = &createDockerFile($package, $version) || die;
+	my ($image_tarfile, $tag, $image_id, $docker_base_image) = @{createDockerFile($package, $version)} || die;
 	print "got $image_tarfile, $tag, $image_id, $docker_base_image\n";
 	unless (defined $tag) {
 		die;
