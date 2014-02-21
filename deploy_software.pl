@@ -215,6 +215,7 @@ sub createDockerFile {
 			
 	my $shock_json =	'{'.
 						' "temporary":"1",'.
+						' "docker":"1",'.
 						' "docker_image_name":"'.$tag.'",'.
 						' "docker_image_id":"'.$image_id.'",'.
 						' "docker_base_image":"'.$docker_base_image.'"'.
