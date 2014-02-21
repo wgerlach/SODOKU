@@ -1239,6 +1239,9 @@ sub install_package {
 							while (substr($src_dir, -1, 1) eq '.') {
 								chop($src_dir);
 							}
+							while (substr($src_dir, -1, 1) eq '/') {
+								chop($src_dir);
+							}
 							if (-d $src_dir) {
 								systemp("rm -rf ".$src_dir)
 							}
