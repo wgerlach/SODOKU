@@ -199,7 +199,7 @@ sub createDockerFile {
 		die;
 	}
 	
-	print "return $image_tarfile, $tag, $image_id, $docker_base_image\n";
+	#print "return $image_tarfile, $tag, $image_id, $docker_base_image\n";
 	return [$image_tarfile, $tag, $image_id, $docker_base_image];
 }
 
@@ -254,9 +254,6 @@ sub upload_docker_image_to_shock {
 	print Dumper($node_accls);
 	
 	my $node_accls_read_users = $node_accls->{'data'}->{'read'} || die;
-	unless ($node_accls_read_users->{'status'} == 200) {
-		die;
-	}
 	
 	print "make node world readable\n";
 	if (@{$node_accls_read_users} > 0) {
@@ -1734,7 +1731,7 @@ if ($d) {
 	my $ref = createDockerFile($package, $version) || die;
 	
 	my ($image_tarfile, $tag, $image_id, $docker_base_image) = @{$ref};
-	print "got $image_tarfile, $tag, $image_id, $docker_base_image\n";
+	
 	unless (defined $tag) {
 		die;
 	}
