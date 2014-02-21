@@ -1235,7 +1235,8 @@ sub install_package {
 						
 						if (-d $ENV{'GOPATH'} ) {
 							my $src_dir = $ENV{GOPATH}.'/src/'.$source;
-							while (substr($src_dir, -1, 1) eq'.') {
+							print "src_dir: $src_dir\n"
+							while (substr($src_dir, -1, 1) eq '.') {
 								chop($src_dir);
 							}
 							if (-d $src_dir) {
