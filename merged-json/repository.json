@@ -89,7 +89,8 @@
       },
       "build-exec" : [
          "sudo stop docker ; chmod +x docker ; sudo mv docker /usr/bin; sudo start docker"
-      ]
+      ],
+      "_comment" : "install docker first as described on theri website, then do this update"
    },
    "golang-deprecated" : {
       "ROOT_set-env" : {
