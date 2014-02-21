@@ -1526,17 +1526,21 @@ if ( @ARGV == 0 && ! defined $h->{'list'}) {
 }
 
 
-eval
+
+my $error   = '';
+my $package = 'SHOCK::Client';
 {
-	require SHOCK::Client;
-	SHOCK::Client->import();
-	$shock_client_module_available = 1;
-	1;
-};
-unless($@)
-{
+	no strict;
+	eval "require $package;";
+	$error = $@;
+}
+if ($error) {
+	$shock_client_module_available = 0;
+} else {
+	#my $resource_obj = $package->new($params);
 	$shock_client_module_available = 1;
 }
+
 
 print "shock_client_module_available: $shock_client_module_available\n";
 exit(0);
