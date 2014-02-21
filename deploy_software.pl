@@ -1503,6 +1503,13 @@ sub install_package {
 	#	}
 	#}
 	
+
+	if (defined $package_hash->{'version'}) {
+		my $version_string = join('.', @{$package_hash->{'version'}});
+		return $version_string;
+	}
+	
+	return 'latest';
 }
 
 #############################################################
@@ -1788,8 +1795,8 @@ foreach my $package_string (@package_list) {
 		die "package $package not found\n";
 	}
 	
-	install_package($repository, $pack_hash, $package, $version, $package_args_ref);
-	push(@packages_installed,[$package, $version] );
+	my $real_version = install_package($repository, $pack_hash, $package, $version, $package_args_ref);
+	push(@packages_installed,[$package, $real_version] );
 }
 
 
