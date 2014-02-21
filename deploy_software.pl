@@ -236,7 +236,7 @@ sub createDockerFile {
 	#system($curl_cmd)== 0 or die;
 	
 	# make image readable
-	$curl_cmd = 'curl -X DELETE -H "Authorization: OAuth $GLOBUSONLINE" '.$shock_server.'/node"';
+	my $curl_cmd = 'curl -X DELETE -H "Authorization: OAuth $GLOBUSONLINE" '.$shock_server.'/node"';
 	print "cmd: ".$curl_cmd."\n";
 	system($curl_cmd)== 0 or die;
 
