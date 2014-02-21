@@ -210,7 +210,7 @@ sub createDockerFile {
 		die 'GLOBUSONLINE token not found';
 	}
 
-	my $shock = new SHOCK::Client($ENV{'GLOBUSONLINE'});
+	my $shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
 	
 			
 	my $shock_json =	'{'.
