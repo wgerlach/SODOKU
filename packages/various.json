@@ -5,6 +5,13 @@
 	"ubuntu-base" : {
 		"source-apt" : "golang curl wget git mercurial bzr make build-essential cpanminus python-setuptools python-dev checkinstall"
 	},
+	"docker-update" : {
+		"_comment" : "install docker first as described on theri website, then do this update",
+		"source" : {	"url" : "https://get.docker.io/builds/Linux/x86_64/docker-latest",
+				"filename" : "docker"
+			},
+		"build-exec" : ["sudo stop docker ; chmod +x docker ; sudo mv docker /usr/bin; sudo start docker"]
+	},
 	"KBase/AMETHST": {
 		"source-git" : "https://github.com/MG-RAST/AMETHST",
 		"subpackages" : [ {"source-pip": "qcli"} ],
@@ -219,7 +226,17 @@
 		"USER_set-env" : { "GOPATH" : "$HOME/gopath:$GOPATH" }
 	},
 	"golang" : {
-		"source-apt" : "golang git mercurial bzr"
+		"version" : [1,2],
+		"source" : "http://go.googlecode.com/files/go${v1}.${v2}.linux-amd64.tar.gz",
+		"source-extract" : 1,
+		"set-env" : { 	"GOROOT" : "${ptarget}go/",
+				"PATH" : "${GOROOT}/bin:${PATH}",
+				"GOPATH" : "${ptarget}gopath/" }
+	},
+	"golang-deprecated" : {
+		"source-apt" : "golang git mercurial bzr",
+		"ROOT_set-env" : { "GOPATH" : "/usr/local/go/:$GOPATH" },
+		"USER_set-env" : { "GOPATH" : "$HOME/gopath:$GOPATH" }
 	},
 	"go-deprecated" : {
 		"source-mercurial" : "-u release https://code.google.com/p/go",
@@ -289,8 +306,7 @@
 			},
 		"source-extract" : 1,
 		"source-temporary" : 1,
-		"build-type" : "make",
-		"install-binary" : ["bowtie2","bowtie2-build","bowtie2-inspect"]
+		"install-binary" : ["bowtie2*"]
 	},
 	"bowtie" : {
 		"version" : [1,0,0],
