@@ -472,7 +472,7 @@ sub downloadFile {
 	
 	my $file_downloaded = 0;
 	if ($shock_client_module_available && $d==0) { # TODO use this only for versioned downloads !!!!
-		
+		print "try using SHOCK cache\n";
 		#check SHOCK
 		
 		unless (defined $shock) {
@@ -482,6 +482,7 @@ sub downloadFile {
 		
 		if (defined $download_return) {
 			$file_downloaded = 1;
+			print "file downloaded from SHOCK cache\n";
 		}
 		
 		
