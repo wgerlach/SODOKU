@@ -523,9 +523,9 @@ sub process_scalar {
 	$text =~ s/\$\{data_target\}/$data_target/g ;
 	
 	
-	@variables = ($text =~ m/\$\{(\S+)\}/g);
+	my @variables = ($text =~ m/\$\{(\S+)\}/g);
 	
-	foreach my $var {
+	foreach my $var (@variables) {
 		if (defined $ENV{$var}) {
 			my $value = $ENV{$var};
 			$text =~ s/\$\{$var\}/$value/ ;
