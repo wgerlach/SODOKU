@@ -241,7 +241,7 @@
       ]
    },
    "docker" : {
-      "ptarget" : "$GOPATH/src/github.com/dotcloud/docker",
+      "ptarget" : "${GOPATH}/src/github.com/dotcloud/docker",
       "source-go" : "github.com/dotcloud/docker/...",
       "build-exec" : "sudo ln -s $GOPATH/bin/docker /usr/local/bin/docker",
       "subpackages" : [
@@ -255,7 +255,7 @@
             ]
          },
          {
-            "ptarget" : "$GOPATH/src/github.com/dotcloud",
+            "ptarget" : "${GOPATH}/src/github.com/dotcloud",
             "source-git" : "https://github.com/dotcloud/docker.git"
          }
       ]
