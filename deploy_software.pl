@@ -195,6 +195,9 @@ sub createDockerFile {
 		system($docker_save_cmd);
 	}
 	
+	unless (defined $tag) {
+		die;
+	}
 	return ($image_tarfile, $tag, $image_id, $docker_base_image);
 	
 	
@@ -1729,6 +1732,9 @@ if ($d) {
 	my ($package, $version) = @{shift(@packages_installed)};
 	
 	my ($image_tarfile, $tag, $image_id, $docker_base_image) = createDockerFile($package, $version) || die;
+	unless (defined $tag) {
+		die;
+	}
 	my $shock_node_id = upload_docker_image_to_shock($image_tarfile, $tag, $image_id, $docker_base_image) || die;
 	
 	return;
