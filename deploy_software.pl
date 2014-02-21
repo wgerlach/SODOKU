@@ -222,9 +222,19 @@ sub createDockerFile {
 	
 	print "upload image to SHOCK docker image repository\n";
 	my $up_result = $shock->upload('file' => $image_tarfile, 'attr' => $shock_json) || die;
-	print Dumper($up_result);
-	exit(0);
 	#same as: my $curl_cmd = 'curl -X POST -H "Authorization: OAuth $GLOBUSONLINE"  -F "attributes=@sodoku_docker.json" -F "upload=@'.$image_tarfile.'" "'.$shock_server.'/node"';
+	print Dumper($up_result);
+	
+	my $shock_node_id = $up_result->{'data'}->{'id'} || die "SHOCK node id not found for uploaded image";
+	
+	
+	my $node_accls = $shock->get("node/$shock_node_id/acl") || die;
+	
+	print Dumper($node_accls)
+	
+	
+	exit(0);
+	
 	
 	
 	
