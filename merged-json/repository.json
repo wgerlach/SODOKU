@@ -82,6 +82,15 @@
          }
       ]
    },
+   "golang-deprecated" : {
+      "ROOT_set-env" : {
+         "GOPATH" : "/usr/local/go/:$GOPATH"
+      },
+      "USER_set-env" : {
+         "GOPATH" : "$HOME/gopath:$GOPATH"
+      },
+      "source-apt" : "golang git mercurial bzr"
+   },
    "kbase_dev_container-deploy" : {
       "ptarget" : "${target}dev_container",
       "exec" : [
@@ -322,20 +331,6 @@
       "_comment" : "requires root",
       "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
    },
-   "deploy-deps" : {
-      "source-apt" : "git cpanminus python-setuptools python-dev checkinstall"
-   },
-   "kbase_bootstrap_mgrast" : {
-      "build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
-      "source-git" : "kbase@git.kbase.us:bootstrap",
-      "_comment" : "target : /kb/",
-      "subpackages" : [
-         {
-            "source" : "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.tar.gz",
-            "ptarget" : "${target}bootstrap/kb_java_runtime"
-         }
-      ]
-   },
    "AWE" : {
       "ROOT_set-env" : {
          "GOPATH" : "/usr/local/go/:$GOPATH"
@@ -350,6 +345,20 @@
       "subpackages" : [
          {
             "source-apt" : "mongodb-server"
+         }
+      ]
+   },
+   "deploy-deps" : {
+      "source-apt" : "git cpanminus python-setuptools python-dev checkinstall"
+   },
+   "kbase_bootstrap_mgrast" : {
+      "build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
+      "source-git" : "kbase@git.kbase.us:bootstrap",
+      "_comment" : "target : /kb/",
+      "subpackages" : [
+         {
+            "source" : "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.tar.gz",
+            "ptarget" : "${target}bootstrap/kb_java_runtime"
          }
       ]
    },
@@ -435,13 +444,16 @@
       ]
    },
    "golang" : {
-      "ROOT_set-env" : {
-         "GOPATH" : "/usr/local/go/:$GOPATH"
+      "source" : "http://go.googlecode.com/files/go${v1}.${v2}.linux-amd64.tar.gz",
+      "set-env" : {
+         "GOROOT" : "${ptarget}go/",
+         "PATH" : "${GOROOT}/bin:${PATH}"
       },
-      "USER_set-env" : {
-         "GOPATH" : "$HOME/gopath:$GOPATH"
-      },
-      "source-apt" : "golang git mercurial bzr"
+      "source-extract" : 1,
+      "version" : [
+         1,
+         2
+      ]
    },
    "picrust_symlink" : {
       "_comment" : "makes symlink in QIIME/picrust installation to picrust_data",
