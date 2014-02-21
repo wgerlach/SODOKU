@@ -1244,9 +1244,10 @@ sub install_package {
 							}
 							if (-d $src_dir) {
 								systemp("rm -rf ".$src_dir);
+								sleep(1);
 							}
 						} else {
-							systemp("mkdir -p ".$ENV{GOPATH});
+							systemp("mkdir -p ".$ENV{'GOPATH'});
 						}
 						
 					}
