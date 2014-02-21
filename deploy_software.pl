@@ -1529,6 +1529,8 @@ if ( @ARGV == 0 && ! defined $h->{'list'}) {
 eval
 {
 	require SHOCK::Client;
+	SHOCK::Client->import();
+	1;
 };
 unless($@)
 {
