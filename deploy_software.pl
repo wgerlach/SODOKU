@@ -220,21 +220,14 @@ sub createDockerFile {
 						' "docker_base_image":"'.$docker_base_image.'"'.
 						'}';
 	
-	$shock->upload('file' => $image_tarfile, 'attr' => $shock_json) || die;
+	print "upload image to SHOCK docker image repository"
+	my $up_result = $shock->upload('file' => $image_tarfile, 'attr' => $shock_json) || die;
+	print Dumper($up_result);
+	exit(0);
+	#same as: my $curl_cmd = 'curl -X POST -H "Authorization: OAuth $GLOBUSONLINE"  -F "attributes=@sodoku_docker.json" -F "upload=@'.$image_tarfile.'" "'.$shock_server.'/node"';
 	
 	
 	
-	
-	#$shock_json =~ s/\"/\\\"/g;
-	
-	#system('echo "'.$shock_json.'" > sodoku_docker.json');
-	
-	#$shock->
-	
-	# upload image
-	#my $curl_cmd = 'curl -X POST -H "Authorization: OAuth $GLOBUSONLINE"  -F "attributes=@sodoku_docker.json" -F "upload=@'.$image_tarfile.'" "'.$shock_server.'/node"';
-	#print "cmd: ".$curl_cmd."\n";
-	#system($curl_cmd)== 0 or die;
 	
 	# make image readable
 	my $curl_cmd = 'curl -X DELETE -H "Authorization: OAuth $GLOBUSONLINE" '.$shock_server.'/node"';
