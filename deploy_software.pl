@@ -166,7 +166,7 @@ sub createDockerFile {
 			$image_id = $result_hash->{'id'};
 						
 		} else {
-			die "result_hash not defined";
+			die "result_hash not defined, docker image was not created !?";
 		}
 		
 	}
@@ -521,6 +521,18 @@ sub process_scalar {
 	$text =~ s/\$\{target\}/$target/g ;
 	
 	$text =~ s/\$\{data_target\}/$data_target/g ;
+	
+	
+	@variables = ($text =~ m/\$\{(\S+)\}/g);
+	
+	foreach my $var {
+		if (defined $ENV{$var}) {
+			my $value = $ENV{$var};
+			$text =~ s/\$\{$var\}/$value/ ;
+		}
+	}
+	
+	
 	
 	return $text;
 }
