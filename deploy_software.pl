@@ -220,7 +220,8 @@ sub createDockerFile {
 						' "docker_base_image":"'.$docker_base_image.'"'.
 						'}';
 	
-	$shock->upload('file' => $image_tarfile, 'attr' => $shock_json);
+	$shock->upload('file' => $image_tarfile, 'attr' => $shock_json) || die;
+	
 	
 	
 	
