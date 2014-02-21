@@ -1287,6 +1287,10 @@ sub install_package {
 			$build_dir .= $source_subdir;
 		}
 
+		if (substr($build_dir,-1,1) ne '/') {
+			$build_dir .= '/';
+		}
+		
 		chdirp($build_dir);
 		
 		### BUILD INSTRUCTIONS ###
@@ -1318,9 +1322,7 @@ sub install_package {
 			#}
 			
 			
-			if (substr($build_dir,-1,1) ne '/') {
-				$build_dir .= '/';
-			}
+			
 			
 			if (-e $build_dir.'configure') {
 				systemp("cd $build_dir && ./configure --prefix=$ptarget") == 0 or die;
