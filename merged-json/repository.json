@@ -435,6 +435,12 @@
       ]
    },
    "golang" : {
+      "ROOT_set-env" : {
+         "GOPATH" : "/usr/local/go/:$GOPATH"
+      },
+      "USER_set-env" : {
+         "GOPATH" : "$HOME/gopath:$GOPATH"
+      },
       "source-apt" : "golang git mercurial bzr"
    },
    "picrust_symlink" : {
