@@ -1367,10 +1367,6 @@ sub install_package {
 							
 				foreach my $install_file (@install_files_array) {
 					
-					unless (-e $build_dir.$install_file || $d) {
-						die "installation file $build_dir.$install_file not found";
-					}
-					
 					systemp('cp -f '.$build_dir.$install_file.' '.$install_target) == 0 or die;
 					
 					if ($inst_type eq 'binary') {
