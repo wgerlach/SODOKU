@@ -220,7 +220,7 @@ sub createDockerFile {
 						' "docker_base_image":"'.$docker_base_image.'"'.
 						'}';
 	
-	print "upload image to SHOCK docker image repository"
+	print "upload image to SHOCK docker image repository\n";
 	my $up_result = $shock->upload('file' => $image_tarfile, 'attr' => $shock_json) || die;
 	print Dumper($up_result);
 	exit(0);
