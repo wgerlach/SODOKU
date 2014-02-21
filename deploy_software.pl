@@ -1528,7 +1528,7 @@ if ( @ARGV == 0 && ! defined $h->{'list'}) {
 
 eval
 {
-	require 'SHOCK/Client.pm';
+	use 'SHOCK/Client.pm';
 	SHOCK::Client->import();
 	1;
 };
