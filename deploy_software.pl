@@ -1535,6 +1535,9 @@ unless($@)
 	$shock_client_module_available = 1;
 }
 
+print "shock_client_module_available: $shock_client_module_available\n";
+exit(0);
+
 $d = $h->{'docker'} || 0;
 
 
