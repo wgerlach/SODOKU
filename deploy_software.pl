@@ -212,26 +212,28 @@ sub createDockerFile {
 
 	my $shock = new SHOCK::Client($ENV{'GLOBUSONLINE'});
 	
-		
-	
-	
-		
+			
 	my $shock_json =	'{'.
 						' "temporary":"1",'.
 						' "docker_image_name":"'.$tag.'",'.
 						' "docker_image_id":"'.$image_id.'",'.
 						' "docker_base_image":"'.$docker_base_image.'"'.
 						'}';
-	$shock_json =~ s/\"/\\\"/g;
 	
-	system('echo "'.$shock_json.'" > sodoku_docker.json');
+	$shock->upload('file' => $image_tarfile, 'attr' => $shock_json);
+	
+	
+	
+	#$shock_json =~ s/\"/\\\"/g;
+	
+	#system('echo "'.$shock_json.'" > sodoku_docker.json');
 	
 	#$shock->
 	
 	# upload image
-	my $curl_cmd = 'curl -X POST -H "Authorization: OAuth $GLOBUSONLINE"  -F "attributes=@sodoku_docker.json" -F "upload=@'.$image_tarfile.'" "'.$shock_server.'/node"';
-	print "cmd: ".$curl_cmd."\n";
-	system($curl_cmd)== 0 or die;
+	#my $curl_cmd = 'curl -X POST -H "Authorization: OAuth $GLOBUSONLINE"  -F "attributes=@sodoku_docker.json" -F "upload=@'.$image_tarfile.'" "'.$shock_server.'/node"';
+	#print "cmd: ".$curl_cmd."\n";
+	#system($curl_cmd)== 0 or die;
 	
 	# make image readable
 	$curl_cmd = 'curl -X DELETE -H "Authorization: OAuth $GLOBUSONLINE" '.$shock_server.'/node"';
