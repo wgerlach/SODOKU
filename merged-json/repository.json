@@ -246,7 +246,7 @@
       "build-exec" : "sudo ln -s $GOPATH/bin/docker /usr/local/bin/docker",
       "subpackages" : [
          {
-            "source-apt" : "lxc curl xz-utils git mercurial"
+            "source-apt" : "lxc curl xz-utils git mercurial libsqlite3-dev"
          },
          {
             "exec" : [
