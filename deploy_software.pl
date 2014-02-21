@@ -200,7 +200,7 @@ sub createDockerFile {
 	}
 	
 	print "return $image_tarfile, $tag, $image_id, $docker_base_image\n";
-	return [$image_tarfile, $tag, $image_id, $docker_base_image];
+	return ($image_tarfile, $tag, $image_id, $docker_base_image);
 }
 
 
