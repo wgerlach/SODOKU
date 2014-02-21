@@ -268,9 +268,7 @@
          0
       ],
       "install-binary" : [
-         "bowtie2",
-         "bowtie2-build",
-         "bowtie2-inspect"
+         "bowtie2*"
       ]
    },
    "usearch" : {
