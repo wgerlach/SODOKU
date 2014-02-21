@@ -1253,7 +1253,7 @@ sub install_package {
 					}
 					
 					if ($update_works == 0) {
-						systemp("go get ".$source) == 0 or die;
+						systemp("cd ".$ENV{'GOPATH'}." && go get ".$source) == 0 or die;
 					}
 				} else {
 					die "repository type unknown";
