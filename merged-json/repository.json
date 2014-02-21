@@ -255,14 +255,22 @@
       "dir" : 1
    },
    "bowtie2" : {
+      "build-type" : "make",
+      "source-temporary" : 1,
       "source" : {
          "url" : "http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/${v1}.${v2}.${v3}/bowtie2-${v1}.${v2}.${v3}-linux-x86_64.zip",
          "subdir" : "bowtie2-${v1}.${v2}.${v3}"
       },
+      "source-extract" : 1,
       "version" : [
          2,
          2,
          0
+      ],
+      "install-binary" : [
+         "bowtie2",
+         "bowtie2-build",
+         "bowtie2-inspect"
       ]
    },
    "usearch" : {
