@@ -203,15 +203,15 @@ sub createDockerFile {
 
 sub upload_docker_image_to_shock {
 	
-	unless (@_ == 4) {
-		die;
-	}
+	
 	my ($image_tarfile, $tag, $image_id, $docker_base_image) = @_;
 	### upload image to SHOCK ###
 	#check token
 	#check server
 	
-	
+	unless (defined $tag) {
+		die;
+	}
 	
 	
 	require SHOCK::Client;
