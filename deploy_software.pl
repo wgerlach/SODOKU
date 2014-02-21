@@ -1395,6 +1395,8 @@ sub install_package {
 					} else {
 						$install_target = $ENV{"HOME"}.'/bin/';
 					}
+					systemp('mkdir -p '.$install_target);
+					
 				}
 				
 				unless (defined $build_dir) {
