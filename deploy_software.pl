@@ -1528,8 +1528,9 @@ if ( @ARGV == 0 && ! defined $h->{'list'}) {
 
 eval
 {
-	use 'SHOCK/Client.pm';
+	require SHOCK::Client;
 	SHOCK::Client->import();
+	$shock_client_module_available = 1;
 	1;
 };
 unless($@)
