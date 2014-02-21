@@ -249,7 +249,10 @@
             "source-apt" : "lxc curl xz-utils git mercurial"
          },
          {
-            "exec" : "mkdir -p $GOPATH/src/github.com/dotcloud/docker"
+            "exec" : [
+               "if [ ! -d $GOPATH ] ; then exit 1 ; fi",
+               "mkdir -p $GOPATH/src/github.com/dotcloud/docker"
+            ]
          },
          {
             "ptarget" : "$GOPATH/src/github.com/dotcloud",
