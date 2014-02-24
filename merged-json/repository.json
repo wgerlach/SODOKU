@@ -387,6 +387,7 @@
    },
    "wgerlach/MG-RAST-Tools" : {
       "set-env" : {
+         "PATH" : "${ptarget}MG-RAST-Tools/tools/bin:$PATH",
          "PERL5LIB" : "${ptarget}MG-RAST-Tools/tools/lib/:$PERL5LIB"
       },
       "source-git" : "https://github.com/wgerlach/MG-RAST-Tools"
@@ -462,8 +463,8 @@
       "source" : "http://go.googlecode.com/files/go${v1}.${v2}.linux-amd64.tar.gz",
       "set-env" : {
          "GOROOT" : "${ptarget}go/",
-         "GOPATH" : "${ptarget}gopath/",
-         "PATH" : "${GOROOT}/bin:${PATH}"
+         "GOPATH" : "${ptarget}gopath",
+         "PATH" : "${GOROOT}bin:${ptarget}gopath:${PATH}"
       },
       "source-extract" : 1,
       "version" : [
