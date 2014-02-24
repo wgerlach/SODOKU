@@ -224,6 +224,17 @@
          }
       ]
    },
+   "wgerlach/AWE" : {
+      "source-go" : "github.com/wgerlach/AWE/...",
+      "depends" : [
+         "golang"
+      ],
+      "subpackages" : [
+         {
+            "source-apt" : "mongodb-server"
+         }
+      ]
+   },
    "go-deprecated" : {
       "set-env" : {
          "PATH" : "$PATH:${target}go/bin:${target}gopath/bin",
@@ -342,12 +353,6 @@
       "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
    },
    "AWE" : {
-      "ROOT_set-env" : {
-         "GOPATH" : "/usr/local/go/:$GOPATH"
-      },
-      "USER_set-env" : {
-         "GOPATH" : "$HOME/gopath:$GOPATH"
-      },
       "source-go" : "github.com/MG-RAST/AWE/...",
       "depends" : [
          "golang"
