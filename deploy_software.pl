@@ -1532,7 +1532,7 @@ sub install_package {
 
 print "deploy arguments: ".join(' ', @ARGV)."\n";
 
-GetOptions ($h, 'target=s', 'data_target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'docker', 'docker_show_only', 'docker_reuse_image', 'nossl', 'forcetarget', 'list', 'create', 'nodeps');
+GetOptions ($h, 'target=s', 'data_target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'docker', 'docker_show_only', 'docker_reuse_image', 'docker_noupload', 'nossl', 'forcetarget', 'list', 'create', 'nodeps');
 
 if ( @ARGV == 0 && ! defined $h->{'list'}) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
@@ -1831,8 +1831,10 @@ if ($d) {
 	unless (defined $tag) {
 		die;
 	}
-	my $shock_node_id = upload_docker_image_to_shock($image_tarfile, $tag, $image_id, $docker_base_image) || die;
 	
+	unless (defined $h->{'docker_noupload'}) {
+		my $shock_node_id = upload_docker_image_to_shock($image_tarfile, $tag, $image_id, $docker_base_image) || die;
+	}
 
 }
 
