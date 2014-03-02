@@ -9,6 +9,7 @@ use File::Basename;
 eval "use JSON; 1"
 or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm install JSON";
 
+use SHOCK::Client;
 
 #use SHOCK::Client;
 
@@ -1629,7 +1630,7 @@ $d = $h->{'docker'} || 0;
 
 
 if ($d ==1  && $shock_client_module_available ==0) {
-	die "error: docker image upload to SHOCK requires module SHOCK::Client";	
+	die "error: docker image upload to SHOCK requires module SHOCK::Client";
 }
 
 
