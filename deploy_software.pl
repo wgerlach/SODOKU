@@ -102,7 +102,7 @@ sub createDockerFile {
 	
 	my $tag = 'wgerlach/'.$package.':'.$version_str;
 	
-	print "tag: \"$tag\"\n";
+	#print "tag: \"$tag\"\n";
 	
 	return ($tag, $dockerfile);
 }
@@ -302,6 +302,8 @@ sub upload_dockerfile_to_shock {
 						' "base_image_tag":"'.$docker_base_image.'"'.
 						'}';
 	
+	print "tag: \"$tag\"\n";
+	print "docker_base_image: \"$docker_base_image\"\n";
 	print "shock_json: \"$shock_json\"\n";
 	exit(0);
 	print "upload dockerfile to SHOCK docker image repository\n";
