@@ -104,7 +104,7 @@ sub createDockerFile {
 	
 	#print "tag: \"$tag\"\n";
 	
-	return ($tag, $dockerfile);
+	return [$tag, $dockerfile];
 }
 
 
@@ -1871,7 +1871,7 @@ if ($d) {
 	
 	
 	# create Dockerfile
-	my ($tag, $dockerfile) = createDockerFile($package, $version) || die;
+	my ($tag, $dockerfile) = @{createDockerFile($package, $version)};
 	unless (defined $tag) {
 		die;
 	}
