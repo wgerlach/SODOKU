@@ -255,7 +255,7 @@ sub upload_docker_image_to_shock {
 						' "base_image_tag":"'.$docker_base_image.'"'.
 						'}';
 	
-	print "upload image to SHOCK docker image repository\n";
+	print "upload image to SHOCK docker repository\n";
 	my $up_result = $shock->upload('file' => $image_tarfile, 'attr' => $shock_json) || die;
 	#same as: my $curl_cmd = 'curl -X POST -H "Authorization: OAuth $GLOBUSONLINE"  -F "attributes=@sodoku_docker.json" -F "upload=@'.$image_tarfile.'" "'.$shock_server.'/node"';
 	print Dumper($up_result);
@@ -302,11 +302,11 @@ sub upload_dockerfile_to_shock {
 						' "base_image_tag":"'.$docker_base_image.'"'.
 						'}';
 	
-	print "tag: \"$tag\"\n";
-	print "docker_base_image: \"$docker_base_image\"\n";
-	print "shock_json: \"$shock_json\"\n";
-	exit(0);
-	print "upload dockerfile to SHOCK docker image repository\n";
+	#print "tag: \"$tag\"\n";
+	#print "docker_base_image: \"$docker_base_image\"\n";
+	#print "shock_json: \"$shock_json\"\n";
+	#exit(0);
+	print "upload dockerfile to SHOCK docker repository\n";
 	my $up_result = $shock->upload('data' => $dockerfile, 'attr' => $shock_json) || die;
 	
 	print Dumper($up_result);
