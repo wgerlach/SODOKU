@@ -1629,7 +1629,7 @@ $d = $h->{'docker'} || 0;
 
 
 if ($d ==1  && $shock_client_module_available ==0) {
-	print STDERR "error: docker image upload to SHOCK requires module SHOCK::Client";
+	die "error: docker image upload to SHOCK requires module SHOCK::Client";	
 }
 
 
