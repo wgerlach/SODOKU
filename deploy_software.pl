@@ -101,6 +101,9 @@ sub createDockerFile {
 	print $dockerfile;
 	
 	my $tag = 'wgerlach/'.$package.':'.$version_str;
+	
+	print "tag: \"$tag\"\n";
+	
 	return ($tag, $dockerfile);
 }
 
