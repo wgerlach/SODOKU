@@ -20,7 +20,9 @@
 	},
 	"wgerlach/MG-RAST-Tools": {
 		"source-git" : "https://github.com/wgerlach/MG-RAST-Tools",
-		"set-env" : {"PERL5LIB":"${ptarget}MG-RAST-Tools/tools/lib/:$PERL5LIB"}
+		"set-env" : {"PERL5LIB":"${ptarget}MG-RAST-Tools/tools/lib/:$PERL5LIB",
+				"PATH" : "${ptarget}MG-RAST-Tools/tools/bin:$PATH"
+				}
 	},
 	"wgerlach/AWE-git": {
 		"source-git" : "https://github.com/wgerlach/AWE",
@@ -214,6 +216,15 @@
 		"source-remove-existing-file" : 1,
 		"ptarget" : "/etc/init/"
 	},
+	"wgerlach/AWE" : {
+		"source-go" : "github.com/wgerlach/AWE/...",
+		"subpackages" : [
+						 {
+						 "source-apt" : "mongodb-server"
+						 }
+						 ],
+		"depends" : ["golang"]
+	},
 	"AWE" : {
 		"source-go" : "github.com/MG-RAST/AWE/...",
 		"subpackages" : [
@@ -221,17 +232,15 @@
 						 "source-apt" : "mongodb-server"
 						 }
 						 ],
-		"depends" : ["golang"],
-		"ROOT_set-env" : { "GOPATH" : "/usr/local/go/:$GOPATH" },
-		"USER_set-env" : { "GOPATH" : "$HOME/gopath:$GOPATH" }
+		"depends" : ["golang"]
 	},
 	"golang" : {
 		"version" : [1,2],
 		"source" : "http://go.googlecode.com/files/go${v1}.${v2}.linux-amd64.tar.gz",
 		"source-extract" : 1,
 		"set-env" : { 	"GOROOT" : "${ptarget}go/",
-				"PATH" : "${GOROOT}/bin:${PATH}",
-				"GOPATH" : "${ptarget}gopath/" }
+				"PATH" : "${GOROOT}bin:${ptarget}gopath:${PATH}",
+				"GOPATH" : "${ptarget}gopath" }
 	},
 	"golang-deprecated" : {
 		"source-apt" : "golang git mercurial bzr",

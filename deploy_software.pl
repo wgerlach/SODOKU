@@ -100,10 +100,19 @@ sub createDockerFile {
 	print "------\nDockerfile\n";
 	print $dockerfile;
 	
-	#$package
-	
 	my $tag = 'wgerlach/'.$package.':'.$version_str;
+	return ($tag, $dockerfile);
+}
+
+
+sub createDockerImage {
 	
+	my ($tag, $dockerfile) = @_;
+
+		
+	
+	
+	# check if image already exists
 	
 	my ($result_hash, $result_body) = dockerSocket('GET', "/images/$tag/json");
 	
@@ -181,7 +190,7 @@ sub createDockerFile {
 	$tag_converted =~ s/[\/]/\_/g;
 	my $docker_base_image_converted = $docker_base_image;
 	$docker_base_image_converted =~ s/[\/]/\_/g;
-	my $image_tarfile = $image_id.'_'.$docker_base_image_converted.'_'.$tag_converted;
+	my $image_tarfile = $image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.tar';
 	
 	my $skip_saving = 0;
 	
@@ -207,7 +216,7 @@ sub createDockerFile {
 	}
 	
 	#print "return $image_tarfile, $tag, $image_id, $docker_base_image\n";
-	return [$image_tarfile, $tag, $image_id, $docker_base_image];
+	return [$image_tarfile, $image_id, $docker_base_image];
 }
 
 
@@ -238,9 +247,9 @@ sub upload_docker_image_to_shock {
 	my $shock_json =	'{'.
 						' "temporary":"1",'.
 						' "docker":"1",'.
-						' "docker_image_name":"'.$tag.'",'.
-						' "docker_image_id":"'.$image_id.'",'.
-						' "docker_base_image":"'.$docker_base_image.'"'.
+						' "tag":"'.$tag.'",'.
+						' "image_id":"'.$image_id.'",'.
+						' "base_image_tag":"'.$docker_base_image.'"'.
 						'}';
 	
 	print "upload image to SHOCK docker image repository\n";
@@ -253,24 +262,7 @@ sub upload_docker_image_to_shock {
 	
 	my $shock_node_id = $up_result->{'data'}->{'id'} || die "SHOCK node id not found for uploaded image";
 	
-	
-	my $node_accls = $shock->get("node/$shock_node_id/acl") || die;
-	unless ($node_accls->{'status'} == 200) {
-		die;
-	}
-	
-	print Dumper($node_accls);
-	
-	my $node_accls_read_users = $node_accls->{'data'}->{'read'} || die;
-	
-	print "make node world readable\n";
-	if (@{$node_accls_read_users} > 0) {
-		my $node_accls_delete = $shock->delete('node/'.$shock_node_id.'/acl/read/?users='.join(',', @{$node_accls_read_users})) || die;
-		print Dumper($node_accls_delete);
-		unless ($node_accls_delete->{'status'} == 200) {
-			die;
-		}
-	}
+	$shock->permisson_readable($shock_node_id) || die "error makeing node readable";
 	
 	
 		
@@ -278,6 +270,52 @@ sub upload_docker_image_to_shock {
 	
 }
 
+sub upload_dockerfile_to_shock {
+	my ($dockerfile, $tag, $docker_base_image) = @_;
+	### upload image to SHOCK ###
+	#check token
+	#check server
+	
+	unless (defined $tag) {
+		die;
+	}
+	
+	
+	require SHOCK::Client;
+	
+	
+	if (!defined($ENV{'GLOBUSONLINE'}) ||  $ENV{'GLOBUSONLINE'} eq '') {
+		die 'GLOBUSONLINE token not found';
+	}
+	
+	unless (defined $shock) {
+		$shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
+	}
+	
+	my $shock_json =	'{'.
+						' "temporary":"1",'.
+						' "dockerfile":"1",'.
+						' "tag":"'.$tag.'",'.
+						' "base_image_tag":"'.$docker_base_image.'"'.
+						'}';
+	
+	print "upload dockerfile to SHOCK docker image repository\n";
+	my $up_result = $shock->upload('data' => $dockerfile, 'attr' => $shock_json) || die;
+	
+	print Dumper($up_result);
+	unless ($up_result->{'status'} == 200) {
+		die;
+	}
+	
+	my $shock_node_id = $up_result->{'data'}->{'id'} || die "SHOCK node id not found for uploaded dockerfile";
+	
+	$shock->permisson_readable($shock_node_id) || die "error makeing node readable";
+	
+	
+	
+	return $shock_node_id;
+	
+}
 
 sub dockerSocket {
 	my ($request_type, $endpoint) = @_;
@@ -1824,14 +1862,24 @@ if ($d) {
 	
 	my ($package, $version) = @{shift(@packages_installed)};
 	
-	my $ref = createDockerFile($package, $version) || die;
 	
-	my ($image_tarfile, $tag, $image_id, $docker_base_image) = @{$ref};
-	
+	# create Dockerfile
+	my ($tag, $dockerfile) = createDockerFile($package, $version) || die;
 	unless (defined $tag) {
 		die;
 	}
 	
+	# upload Dockerfile
+	unless (defined $h->{'docker_noupload'}) {
+		my $shock_node_id = upload_dockerfile_to_shock($dockerfile, $tag, $docker_base_image) || die;
+	}
+	
+	# create docker image
+	my $ref = createDockerImage($tag, $dockerfile);
+	my ($image_tarfile, $image_id, $docker_base_image) = @{$ref};
+	
+	
+	# upload docker image
 	unless (defined $h->{'docker_noupload'}) {
 		my $shock_node_id = upload_docker_image_to_shock($image_tarfile, $tag, $image_id, $docker_base_image) || die;
 	}
