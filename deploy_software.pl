@@ -927,8 +927,8 @@ my $functions = {};
 sub function_kbasemodules {
 	my %arghash = @_;
 	
-	my $server = $arghash{'server'} or die;
-	#my $target = $arghash{'target'} or die;
+	#my $server = $arghash{'server'} or die;
+	my $target = $arghash{'target'} or die;
 	my $package_list = $arghash{'package-list'} || "";
 	
 	
@@ -944,7 +944,7 @@ sub function_kbasemodules {
 	while (@kbase_modules > 0) {
 		my $module = shift(@kbase_modules);
 		unless (defined $downloaded_modules->{$module}) {
-			my $this_server = $server;
+			
 			
 			print "kbase module requested: ".$module."\n";
 			
