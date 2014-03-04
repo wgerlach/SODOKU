@@ -937,7 +937,7 @@ sub function_kbasemodules {
 	my $package_list = $arghash{'package-list'} || "";
 	
 	
-	my @server_list = ('https://github.com/kbase/', 'kbase@git.kbase.us:');
+	
 	
 	if (substr($target, -1, 1) ne "/") {
 		$target .= '/';
@@ -948,6 +948,15 @@ sub function_kbasemodules {
 	my $downloaded_modules = {};
 	while (@kbase_modules > 0) {
 		my $module = shift(@kbase_modules);
+		my @server_list = ('https://github.com/kbase/', 'kbase@git.kbase.us:');
+		
+		my ($use_server, $mod) = $module =~ /(http.?:\/\/github.com\/\S+\/)(.*)/;
+		
+		if (defined $mod) {
+			$module = $mod;
+			
+			@server_list = ($use_server);
+		}
 		
 		my ($mod, $branch) = split('/', $module);
 		
