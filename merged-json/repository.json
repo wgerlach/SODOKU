@@ -4,8 +4,7 @@
          {
             "target" : "${ptarget}modules",
             "name" : "kbasemodules",
-            "package-list" : "${arguments}",
-            "server" : "kbase@git.kbase.us:"
+            "package-list" : "${arguments}"
          }
       ],
       "ptarget" : "${target}dev_container",
