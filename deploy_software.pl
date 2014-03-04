@@ -964,11 +964,11 @@ sub function_kbasemodules {
 			@server_list = ($use_server);
 		}
 		
-		my ($mod, $branch) = split('/', $module);
+		my ($modx, $branch) = split('/', $module);
 		
 		if (defined $branch) {
 			print "branch: $branch\n";
-			$module = $mod;
+			$module = $modx;
 		}
 		
 		
