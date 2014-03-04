@@ -742,6 +742,13 @@ sub git_clone {
 		die "git string unkown: $source";
 	}
 	
+	my $usebranch="";
+	if (defined $gitbranch) {
+		#systemp("cd $gitdir && git checkout ".$gitbranch) == 0 or return undef;
+		$usebranch = ' -b '.$gitbranch;
+	}
+	
+	
 	my $gitdir = $dir.$gitname.'/';
 	print "gitdir: $gitdir\n";
 	if (-d $gitdir) {
@@ -753,11 +760,9 @@ sub git_clone {
 			systemp("rm -rf $gitdir") == 0 or die;
 		}
 	}
-	systemp("cd $dir && git clone $source") == 0 or return undef;
+	systemp("cd $dir && git clone $usebranch $source") == 0 or return undef;
 	
-	if (defined $gitbranch) {
-		systemp("cd $gitdir && git checkout ".$gitbranch) == 0 or return undef;
-	}
+	
 	
 	print "git_clone returns $gitdir\n";
 	return $gitdir;
