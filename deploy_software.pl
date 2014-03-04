@@ -950,7 +950,7 @@ sub function_kbasemodules {
 		my $module = shift(@kbase_modules);
 		my @server_list = ('https://github.com/kbase/', 'kbase@git.kbase.us:');
 		
-		my ($use_server, $mod) = $module =~ /^(http.?:\/\/github.com\/\S+\/)(.*)$/;
+		my ($use_server, $mod) = $module =~ /^(http.?:\/\/github.com\/[a-zA-Z0-9\.\-\_]+\/)(.*)$/;
 		
 		if (defined $mod) {
 			$module = $mod;
