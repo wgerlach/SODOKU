@@ -955,6 +955,10 @@ sub function_kbasemodules {
 		if (defined $mod) {
 			$module = $mod;
 			print "use_server: $use_server\n";
+			
+			# set arbitary password to avoid username prompt
+			$use_server =~ /\/\/github.com\//\/\/anonymous:anonymousgithub.com\//;
+			
 			@server_list = ($use_server);
 		}
 		
