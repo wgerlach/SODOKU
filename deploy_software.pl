@@ -957,7 +957,7 @@ sub function_kbasemodules {
 			print "use_server: $use_server\n";
 			
 			# set arbitary password to avoid username prompt
-			$use_server =~ /\/\/github.com\//\/\/anonymous:anonymousgithub.com\//;
+			$use_server =~ /github\.com/anonymous\:anonymous\@github\.com/;
 			
 			@server_list = ($use_server);
 		}
