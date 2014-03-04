@@ -948,7 +948,7 @@ sub function_kbasemodules {
 	my $downloaded_modules = {};
 	while (@kbase_modules > 0) {
 		my $module = shift(@kbase_modules);
-		my @server_list = ('https://github.com/kbase/', 'kbase@git.kbase.us:');
+		my @server_list = ('https://anonymous:anonymous@github.com/kbase/', 'kbase@git.kbase.us:');
 		
 		my ($use_server, $mod) = $module =~ /^(http.?:\/\/github.com\/[a-zA-Z0-9\.\-\_]+\/)(.*)$/;
 		
