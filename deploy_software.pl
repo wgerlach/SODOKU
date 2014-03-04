@@ -959,7 +959,7 @@ sub function_kbasemodules {
 			# set arbitary password to avoid username prompt
 			my $search = 'github.com';
 			my $replace = 'anonymous:anonymous@github.com';
-			$use_server =~ /$search/$replace/;
+			$use_server =~ s/$search/$replace/;
 			
 			@server_list = ($use_server);
 		}
