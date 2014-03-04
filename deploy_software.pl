@@ -943,6 +943,14 @@ sub function_kbasemodules {
 	my $downloaded_modules = {};
 	while (@kbase_modules > 0) {
 		my $module = shift(@kbase_modules);
+		
+		my ($mod, $branch) = $module =~ /(\S+)\/(\S+)/;
+		
+		if (defined $branch) {
+			$module = $mod;
+		}
+		
+		
 		unless (defined $downloaded_modules->{$module}) {
 			
 			
@@ -950,7 +958,7 @@ sub function_kbasemodules {
 			
 			my $gitdir = undef;
 			foreach my $this_server (@server_list) {
-				$gitdir = git_clone($this_server.$module, $target);
+				$gitdir = git_clone($this_server.$module, $target, $branch);
 				
 				if (defined $gitdir) {
 					last;
