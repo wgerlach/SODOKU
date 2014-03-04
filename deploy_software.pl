@@ -760,7 +760,7 @@ sub git_clone {
 			systemp("rm -rf $gitdir") == 0 or die;
 		}
 	}
-	systemp("cd $dir && git clone $usebranch $source") == 0 or return undef;
+	systemp("cd $dir && git clone --recursive $usebranch $source") == 0 or return undef;
 	
 	
 	
@@ -928,7 +928,10 @@ sub parsePackageString{
 
 my $functions = {};
 
-
+# examples:
+# https://github.com/wgerlach/amethst/playground
+# amethst/playground
+# amethst
 sub function_kbasemodules {
 	my %arghash = @_;
 	
