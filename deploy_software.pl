@@ -950,17 +950,18 @@ sub function_kbasemodules {
 		my $module = shift(@kbase_modules);
 		my @server_list = ('https://github.com/kbase/', 'kbase@git.kbase.us:');
 		
-		my ($use_server, $mod) = $module =~ /(http.?:\/\/github.com\/\S+\/)(.*)/;
+		my ($use_server, $mod) = $module =~ /^(http.?:\/\/github.com\/\S+\/)(.*)$/;
 		
 		if (defined $mod) {
 			$module = $mod;
-			
+			print "use_server: $use_server\n";
 			@server_list = ($use_server);
 		}
 		
 		my ($mod, $branch) = split('/', $module);
 		
 		if (defined $branch) {
+			print "branch: $branch\n";
 			$module = $mod;
 		}
 		
