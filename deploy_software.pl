@@ -944,7 +944,7 @@ sub function_kbasemodules {
 	while (@kbase_modules > 0) {
 		my $module = shift(@kbase_modules);
 		
-		my ($mod, $branch) = $module =~ /(\S+)\/(\S+)/;
+		my ($mod, $branch) = split('/', $module);
 		
 		if (defined $branch) {
 			$module = $mod;
