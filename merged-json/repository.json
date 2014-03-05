@@ -44,7 +44,7 @@
       "depends" : [
          "wgerlach/MG-RAST-Tools",
          "wgerlach/AWE-git",
-         "wgerlach/Shock-git"
+         "SHOCK-lib"
       ],
       "subpackages" : [
          {
@@ -107,6 +107,12 @@
          ". ${ptarget}user-env.sh ; make && make deploy"
       ]
    },
+   "SHOCK-lib" : {
+      "set-env" : {
+         "PERL5LIB" : "${ptarget}Shock/libs/:$PERL5LIB"
+      },
+      "source-git" : "https://github.com/wgerlach/Shock"
+   },
    "ubuntu-base" : {
       "source-apt" : "golang curl wget git mercurial bzr make build-essential cpanminus python-setuptools python-dev checkinstall"
    },
@@ -123,12 +129,6 @@
             ]
          }
       ]
-   },
-   "wgerlach/Shock-git" : {
-      "set-env" : {
-         "PERL5LIB" : "${ptarget}Shock/libs/:$PERL5LIB"
-      },
-      "source-git" : "https://github.com/wgerlach/Shock"
    },
    "picrust_data" : {
       "source" : [
