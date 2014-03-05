@@ -9,7 +9,7 @@ use File::Basename;
 eval "use JSON; 1"
 or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm install JSON";
 
-use SHOCK::Client;
+#use SHOCK::Client;
 
 #use SHOCK::Client;
 
