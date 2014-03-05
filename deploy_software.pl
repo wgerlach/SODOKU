@@ -1673,7 +1673,7 @@ eval {
     1;
 } or do {
 	my $error = $@;
-	print "not using SHOCK::Client\n";
+	print "not using SHOCK::Client : $error\n";
 };
 
 
