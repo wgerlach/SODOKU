@@ -300,7 +300,7 @@ sub upload_dockerfile_to_shock {
 	# prepare tar-file
 	write_file('Dockerfile', $dockerfile ) ;
 	$d = 0;
-	systemp("tar -cf $tag.dockerfile.tar Dockerfile");
+	systemp("tar cf $tag.dockerfile.tar Dockerfile");
 	$d = 1;
 	
 	exit(0);
