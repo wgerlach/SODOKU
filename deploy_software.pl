@@ -304,10 +304,11 @@ sub upload_dockerfile_to_shock {
 	$tar_filename =~ s/[\/\:]/_/g;
 	
 	$d = 0;
-	systemp("tar cf ".$tar_filename." Dockerfile");
+	systemp("tar cf ".$tar_filename." Dockerfile") == 0 or die;
+	systemp("rm -f Dockerfile") == 0 or die;
 	$d = 1;
 	
-	exit(0);
+
 	
 	unless (defined $shock) {
 		$shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
@@ -325,7 +326,7 @@ sub upload_dockerfile_to_shock {
 	#print "shock_json: \"$shock_json\"\n";
 	#exit(0);
 	print "upload dockerfile to SHOCK docker repository\n";
-	my $up_result = $shock->upload('data' => $dockerfile, 'attr' => $shock_json) || die;
+	my $up_result = $shock->upload('file' => $tar_filename, 'attr' => $shock_json) || die;
 	
 	print Dumper($up_result);
 	unless ($up_result->{'status'} == 200) {
