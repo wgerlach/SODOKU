@@ -1982,7 +1982,7 @@ if ($d) {
 	
 	#print Dumper($docker_version_info);
 	
-	exit(0);
+	#exit(0);
 	
 	# create Dockerfile
 	my ($tag, $dockerfile) = @{createDockerFile($package, $version)};
