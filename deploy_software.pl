@@ -49,7 +49,7 @@ my %already_installed;
 my $h = {};
 
 my $shock=undef;
-
+my $docker_version_info = {};
 my $shock_client_module_available = 0;
 
 my $d=undef; # docker inidicator
@@ -249,11 +249,14 @@ sub upload_docker_image_to_shock {
 		$shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
 	}
 	
+	my $json = JSON->new;
+	my $docker_version_info_str = $json->encode( $docker_version_info );
 
 	
 	my $shock_json =	'{'.
 						' "temporary":"1",'.
 						' "docker":"1",'.
+						' "docker_version":'.$docker_version_info_str.','.
 						' "tag":"'.$tag.'",'.
 						' "image_id":"'.$image_id.'",'.
 						' "base_image_tag":"'.$docker_base_image.'"'.
@@ -314,9 +317,14 @@ sub upload_dockerfile_to_shock {
 		$shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
 	}
 	
+	my $json = JSON->new;
+	my $docker_version_info_str = $json->encode( $docker_version_info );
+	
+	
 	my $shock_json =	'{'.
 						' "temporary":"1",'.
 						' "dockerfile":"1",'.
+						' "docker_version":'.$docker_version_info_str.','.
 						' "tag":"'.$tag.'",'.
 						' "base_image_tag":"'.$docker_base_image.'"'.
 						'}';
@@ -1957,9 +1965,22 @@ if ($d) {
 	
 	my ($package, $version) = @{shift(@packages_installed)};
 	
-	
+	# docker version
 	my ($result_hash, $result_body) = dockerSocket('GET', "/version");
-	print Dumper($result_hash);
+	unless (defined $result_hash) {
+		die;
+	}
+	$docker_version_info = $result_hash;
+	
+	# docker info
+	my ($result_hash, $result_body) = dockerSocket('GET', "/info");
+	unless (defined $result_hash) {
+		die;
+	}
+	Dumper($result_hash);
+	
+	
+	#print Dumper($docker_version_info);
 	
 	exit(0);
 	
