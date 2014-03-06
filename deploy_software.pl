@@ -1966,18 +1966,18 @@ if ($d) {
 	my ($package, $version) = @{shift(@packages_installed)};
 	
 	# docker version
-	my ($result_hash, $result_body) = dockerSocket('GET', "/version");
+	my ($result_hash) = dockerSocket('GET', "/version");
 	unless (defined $result_hash) {
 		die;
 	}
 	$docker_version_info = $result_hash;
 	
 	# docker info
-	my ($result_hash, $result_body) = dockerSocket('GET', "/info");
-	unless (defined $result_hash) {
+	my ($docker_info) = dockerSocket('GET', "/info");
+	unless (defined $docker_info) {
 		die;
 	}
-	Dumper($result_hash);
+	Dumper($docker_info);
 	
 	
 	#print Dumper($docker_version_info);
