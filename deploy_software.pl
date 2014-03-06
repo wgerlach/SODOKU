@@ -299,8 +299,12 @@ sub upload_dockerfile_to_shock {
 	
 	# prepare tar-file
 	write_file('Dockerfile', $dockerfile ) ;
+	
+	my $tar_filename = $tag.'.dockerfile.tar';
+	$tar_filename =~ s/[\/]/_/g;
+	
 	$d = 0;
-	systemp("tar cf $tag.dockerfile.tar Dockerfile");
+	systemp("tar cf ".$tar_filename." Dockerfile");
 	$d = 1;
 	
 	exit(0);
