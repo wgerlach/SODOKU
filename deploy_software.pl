@@ -1978,7 +1978,7 @@ if ($d) {
 		die;
 	}
 	Dumper($docker_info);
-	
+	print "body: $body\n";
 	
 	#print Dumper($docker_version_info);
 	
