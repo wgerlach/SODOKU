@@ -1961,7 +1961,7 @@ if ($d) {
 	my ($result_hash, $result_body) = dockerSocket('GET', "/version");
 	print Dumper($result_hash);
 	
-	exit(0)
+	exit(0);
 	
 	# create Dockerfile
 	my ($tag, $dockerfile) = @{createDockerFile($package, $version)};
