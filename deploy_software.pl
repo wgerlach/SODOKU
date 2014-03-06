@@ -1973,7 +1973,7 @@ if ($d) {
 	$docker_version_info = $result_hash;
 	
 	# docker info
-	my ($docker_info) = dockerSocket('GET', "/info");
+	my ($docker_info, $body) = dockerSocket('GET', "/info");
 	unless (defined $docker_info) {
 		die;
 	}
