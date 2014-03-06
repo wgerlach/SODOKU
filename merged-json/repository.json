@@ -232,6 +232,9 @@
          {
             "source-apt" : "mongodb-server"
          }
+      ],
+      "exec" : [
+         "mv $GOPATH/src/github.com/wgerlach/AWE $GOPATH/src/github.com/MG-RAST"
       ]
    },
    "go-deprecated" : {
