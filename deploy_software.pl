@@ -6,6 +6,7 @@ use warnings;
 use Cwd; #'abs_path getcwd'
 use Getopt::Long;
 use File::Basename;
+use File::Slurp;
 eval "use JSON; 1"
 or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm install JSON";
 
@@ -302,6 +303,16 @@ sub upload_dockerfile_to_shock {
 	if (!defined($ENV{'GLOBUSONLINE'}) ||  $ENV{'GLOBUSONLINE'} eq '') {
 		die 'GLOBUSONLINE token not found';
 	}
+	
+	
+	
+	# prepare tar-file
+	write_file('Dockerfile', $dockerfile ) ;
+	$d = 0;
+	systemp("tar -cf $tag.dockerfile.tar Dockerfile");
+	$d = 1;
+	
+	exit(0);
 	
 	unless (defined $shock) {
 		$shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
