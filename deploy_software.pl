@@ -6,7 +6,7 @@ use warnings;
 use Cwd; #'abs_path getcwd'
 use Getopt::Long;
 use File::Basename;
-use File::Slurp;
+
 eval "use JSON; 1"
 or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm install JSON";
 
