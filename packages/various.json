@@ -16,7 +16,7 @@
 		"source-git" : "https://github.com/MG-RAST/AMETHST",
 		"subpackages" : [ {"source-pip": "qcli"} ],
 		"set-env" : {"PATH":"${ptarget}AMETHST:$PATH"},
-		"depends" : ["wgerlach/MG-RAST-Tools","wgerlach/AWE-git","wgerlach/Shock-git"]
+		"depends" : ["wgerlach/MG-RAST-Tools","wgerlach/AWE-git","SHOCK-lib"]
 	},
 	"wgerlach/MG-RAST-Tools": {
 		"source-git" : "https://github.com/wgerlach/MG-RAST-Tools",
@@ -28,7 +28,7 @@
 		"source-git" : "https://github.com/wgerlach/AWE",
 		"set-env" : {"PERL5LIB":"${ptarget}AWE/utils/lib:$PERL5LIB"}
 	},
-	"wgerlach/Shock-git": {
+	"SHOCK-lib": {
 		"source-git" : "https://github.com/wgerlach/Shock",
 		"set-env" : {"PERL5LIB":"${ptarget}Shock/libs/:$PERL5LIB"}
 	},
@@ -153,7 +153,6 @@
 		"depend-function" : [
 							 {
 							 "name" : "kbasemodules",
-							 "server": "kbase@git.kbase.us:",
 							 "target" : "${ptarget}modules",
 							 "package-list" : "${arguments}"
 							 }
