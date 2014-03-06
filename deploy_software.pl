@@ -279,7 +279,7 @@ sub upload_docker_image_to_shock {
 	
 	$shock->permisson_readable($shock_node_id) || die "error makeing node readable";
 	
-	
+	print "Docker image uploaded.\n";
 		
 	return $shock_node_id;
 	
@@ -329,7 +329,7 @@ sub upload_dockerfile_to_shock {
 	my $shock_node_id = $up_result->{'data'}->{'id'} || die "SHOCK node id not found for uploaded dockerfile";
 	
 	$shock->permisson_readable($shock_node_id) || die "error makeing node readable";
-	
+	print "Dockerfile uploaded.\n";
 	
 	
 	return $shock_node_id;
@@ -1630,7 +1630,7 @@ sub install_package {
 
 print "deploy arguments: ".join(' ', @ARGV)."\n";
 
-GetOptions ($h, 'target=s', 'data_target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'docker', 'docker_show_only', 'docker_reuse_image', 'docker_noupload', 'nossl', 'forcetarget', 'list', 'create', 'nodeps');
+GetOptions ($h, 'target=s', 'data_target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'docker', 'dockerfile', 'dockerimage','docker_show_only', 'docker_reuse_image', 'docker_noupload', 'nossl', 'forcetarget', 'list', 'create', 'nodeps');
 
 if ( @ARGV == 0 && ! defined $h->{'list'}) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
@@ -1646,6 +1646,10 @@ if ( @ARGV == 0 && ! defined $h->{'list'}) {
 	print "     --repo_url\n";
 	print "     --create  write repository.json by merging multiple json files\n";
 	print "     --nodeps do not install dependencies\n";
+	print "     \n";
+	print "     --docker create and upload Dockerfile and Dockerimage\n";
+	print "     --dockerfile create and upload Dockerfile\n";
+	print "     --dockerimage create and upload Dockerimage\n";
 	exit 1;
 }
 
@@ -1668,9 +1672,22 @@ if ( @ARGV == 0 && ! defined $h->{'list'}) {
 
 
 
-$d = $h->{'docker'} || 0;
 
-if ($d ==1) {
+
+if (defined($h->{'docker'}) || defined($h->{'dockerfile'}) || defined($h->{'dockerimage'})) {
+	$d = 1;
+}
+
+if (defined($h->{'docker'}) {
+	$h->{'dockerfile'} = 1;
+	$h->{'dockerimage'} = 1;
+}
+
+
+if ($d == 1) {
+	
+	
+	
 	eval {
 		require SHOCK::Client;
 		SHOCK::Client->import();
@@ -1932,20 +1949,23 @@ if ($d) {
 	}
 	
 	# upload Dockerfile
-	unless (defined $h->{'docker_noupload'}) {
-		my $shock_node_id = upload_dockerfile_to_shock($dockerfile, $tag, $docker_base_image) || die;
+	if (defined($h->{'dockerfile'})) {
+		unless (defined $h->{'docker_noupload'}) {
+			my $shock_node_id = upload_dockerfile_to_shock($dockerfile, $tag, $docker_base_image) || die;
+		}
 	}
 	
-	# create docker image
-	my $ref = createDockerImage($tag, $dockerfile);
-	my ($image_tarfile, $image_id, $docker_base_image) = @{$ref};
-	
-	
-	# upload docker image
-	unless (defined $h->{'docker_noupload'}) {
-		my $shock_node_id = upload_docker_image_to_shock($image_tarfile, $tag, $image_id, $docker_base_image) || die;
+	if (defined($h->{'dockerimage'})) {
+		# create docker image
+		my $ref = createDockerImage($tag, $dockerfile);
+		my ($image_tarfile, $image_id, $docker_base_image) = @{$ref};
+		
+		
+		# upload docker image
+		unless (defined $h->{'docker_noupload'}) {
+			my $shock_node_id = upload_docker_image_to_shock($image_tarfile, $tag, $image_id, $docker_base_image) || die;
+		}
 	}
-
 }
 
 
