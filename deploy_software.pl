@@ -1665,24 +1665,26 @@ if ( @ARGV == 0 && ! defined $h->{'list'}) {
 #	$shock_client_module_available = 1;
 #}
 
-eval {
-    require SHOCK::Client;
-	SHOCK::Client->import();
-	$shock_client_module_available = 1;
-	print "using SHOCK::Client\n";
-    1;
-} or do {
-	my $error = $@;
-	print "not using SHOCK::Client : $error\n";
-};
 
 
 
 $d = $h->{'docker'} || 0;
 
+if ($d ==1) {
+	eval {
+		require SHOCK::Client;
+		SHOCK::Client->import();
+		$shock_client_module_available = 1;
+		print "using SHOCK::Client\n";
+		1;
+	} or do {
+		my $error = $@;
+		print "not using SHOCK::Client : $error\n";
+	};
 
-if ($d ==1  && $shock_client_module_available ==0) {
-	die "error: docker image upload to SHOCK requires module SHOCK::Client";
+	if ($shock_client_module_available == 0) {
+		die "error: docker image upload to SHOCK requires module SHOCK::Client";
+	}
 }
 
 
