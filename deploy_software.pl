@@ -1678,7 +1678,7 @@ if (defined($h->{'docker'}) || defined($h->{'dockerfile'}) || defined($h->{'dock
 	$d = 1;
 }
 
-if (defined($h->{'docker'}) {
+if (defined($h->{'docker'})) {
 	$h->{'dockerfile'} = 1;
 	$h->{'dockerimage'} = 1;
 }
