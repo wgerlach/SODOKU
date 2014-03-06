@@ -1699,7 +1699,7 @@ if (defined($h->{'docker'})) {
 }
 
 
-if ($d == 1) {
+if (defined($d) && ($d == 1)) {
 	
 	
 	
