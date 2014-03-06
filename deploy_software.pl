@@ -1977,8 +1977,8 @@ if ($d) {
 	unless (defined $docker_info) {
 		die;
 	}
-	Dumper($docker_info);
-	print "body: $body\n";
+	print Dumper($docker_info);
+	
 	
 	#print Dumper($docker_version_info);
 	
