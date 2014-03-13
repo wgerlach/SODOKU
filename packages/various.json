@@ -217,6 +217,7 @@
 	},
 	"wgerlach/AWE" : {
 		"source-go" : "github.com/wgerlach/AWE/...",
+		"exec" : ["mv $GOPATH/src/github.com/wgerlach/AWE $GOPATH/src/github.com/MG-RAST"],
 		"subpackages" : [
 						 {
 						 "source-apt" : "mongodb-server"
@@ -239,7 +240,8 @@
 		"source-extract" : 1,
 		"set-env" : { 	"GOROOT" : "${ptarget}go/",
 				"PATH" : "${GOROOT}bin:${ptarget}gopath:${PATH}",
-				"GOPATH" : "${ptarget}gopath" }
+				"GOPATH" : "${ptarget}gopath" },
+		"subpackages" : [ {"source-apt" : "git mercurial bzr"} ]
 	},
 	"golang-deprecated" : {
 		"source-apt" : "golang git mercurial bzr",

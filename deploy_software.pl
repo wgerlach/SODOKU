@@ -142,7 +142,7 @@ sub createDockerImage {
 
 	
 	if (defined $result_body) {
-		unless ($result_body =~ /inspect: No such image:/) {
+		unless ($result_body =~ /No such image:/) {
 			die "Error: Some error other than image not found: $result_body";
 		}
 	}
@@ -1833,7 +1833,7 @@ if (defined $h->{'target'}) {
 
 
 unless (defined $target) {
-	$target = getcwd();
+	die "--target needs to specified"; # TODO make package specific !
 }
 
 if (substr($target, -1, 1) ne "/") {
