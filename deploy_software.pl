@@ -211,7 +211,8 @@ sub createDockerImage {
 	}
 	
 	if ($skip_saving == 0) {
-		my $docker_save_cmd = 'docker save '.$image_id.' > '.$image_tarfile;
+		#my $docker_save_cmd = 'docker save '.$image_id.' > '.$image_tarfile;
+		my $docker_save_cmd = 'docker save '.$tag.' > '.$image_tarfile;
 		print "cmd: ".$docker_save_cmd."\n";
 		system($docker_save_cmd);
 	}
