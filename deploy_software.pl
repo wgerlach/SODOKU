@@ -1988,9 +1988,17 @@ if ($d) {
 	
 	my $agent = LWP::UserAgent->new;
 	
-	my $uri = URI->new('http:var/run/docker.sock/' . "images/$docker_base_image/history");
+	#my $uri = URI->new('http:var/run/docker.sock/' . "images/$docker_base_image/history");
+	#my $uri = URI->new('http:var/run/docker.sock/' . "images/$docker_base_image/history");
 	
-	my $res = $agent->get($uri); #my $res = $self->ua->get($self->_uri($uri, %options));
+	
+	require LWP::Protocol::http::SocketUnixAlt;
+	LWP::Protocol::implementor( http => 'LWP::Protocol::http::SocketUnixAlt' );
+	my $res = $agent->get('http:var/run/docker.sock//images/json');
+	
+	
+	
+	#my $res = $agent->get($uri); #my $res = $self->ua->get($self->_uri($uri, %options));
 	
 	#my $response_object = $self->agent->get("/var/run/docker.sock", "/info");
 	#print "content: ".$response_object->content."\n";
