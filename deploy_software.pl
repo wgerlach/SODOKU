@@ -1986,7 +1986,7 @@ if ($d) {
 	
 	my $agent = LWP::UserAgent->new;
 	
-	$uri = URI->new('http:var/run/docker.sock/' . "images/$docker_base_image/history");
+	my $uri = URI->new('http:var/run/docker.sock/' . "images/$docker_base_image/history");
 	
 	my $res = $self->ua->get($uri); #my $res = $self->ua->get($self->_uri($uri, %options));
 	
