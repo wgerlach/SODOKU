@@ -194,7 +194,7 @@ sub createDockerImage {
 	$tag_converted =~ s/[\/]/\_/g;
 	my $docker_base_image_converted = $docker_base_image;
 	$docker_base_image_converted =~ s/[\/]/\_/g;
-	my $image_tarfile = $image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.tar';
+	my $image_tarfile = $image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.complete.tar';
 	my $imagediff_tarfile = $image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.diff.tar';
 	
 	my $skip_saving = 0;
@@ -220,7 +220,7 @@ sub createDockerImage {
 		die;
 	}
 	
-	# open tar archive
+	# open and modify tar archive
 	
 	
 	system("mkdir -p tar_temp");
@@ -235,29 +235,30 @@ sub createDockerImage {
 		system("sudo rm -rf ".$layer_dir);
 	}
 	
-	system("cd tar_temp && sudo tar -cf ../$imagediff_tarfile *");
+	print "create new tar without the base layers\n";
+	system("cd tar_temp && sudo tar -cf ../$imagediff_tarfile *") == 0 or die;
+	system("sudo chmod 666 ".$imagediff_tarfile);
 	
+	print "insert tag information into tar\n";
 	my $repositories_file_content = "{\\\"$repo\\\":{\\\"$tag\\\":\\\"$image_id\\\"}}";
 	
 	system("echo \"$repositories_file_content\" > repositories");
 	
 	
-	my $py_cmd = "sudo python -c \"import tarfile; f=tarfile.open('".$imagediff_tarfile."', 'a'); f.add('repositories'); f.close()\"";
+	my $py_cmd = "python -c \"import tarfile; f=tarfile.open('".$imagediff_tarfile."', 'a'); f.add('repositories'); f.close()\"";
 	
-	system($py_cmd);
+	system($py_cmd) == 0 or die;
 	
-	exit(0);
+	print "gzip tar file\n";
 	
+	system("gzip ".$imagediff_tarfile)==0 or die;
 	
+	my $imagediff_tarfile_gz = $imagediff_tarfile.'.gz';
+	unless (-e $imagediff_tarfile_gz) {
+		die;
+	}
 	
-	#my $diff_image_tar = Archive::Tar->new;
-	
-	
-	
-	
-	
-	#print "return $image_tarfile, $tag, $image_id, $docker_base_image\n";
-	return [$image_tarfile, $image_id, $docker_base_image];
+	return [$imagediff_tarfile_gz, $image_id, $docker_base_image];
 }
 
 
@@ -420,8 +421,11 @@ sub dockerSocket {
 	
 		print "content: ".$response_object->content."\n";
 		
-		$response_content = $json->decode( $response_object->content );
+		my $content_type = $response_object->header('Content-Type');
 		
+		if (defined $content_type && $content_type eq 'application/json') {
+				$response_content = $json->decode( $response_object->content );
+		}
 	};
 	
 	
@@ -444,27 +448,6 @@ sub dockerSocket {
 	
 	return $response_content;
 
-	
-	
-	
-	
-	#my @return_body_lines = split("\n", $return_body);
-	
-	#my $hash=undef;
-	#if (@return_body_lines > 0 && $return_body_lines[-1] =~ /[\}\]]/) {
-#		$hash = decode_json($return_body_lines[-1]);
-#	}
-
-#	my $body = undef;
-#	unless (defined $hash) {
-#		$body = $return_body;
-#	}
-
-#	unless (defined $hash || defined $body) {
-#		die;
-#	}
-
-#	return ($hash, $body);
 }
 
 
