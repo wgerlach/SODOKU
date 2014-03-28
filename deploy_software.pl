@@ -239,7 +239,7 @@ sub createDockerImage {
 	
 	my $repositories_file_content = "{\"$repo\":{\"tag\":\"$tag\"}}";
 	
-	system("echo -e \"$repositories_file_content\" > repositories");
+	system("echo \"$repositories_file_content\" > repositories");
 	
 	
 	my $py_cmd = "python -c \"import tarfile; f=tarfile.open('".$imagediff_tarfile."', 'a'); f.add('repositories'); f.close()\"";
