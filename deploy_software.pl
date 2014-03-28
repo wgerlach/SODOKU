@@ -119,7 +119,7 @@ sub createDockerImage {
 	
 	# check if image already exists
 	
-	my ($result_hash, $result_body) = dockerSocket('GET', "/images/$tag/json");
+	my $result_hash = dockerSocket('GET', "/images/$tag/json");
 	
 	my $image_id = undef;
 	if (defined $result_hash) {
@@ -141,11 +141,7 @@ sub createDockerImage {
 	}
 
 	
-	if (defined $result_body) {
-		unless ($result_body =~ /No such image:/) {
-			die "Error: Some error other than image not found: $result_body";
-		}
-	}
+	
 		
 	
 	
@@ -172,8 +168,8 @@ sub createDockerImage {
 		
 		
 		$result_hash = undef;
-		$result_body = undef;
-		($result_hash, $result_body) = dockerSocket('GET', "/images/$tag/json");
+		
+		$result_hash = dockerSocket('GET', "/images/$tag/json");
 		
 		
 		if (defined $result_hash) {
@@ -353,37 +349,85 @@ sub upload_dockerfile_to_shock {
 
 sub dockerSocket {
 	my ($request_type, $endpoint) = @_;
-	my $cmd = 'echo -e "'.$request_type.' '.$endpoint.' HTTP/1.0\r\n" | nc -U /var/run/docker.sock';
-	$cmd = "bash -c '$cmd'";
-	print "cmd: $cmd\n";
-	my $return_value = `$cmd`;
-	chomp($return_value);
-	print "return_value: \"$return_value\"\n";
-	
-	my ($return_header, $return_body) = split(/\n\s*\n/, $return_value);
-	chomp($return_header);
-	
-	print "return_header:\n\"$return_header\"\n";
-	print "return_body:\n\"$return_body\"\n";
 	
 	
-	my @return_body_lines = split("\n", $return_body);
 	
-	my $hash=undef;
-	if (@return_body_lines > 0 && $return_body_lines[-1] =~ /[\}\]]/) {
-		$hash = decode_json($return_body_lines[-1]);
-	}
+	#my $cmd = 'echo -e "'.$request_type.' '.$endpoint.' HTTP/1.0\r\n" | nc -U /var/run/docker.sock';
+	#$cmd = "bash -c '$cmd'";
+	#print "cmd: $cmd\n";
+	#my $return_value = `$cmd`;
+	#chomp($return_value);
+	#print "return_value: \"$return_value\"\n";
+	
+	#my ($return_header, $return_body) = split(/\n\s*\n/, $return_value);
+	#chomp($return_header);
+	
+	
+	#print "return_header:\n\"$return_header\"\n";
+	#print "return_body:\n\"$return_body\"\n";
+	
+	
+	my $url = 'http:/var/run/docker.sock//'.$endpoint;
+	
+	my $agent = LWP::UserAgent->new;
+	
+	require LWP::Protocol::http::SocketUnixAlt;
+	LWP::Protocol::implementor( http => 'LWP::Protocol::http::SocketUnixAlt' );
+	
+	my $response_content = undef;
+    
+    eval {
+		
+        my $response_object = undef;
 
-	my $body = undef;
-	unless (defined $hash) {
-		$body = $return_body;
+		
+		if ($request_type eq 'GET') {
+			$response_object = $agent->get($url);
+		} else {
+			die;
+		}
+	
+		print "content: ".$response_object->content."\n";
+		
+		$response_content = $self->json->decode( $response_object->content );
+		
 	}
-
-	unless (defined $hash || defined $body) {
-		die;
+	
+	
+	if ($@) {
+		if (! ref($response_content) && ($is_download==0 )) {
+			print STDERR "[error] unable to connect to Shock ".$self->shock_url."\n";
+			return undef;
+		} elsif (exists($response_content->{error}) && $response_content->{error}) {
+			print STDERR "[error] unable to send $method request to Shock: ".$response_content->{error}[0]."\n";
+			return undef;
+		}
+		
 	}
+	
+	return $response_content;
 
-	return ($hash, $body);
+	
+	
+	
+	
+	#my @return_body_lines = split("\n", $return_body);
+	
+	#my $hash=undef;
+	#if (@return_body_lines > 0 && $return_body_lines[-1] =~ /[\}\]]/) {
+#		$hash = decode_json($return_body_lines[-1]);
+#	}
+
+#	my $body = undef;
+#	unless (defined $hash) {
+#		$body = $return_body;
+#	}
+
+#	unless (defined $hash || defined $body) {
+#		die;
+#	}
+
+#	return ($hash, $body);
 }
 
 
@@ -1968,14 +2012,14 @@ if ($d) {
 	my ($package, $version) = @{shift(@packages_installed)};
 	
 	# docker version
-	my ($result_hash) = dockerSocket('GET', "/version");
+	my $result_hash = dockerSocket('GET', "/version");
 	unless (defined $result_hash) {
 		die;
 	}
 	$docker_version_info = $result_hash;
 	
 	# docker info
-	my ($docker_info, $body) = dockerSocket('GET', "/info");
+	my $docker_info = dockerSocket('GET', "/info");
 	unless (defined $docker_info) {
 		die;
 	}
@@ -1984,17 +2028,9 @@ if ($d) {
 	print "------\n";
 	#print Dumper($docker_version_info);
 	
-	require URI;
-	
-	my $agent = LWP::UserAgent->new;
-	
-	#my $uri = URI->new('http:var/run/docker.sock/' . "images/$docker_base_image/history");
-	#my $uri = URI->new('http:var/run/docker.sock/' . "images/$docker_base_image/history");
+	#require URI;
 	
 	
-	require LWP::Protocol::http::SocketUnixAlt;
-	LWP::Protocol::implementor( http => 'LWP::Protocol::http::SocketUnixAlt' );
-	my $res = $agent->get('http:/var/run/docker.sock//images/json');
 	
 	
 	
@@ -2006,7 +2042,7 @@ if ($d) {
 	
 	#my $api = Net::Docker->new;
 	#my $hist = $api->history($docker_base_image);
-	print Dumper($res)."\n";
+	#print Dumper($res)."\n";
 	exit(0);
 	
 	
