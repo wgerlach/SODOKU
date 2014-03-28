@@ -391,7 +391,7 @@ sub dockerSocket {
 	
 		print "content: ".$response_object->content."\n";
 		
-		$response_content = json->decode( $response_object->content );
+		$response_content = $json->decode( $response_object->content );
 		
 	};
 	
