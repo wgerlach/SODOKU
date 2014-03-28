@@ -1985,7 +1985,7 @@ if ($d) {
 	
 	
 	
-	my ($result_hash, $result_body) = dockerSocket('GET', "/images/$docker_base_image/hostory");
+	my ($result_hash, $result_body) = dockerSocket('GET', "/images/$docker_base_image/history");
 	
 	print Dumper($result_hash)."\n";
 	
