@@ -2020,6 +2020,21 @@ if ($d) {
 	
 	my $history = dockerSocket('GET', "/images/$docker_base_image/history");
 	
+	
+	my @base_layers=();
+	foreach my $layer (@{$history}) {
+		my $id = $layer->{'Id'};
+		unless (defined $id) {
+			die;
+		}
+		push(@base_layers, $id);
+	}
+	
+	print "found ".@base_layers." layers for image ".$docker_base_image."\n";
+	if (@base_layers == 0) {
+		die;
+	}
+	
 	#print Dumper($result_hash)."\n";
 	
 	#print Dumper($result_body)."\n";
