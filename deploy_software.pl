@@ -230,7 +230,7 @@ sub createDockerImage {
 		unless (-d $layer_dir) {
 			die "layer_dir $layer_dir not found !";
 		}
-		system("rm -rf ".$layer_dir);
+		system("sudo rm -rf ".$layer_dir);
 	}
 	
 	
