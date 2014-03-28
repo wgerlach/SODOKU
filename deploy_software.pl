@@ -367,8 +367,6 @@ sub dockerSocket {
 	print "return_body:\n\"$return_body\"\n";
 	
 	
-	if ($return_header =~ //)
-	
 	my @return_body_lines = split("\n", $return_body);
 	
 	my $hash=undef;
