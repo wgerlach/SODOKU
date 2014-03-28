@@ -63,6 +63,9 @@ my @docker_file_content=();
 my $docker_deps={};
 
 my $is_root_user = undef;
+my @base_layers=();
+
+
 
 
 sub createDockerFile {
@@ -221,6 +224,15 @@ sub createDockerImage {
 	
 	system("mkdir -p tar_temp");
 	system("cd tar_temp && tar xvf ../".$image_tarfile);
+	
+	foreach my $layer (@base_layers) {
+		my $layer_dir = "tar_temp/".$layer;
+		unless (-d $layer_dir) {
+			die "layer_dir $layer_dir not found !";
+		}
+		system("rm -rf ".$layer_dir);
+	}
+	
 	
 	exit(0);
 	
@@ -2040,7 +2052,7 @@ if ($d) {
 	my $history = dockerSocket('GET', "/images/$docker_base_image/history");
 	
 	
-	my @base_layers=();
+	
 	foreach my $layer (@{$history}) {
 		my $id = $layer->{'Id'};
 		unless (defined $id) {
