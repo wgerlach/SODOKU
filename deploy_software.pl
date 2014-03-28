@@ -2073,9 +2073,9 @@ if ($d) {
 		die;
 	}
 	
-	$h->{'docker_noupload'} = 1;
+	
 	# upload Dockerfile
-	if (defined($h->{'dockerfile'})) {
+	if (defined($h->{'dockerfile'}) && 0) {
 		unless (defined $h->{'docker_noupload'}) {
 			my $shock_node_id = upload_dockerfile_to_shock($dockerfile, $repo, $tag, $docker_base_image) || die;
 		}
