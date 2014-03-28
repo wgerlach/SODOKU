@@ -1984,6 +1984,8 @@ if ($d) {
 	print "------\n";
 	#print Dumper($docker_version_info);
 	
+	require URI;
+	
 	my $agent = LWP::UserAgent->new;
 	
 	my $uri = URI->new('http:var/run/docker.sock/' . "images/$docker_base_image/history");
