@@ -2035,11 +2035,7 @@ if ($d) {
 		die;
 	}
 	
-	#print Dumper($result_hash)."\n";
 	
-	#print Dumper($result_body)."\n";
-	
-	exit(0);
 	
 	# create Dockerfile
 	my ($tag, $dockerfile) = @{createDockerFile($package, $version)};
