@@ -211,8 +211,7 @@ sub createDockerImage {
 	}
 	
 	if ($skip_saving == 0) {
-		#my $docker_save_cmd = 'docker save '.$image_id.' > '.$image_tarfile;
-		my $docker_save_cmd = 'docker save '.$tag.' > '.$image_tarfile;
+		my $docker_save_cmd = 'docker save '.$image_id.' > '.$image_tarfile;
 		print "cmd: ".$docker_save_cmd."\n";
 		system($docker_save_cmd);
 	}
@@ -1983,7 +1982,16 @@ if ($d) {
 	
 	#print Dumper($docker_version_info);
 	
-	#exit(0);
+	
+	
+	
+	my ($result_hash, $result_body) = dockerSocket('GET', "/images/$docker_base_image/hostory");
+	
+	print Dumper($result_hash)."\n";
+	
+	print Dumper($result_body)."\n";
+	
+	exit(0);
 	
 	# create Dockerfile
 	my ($tag, $dockerfile) = @{createDockerFile($package, $version)};
