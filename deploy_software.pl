@@ -374,6 +374,8 @@ sub dockerSocket {
 	require LWP::Protocol::http::SocketUnixAlt;
 	LWP::Protocol::implementor( http => 'LWP::Protocol::http::SocketUnixAlt' );
 	
+	
+	my $json = JSON->new;
 	my $response_content = undef;
     
     eval {
@@ -389,7 +391,7 @@ sub dockerSocket {
 	
 		print "content: ".$response_object->content."\n";
 		
-		$response_content = $self->json->decode( $response_object->content );
+		$response_content = json->decode( $response_object->content );
 		
 	}
 	
@@ -404,6 +406,8 @@ sub dockerSocket {
 		}
 		
 	}
+	
+	print 'response_content: '.Dumper($response_content)."\n";
 	
 	return $response_content;
 
