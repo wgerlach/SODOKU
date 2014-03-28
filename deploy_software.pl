@@ -393,15 +393,16 @@ sub dockerSocket {
 		
 		$response_content = json->decode( $response_object->content );
 		
-	}
+	};
 	
 	
 	if ($@) {
+		
 		if (! ref($response_content) ) {
 			print STDERR "[error] unable to connect to socket\n";
 			return undef;
 		} elsif (exists($response_content->{error}) && $response_content->{error}) {
-			print STDERR "[error] unable to send $method request to socket: ".$response_content->{error}[0]."\n";
+			print STDERR "[error] unable to send $request_type request to socket: ".$response_content->{error}[0]."\n";
 			return undef;
 		}
 		
