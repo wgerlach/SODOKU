@@ -397,11 +397,11 @@ sub dockerSocket {
 	
 	
 	if ($@) {
-		if (! ref($response_content)) {
+		if (! ref($response_content) ) {
 			print STDERR "[error] unable to connect to socket\n";
 			return undef;
 		} elsif (exists($response_content->{error}) && $response_content->{error}) {
-			print STDERR "[error] unable to send $method request to Shock: ".$response_content->{error}[0]."\n";
+			print STDERR "[error] unable to send $method request to socket: ".$response_content->{error}[0]."\n";
 			return undef;
 		}
 		
