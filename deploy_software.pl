@@ -367,7 +367,7 @@ sub dockerSocket {
 	#print "return_body:\n\"$return_body\"\n";
 	
 	
-	my $url = 'http:/var/run/docker.sock//'.$endpoint;
+	my $url = 'http:/var/run/docker.sock/'.$endpoint;
 	
 	my $agent = LWP::UserAgent->new;
 	
