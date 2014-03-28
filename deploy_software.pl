@@ -1990,7 +1990,7 @@ if ($d) {
 	
 	my $uri = URI->new('http:var/run/docker.sock/' . "images/$docker_base_image/history");
 	
-	my $res = $self->ua->get($uri); #my $res = $self->ua->get($self->_uri($uri, %options));
+	my $res = $agent->get($uri); #my $res = $self->ua->get($self->_uri($uri, %options));
 	
 	#my $response_object = $self->agent->get("/var/run/docker.sock", "/info");
 	#print "content: ".$response_object->content."\n";
