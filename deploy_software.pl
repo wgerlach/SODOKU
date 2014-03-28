@@ -216,6 +216,22 @@ sub createDockerImage {
 		die;
 	}
 	
+	# open tar archive
+	
+	
+	system("mkdir -p tar_temp");
+	system("cd tar_temp && tar xvf ../".$image_tarfile);
+	
+	exit(0);
+	
+	
+	
+	#my $diff_image_tar = Archive::Tar->new;
+	
+	
+	
+	
+	
 	#print "return $image_tarfile, $tag, $image_id, $docker_base_image\n";
 	return [$image_tarfile, $image_id, $docker_base_image];
 }
@@ -2046,6 +2062,7 @@ if ($d) {
 		die;
 	}
 	
+	$h->{'docker_noupload'} = 1;
 	# upload Dockerfile
 	if (defined($h->{'dockerfile'})) {
 		unless (defined $h->{'docker_noupload'}) {
