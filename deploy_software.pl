@@ -397,7 +397,7 @@ sub dockerSocket {
 	
 	
 	if ($@) {
-		if (! ref($response_content) && ($is_download==0 )) {
+		if (! ref($response_content)) {
 			print STDERR "[error] unable to connect to Shock ".$self->shock_url."\n";
 			return undef;
 		} elsif (exists($response_content->{error}) && $response_content->{error}) {
