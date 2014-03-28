@@ -33,7 +33,7 @@ my $ubuntu_cmd2package = {
 	'unzip' => 'unzip'
 };
 
-
+my $docker_socket = '/var/run/docker.sock';
 my $docker_base_image = 'ubuntu:13.10';
 my $author = 'Wolfgang Gerlach';
 
@@ -352,22 +352,7 @@ sub dockerSocket {
 	
 	
 	
-	#my $cmd = 'echo -e "'.$request_type.' '.$endpoint.' HTTP/1.0\r\n" | nc -U /var/run/docker.sock';
-	#$cmd = "bash -c '$cmd'";
-	#print "cmd: $cmd\n";
-	#my $return_value = `$cmd`;
-	#chomp($return_value);
-	#print "return_value: \"$return_value\"\n";
-	
-	#my ($return_header, $return_body) = split(/\n\s*\n/, $return_value);
-	#chomp($return_header);
-	
-	
-	#print "return_header:\n\"$return_header\"\n";
-	#print "return_body:\n\"$return_body\"\n";
-	
-	
-	my $url = 'http:/var/run/docker.sock/'.$endpoint;
+	my $url = 'http:'.$docker_socket.'/'.$endpoint;
 	
 	my $agent = LWP::UserAgent->new;
 	
@@ -2030,34 +2015,16 @@ if ($d) {
 	}
 	print Dumper($docker_info);
 	
-	print "------\n";
-	#print Dumper($docker_version_info);
-	
-	#require URI;
 	
 	
 	
-	
-	
-	#my $res = $agent->get($uri); #my $res = $self->ua->get($self->_uri($uri, %options));
-	
-	#my $response_object = $self->agent->get("/var/run/docker.sock", "/info");
-	#print "content: ".$response_object->content."\n";
-	#require Net::Docker;
-	
-	#my $api = Net::Docker->new;
-	#my $hist = $api->history($docker_base_image);
-	#print Dumper($res)."\n";
-	exit(0);
-	
-	
-	#my ($result_hash, $result_body) = dockerSocket('GET', "/images/$docker_base_image/history");
+	my $history = dockerSocket('GET', "/images/$docker_base_image/history");
 	
 	#print Dumper($result_hash)."\n";
 	
 	#print Dumper($result_body)."\n";
 	
-	#exit(0);
+	exit(0);
 	
 	# create Dockerfile
 	my ($tag, $dockerfile) = @{createDockerFile($package, $version)};
