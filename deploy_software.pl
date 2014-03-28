@@ -395,6 +395,9 @@ sub dockerSocket {
 	
 	print 'response_content: '.Dumper($response_content)."\n";
 	
+
+	LWP::Protocol::implementor( http => 'LWP::Protocol::http' );
+	
 	return $response_content;
 
 	
