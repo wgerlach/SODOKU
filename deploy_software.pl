@@ -368,7 +368,7 @@ sub dockerSocket {
 	my @return_body_lines = split("\n", $return_body);
 	
 	my $hash=undef;
-	if (@return_body_lines > 0 && $return_body_lines[-1] =~ /\}/) {
+	if (@return_body_lines > 0 && $return_body_lines[-1] =~ /[\}\]]/) {
 		$hash = decode_json($return_body_lines[-1]);
 	}
 
