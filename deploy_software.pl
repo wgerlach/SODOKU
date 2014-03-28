@@ -365,6 +365,10 @@ sub dockerSocket {
 	
 	print "return_header:\n\"$return_header\"\n";
 	print "return_body:\n\"$return_body\"\n";
+	
+	
+	if ($return_header =~ //)
+	
 	my @return_body_lines = split("\n", $return_body);
 	
 	my $hash=undef;
@@ -1982,7 +1986,15 @@ if ($d) {
 	
 	#print Dumper($docker_version_info);
 	
+	#my $agent = LWP::UserAgent->new;
+	#my $response_object = $self->agent->get("/var/run/docker.sock", "/info");
+	#print "content: ".$response_object->content."\n";
+	require Net::Docker;
 	
+	my $api = Net::Docker->new;
+	my $hist = $api->history($docker_base_image);
+	print Dumper($hist)."\n";
+	exit(0);
 	
 	
 	my ($result_hash, $result_body) = dockerSocket('GET', "/images/$docker_base_image/history");
