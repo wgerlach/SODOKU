@@ -1997,13 +1997,13 @@ if ($d) {
 	exit(0);
 	
 	
-	my ($result_hash, $result_body) = dockerSocket('GET', "/images/$docker_base_image/history");
+	#my ($result_hash, $result_body) = dockerSocket('GET', "/images/$docker_base_image/history");
 	
-	print Dumper($result_hash)."\n";
+	#print Dumper($result_hash)."\n";
 	
-	print Dumper($result_body)."\n";
+	#print Dumper($result_body)."\n";
 	
-	exit(0);
+	#exit(0);
 	
 	# create Dockerfile
 	my ($tag, $dockerfile) = @{createDockerFile($package, $version)};
