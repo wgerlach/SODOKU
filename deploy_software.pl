@@ -1981,17 +1981,22 @@ if ($d) {
 	}
 	print Dumper($docker_info);
 	
-	
+	print "------\n";
 	#print Dumper($docker_version_info);
 	
-	#my $agent = LWP::UserAgent->new;
+	my $agent = LWP::UserAgent->new;
+	
+	$uri = URI->new('http:var/run/docker.sock/' . "images/$docker_base_image/history");
+	
+	my $res = $self->ua->get($uri); #my $res = $self->ua->get($self->_uri($uri, %options));
+	
 	#my $response_object = $self->agent->get("/var/run/docker.sock", "/info");
 	#print "content: ".$response_object->content."\n";
-	require Net::Docker;
+	#require Net::Docker;
 	
-	my $api = Net::Docker->new;
-	my $hist = $api->history($docker_base_image);
-	print Dumper($hist)."\n";
+	#my $api = Net::Docker->new;
+	#my $hist = $api->history($docker_base_image);
+	print Dumper($res)."\n";
 	exit(0);
 	
 	
