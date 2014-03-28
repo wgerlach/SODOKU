@@ -235,7 +235,7 @@ sub createDockerImage {
 		system("sudo rm -rf ".$layer_dir);
 	}
 	
-	system("cd tar_temp && tar -cf ../$imagediff_tarfile *");
+	system("cd tar_temp && sudo tar -cf ../$imagediff_tarfile *");
 	
 	my $repositories_file_content = "{\"$repo\":{\"tag\":\"$tag\"}}";
 	
