@@ -1994,7 +1994,7 @@ if ($d) {
 	
 	require LWP::Protocol::http::SocketUnixAlt;
 	LWP::Protocol::implementor( http => 'LWP::Protocol::http::SocketUnixAlt' );
-	my $res = $agent->get('http:var/run/docker.sock//images/json');
+	my $res = $agent->get('http:/var/run/docker.sock//images/json');
 	
 	
 	
