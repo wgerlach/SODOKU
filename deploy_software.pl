@@ -105,24 +105,24 @@ sub createDockerFile {
 	print "------\nDockerfile\n";
 	print $dockerfile;
 	
-	my $tag = 'wgerlach/'.$package.':'.$version_str;
+	#my $tag = 'wgerlach/'.$package.':'.$version_str;
 	
 	#print "tag: \"$tag\"\n";
 	
-	return [$tag, $dockerfile];
+	return ['wgerlach/'.$package, $version_str , $dockerfile];
 }
 
 
 sub createDockerImage {
 	
-	my ($tag, $dockerfile) = @_;
+	my ($repo, $tag, $dockerfile) = @_;
 
-		
+	my $repotag = $repo.':'.$tag;
 	
 	
 	# check if image already exists
 	
-	my $result_hash = dockerSocket('GET', "/images/$tag/json");
+	my $result_hash = dockerSocket('GET', "/images/$repotag/json");
 	
 	my $image_id = undef;
 	if (defined $result_hash) {
@@ -133,7 +133,7 @@ sub createDockerImage {
 		
 		print Dumper($result_hash);
 		print "image already exists:\n";
-		print "ID: ".$image_id." $tag\n";
+		print "ID: ".$image_id." $repotag\n";
 		
 		unless (defined $h->{'docker_reuse_image'}) {
 			print "to delete it run docker rmi ".$image_id."\n";
@@ -153,7 +153,7 @@ sub createDockerImage {
 	
 	### create docker image ###
 	
-	my $docker_build_cmd = 'docker build -q=true --no-cache=true --rm --tag='.$tag.' -';
+	my $docker_build_cmd = 'docker build -q=true --no-cache=true --rm --tag='.$repotag.' -';
 	
 	print "docker_build_cmd: $docker_build_cmd\n";
 	
@@ -172,7 +172,7 @@ sub createDockerImage {
 		
 		$result_hash = undef;
 		
-		$result_hash = dockerSocket('GET', "/images/$tag/json");
+		$result_hash = dockerSocket('GET', "/images/$repotag/json");
 		
 		
 		if (defined $result_hash) {
@@ -190,11 +190,12 @@ sub createDockerImage {
 
 	### save image as tar archive file
 	
-	my $tag_converted = $tag;
+	my $tag_converted = $repotag;
 	$tag_converted =~ s/[\/]/\_/g;
 	my $docker_base_image_converted = $docker_base_image;
 	$docker_base_image_converted =~ s/[\/]/\_/g;
 	my $image_tarfile = $image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.tar';
+	my $imagediff_tarfile = $image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.diff.tar';
 	
 	my $skip_saving = 0;
 	
@@ -215,7 +216,7 @@ sub createDockerImage {
 		system($docker_save_cmd);
 	}
 	
-	unless (defined $tag) {
+	unless (defined $repotag) {
 		die;
 	}
 	
@@ -230,9 +231,18 @@ sub createDockerImage {
 		unless (-d $layer_dir) {
 			die "layer_dir $layer_dir not found !";
 		}
+		print "delete base layer $layer_dir\n";
 		system("sudo rm -rf ".$layer_dir);
 	}
 	
+	system("cd tar_temp && tar -cf ../$imagediff_tarfile *");
+	
+	my $repositories_file_content = "{\"$repo\":{\"tag\":\"$tag\"}}";
+	
+	system("echo -e \"$repositories_file_content\" > repositories");
+	
+	
+	my $py_cmd = "python -c \"import tarfile; f=tarfile.open('".$imagediff_tarfile."', 'a'); f.add('repositories'); f.close()\"";
 	
 	exit(0);
 	
@@ -305,14 +315,18 @@ sub upload_docker_image_to_shock {
 }
 
 sub upload_dockerfile_to_shock {
-	my ($dockerfile, $tag, $docker_base_image) = @_;
+	my ($dockerfile, $repo, $tag, $docker_base_image) = @_;
 	### upload image to SHOCK ###
 	#check token
 	#check server
 	
+	
 	unless (defined $tag) {
 		die;
 	}
+	
+	
+	my $repotag = $repo.':'.$tag;
 	
 	
 	require SHOCK::Client;
@@ -327,7 +341,7 @@ sub upload_dockerfile_to_shock {
 	# prepare tar-file
 	write_file('Dockerfile', $dockerfile ) ;
 	
-	my $tar_filename = $tag.'.dockerfile.tar';
+	my $tar_filename = $repotag.'.dockerfile.tar';
 	$tar_filename =~ s/[\/\:]/_/g;
 	
 	$d = 0;
@@ -349,7 +363,7 @@ sub upload_dockerfile_to_shock {
 						' "temporary":"1",'.
 						' "dockerfile":"1",'.
 						' "docker_version":'.$docker_version_info_str.','.
-						' "tag":"'.$tag.'",'.
+						' "tag":"'.$repotag.'",'.
 						' "base_image_tag":"'.$docker_base_image.'"'.
 						'}';
 	
@@ -2069,7 +2083,7 @@ if ($d) {
 	
 	
 	# create Dockerfile
-	my ($tag, $dockerfile) = @{createDockerFile($package, $version)};
+	my ($repo, $tag, $dockerfile) = @{createDockerFile($package, $version)};
 	unless (defined $tag) {
 		die;
 	}
@@ -2078,13 +2092,13 @@ if ($d) {
 	# upload Dockerfile
 	if (defined($h->{'dockerfile'})) {
 		unless (defined $h->{'docker_noupload'}) {
-			my $shock_node_id = upload_dockerfile_to_shock($dockerfile, $tag, $docker_base_image) || die;
+			my $shock_node_id = upload_dockerfile_to_shock($dockerfile, $repo, $tag, $docker_base_image) || die;
 		}
 	}
 	
 	if (defined($h->{'dockerimage'})) {
 		# create docker image
-		my $ref = createDockerImage($tag, $dockerfile);
+		my $ref = createDockerImage($repo, $tag, $dockerfile);
 		my ($image_tarfile, $image_id, $docker_base_image) = @{$ref};
 		
 		
