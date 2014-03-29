@@ -265,14 +265,18 @@ sub createDockerImage {
 sub upload_docker_image_to_shock {
 	
 	
-	my ($image_tarfile, $tag, $image_id, $docker_base_image) = @_;
+	my ($image_tarfile, $repo, $tag, $image_id, $docker_base_image) = @_;
 	### upload image to SHOCK ###
 	#check token
 	#check server
 	
+	
+	
 	unless (defined $tag) {
 		die;
 	}
+	
+	my $repotag = $repo.':'.$tag;
 	
 	
 	require SHOCK::Client;
@@ -294,7 +298,7 @@ sub upload_docker_image_to_shock {
 						' "temporary":"1",'.
 						' "docker":"1",'.
 						' "docker_version":'.$docker_version_info_str.','.
-						' "tag":"'.$tag.'",'.
+						' "tag":"'.$repotag.'",'.
 						' "image_id":"'.$image_id.'",'.
 						' "base_image_tag":"'.$docker_base_image.'"'.
 						'}';
@@ -2089,7 +2093,7 @@ if ($d) {
 		
 		# upload docker image
 		unless (defined $h->{'docker_noupload'}) {
-			my $shock_node_id = upload_docker_image_to_shock($image_tarfile, $tag, $image_id, $docker_base_image) || die;
+			my $shock_node_id = upload_docker_image_to_shock($image_tarfile, $repo, $tag, $image_id, $docker_base_image) || die;
 		}
 	}
 }
