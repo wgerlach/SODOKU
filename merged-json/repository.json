@@ -104,7 +104,7 @@
       "ptarget" : "${target}dev_container",
       "exec" : [
          "./bootstrap ${target}runtime",
-         ". ${ptarget}user-env.sh ; make && make deploy"
+         ". ${ptarget}user-env.sh ; make && make deploy -d"
       ]
    },
    "SHOCK-lib" : {
