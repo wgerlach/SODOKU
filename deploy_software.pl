@@ -298,8 +298,8 @@ sub upload_docker_image_to_shock {
 						' "temporary":"1",'.
 						' "type":"dockerimage",'.
 						' "docker_version":'.$docker_version_info_str.','.
-						' "tag":"'.$repotag.'",'.
-						' "image_id":"'.$image_id.'",'.
+						' "name":"'.$repotag.'",'.
+						' "id":"'.$image_id.'",'.
 						' "base_image_tag":"'.$docker_base_image.'"'.
 						'}';
 	
