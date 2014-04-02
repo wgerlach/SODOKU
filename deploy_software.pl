@@ -223,7 +223,7 @@ sub createDockerImage {
 	# open and modify tar archive
 	
 	
-	system("mkdir -p tar_temp");
+	system("rm -rf tar_temp ; mkdir -p tar_temp ; rm -f ".$imagediff_tarfile);
 	system("cd tar_temp && tar xvf ../".$image_tarfile);
 	
 	foreach my $layer (@base_layers) {
