@@ -296,7 +296,7 @@ sub upload_docker_image_to_shock {
 	
 	my $shock_json =	'{'.
 						' "temporary":"1",'.
-						' "docker":"1",'.
+						' "type":"dockerimage",'.
 						' "docker_version":'.$docker_version_info_str.','.
 						' "tag":"'.$repotag.'",'.
 						' "image_id":"'.$image_id.'",'.
@@ -368,7 +368,7 @@ sub upload_dockerfile_to_shock {
 	
 	my $shock_json =	'{'.
 						' "temporary":"1",'.
-						' "dockerfile":"1",'.
+						' "type":"dockerfile",'.
 						' "docker_version":'.$docker_version_info_str.','.
 						' "tag":"'.$repotag.'",'.
 						' "base_image_tag":"'.$docker_base_image.'"'.
