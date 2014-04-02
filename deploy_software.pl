@@ -258,6 +258,8 @@ sub createDockerImage {
 		die;
 	}
 	
+	system("rm -f ".$image_tarfile);
+	
 	return [$imagediff_tarfile_gz, $image_id, $docker_base_image];
 }
 
