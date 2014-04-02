@@ -318,7 +318,10 @@ sub upload_docker_image_to_shock {
 	$shock->permisson_readable($shock_node_id) || die "error makeing node readable";
 	
 	print "Docker image uploaded.\n";
-		
+	
+	
+	system("rm -f ".$image_tarfile);
+	
 	return $shock_node_id;
 	
 }
