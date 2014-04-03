@@ -81,16 +81,6 @@
          }
       ]
    },
-   "docker-update" : {
-      "source" : {
-         "filename" : "docker",
-         "url" : "https://get.docker.io/builds/Linux/x86_64/docker-latest"
-      },
-      "build-exec" : [
-         "sudo stop docker ; chmod +x docker ; sudo mv docker /usr/bin; sudo start docker"
-      ],
-      "_comment" : "install docker first as described on theri website, then do this update"
-   },
    "golang-deprecated" : {
       "ROOT_set-env" : {
          "GOPATH" : "/usr/local/go/:$GOPATH"
@@ -104,7 +94,7 @@
       "ptarget" : "${target}dev_container",
       "exec" : [
          "./bootstrap ${target}runtime",
-         ". ${ptarget}user-env.sh ; make && make deploy -d"
+         ". ${ptarget}user-env.sh ; make && make deploy"
       ]
    },
    "SHOCK-lib" : {
@@ -263,6 +253,28 @@
          "kbase_dev_container-deploy"
       ]
    },
+   "docker" : {
+      "source" : {
+         "filename" : "docker",
+         "url" : "https://get.docker.io/builds/Linux/x86_64/docker-latest"
+      },
+      "build-exec" : [
+         "sudo stop docker ; chmod +x docker ; sudo mv docker /usr/bin; sudo start docker"
+      ],
+      "_comment" : "install docker first as described on theri website, then do this update",
+      "subpackages" : [
+         {
+            "exec" : [
+               "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list",
+               "apt-get update",
+               "apt-get install lxc-docker",
+               "groupadd docker",
+               "gpasswd -a $USER docker",
+               "service docker restart"
+            ]
+         }
+      ]
+   },
    "emirge-data-cached" : {
       "source" : "http://dunkirk.mcs.anl.gov/~wgerlach/SSURef_111.tar.gz",
       "ptarget" : "${data_target}emirge-data",
@@ -395,7 +407,7 @@
       "source-git" : "https://github.com/wgerlach/MG-RAST-Tools"
    },
    "kbase_dev_container" : {
-      "source-git" : "kbase@git.kbase.us:dev_container",
+      "source-git" : "http://github.com/kbase/dev_container",
       "_comment" : "--target should be /kb/"
    },
    "emirge" : {
