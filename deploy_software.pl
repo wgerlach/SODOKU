@@ -1720,7 +1720,7 @@ sub install_package {
 
 print "deploy arguments: ".join(' ', @ARGV)."\n";
 
-GetOptions ($h, 'target=s', 'data_target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'docker', 'dockerfile', 'dockerimage','docker_show_only', 'docker_reuse_image', 'docker_noupload', 'nossl', 'forcetarget', 'list', 'create', 'nodeps');
+GetOptions ($h, 'target=s', 'data_target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'docker', 'dockerfile', 'dockerimage','docker_show_only', 'docker_reuse_image', 'docker_noupload', 'private', 'tag=s', 'nossl', 'forcetarget', 'list', 'create', 'nodeps');
 
 if ( @ARGV == 0 && ! defined $h->{'list'}) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
@@ -2038,8 +2038,17 @@ if ($d) {
 		die "not supported";
 	}
 	
-	my ($package, $version) = @{shift(@packages_installed)};
+	my $package;
+	my $version;
 	
+	if (defined $h->{'tag'}) {
+		($package, $version) = split(':', $h->{'tag'});
+		unless (defined $version) {
+			die "version not defined in --tag repo:ver";
+		}
+	} else {
+		($package, $version) = @{shift(@packages_installed)};
+	}
 	# docker version
 	my $result_hash = dockerSocket('GET', "/version");
 	unless (defined $result_hash) {
