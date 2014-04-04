@@ -76,6 +76,8 @@ sub createDockerFile {
 		$version_str = join('.', @{$version});
 	}
 	
+	print "version: $package, $version_str\n";
+	exit(0);
 	if (defined $h->{'tag'} && !(defined $version_str)) {
 		die;
 	}
@@ -2049,7 +2051,7 @@ if ($d) {
 	if (defined $h->{'tag'}) {
 		($package, $version) = split(':', $h->{'tag'});
 		print "version: $package, $version\n";
-		exit(0);
+		
 		unless (defined $version) {
 			die "version not defined in --tag repo:ver";
 		}
