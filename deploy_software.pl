@@ -2060,6 +2060,9 @@ if ($d) {
 	} else {
 		($package, $version) = @{shift(@packages_installed)};
 	}
+	
+	print "version: $package, $version\n";
+	
 	# docker version
 	my $result_hash = dockerSocket('GET', "/version");
 	unless (defined $result_hash) {
