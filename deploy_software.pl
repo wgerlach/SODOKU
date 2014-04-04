@@ -74,6 +74,8 @@ sub createDockerFile {
 	my $version_str = undef;
 	if (defined $version) {
 		$version_str = join('.', @{$version});
+	} else {
+		$version_str = 'latest';
 	}
 	
 	print "version: $package, $version_str\n";
@@ -2045,8 +2047,8 @@ if ($d) {
 		die "not supported";
 	}
 	
-	my $package;
-	my $version;
+	my $package=undef;
+	my $version=undef;
 	
 	if (defined $h->{'tag'}) {
 		($package, $version) = split(':', $h->{'tag'});
