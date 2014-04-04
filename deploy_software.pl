@@ -2060,7 +2060,7 @@ if ($d) {
 		if ($version eq '') {
 			die "version not defined in --tag repo:ver";
 		}
-		my @ver = split('.', $version);
+		my @ver = split(/\./, $version);
 		print "got: ".join('-', @ver )."\n";
 		$version = \@ver;
 		
