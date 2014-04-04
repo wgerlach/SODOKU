@@ -79,7 +79,7 @@ sub createDockerFile {
 	}
 	
 	print "version: $package, $version_str\n";
-	exit(0);
+	#exit(0);
 	if (defined $h->{'tag'} && !(defined $version_str)) {
 		die;
 	}
@@ -2061,11 +2061,11 @@ if ($d) {
 			die "version not defined in --tag repo:ver";
 		}
 		my @ver = split(/\./, $version);
-		print "got: ".join('-', @ver )."\n";
+		#print "got: ".join('-', @ver )."\n";
 		$version = \@ver;
 		
-		print "got: ".join('-', @{$version} )."\n";
-		exit(0);
+		#print "got: ".join('-', @{$version} )."\n";
+		#exit(0);
 	} else {
 		($package, $version) = @{shift(@packages_installed)};
 	}
