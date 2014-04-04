@@ -2063,6 +2063,8 @@ if ($d) {
 		my @ver = split('.', $version);
 		$version = \@ver;
 		
+		print "got: ".join('-', @{$version} )."\n";
+		exit(0);
 	} else {
 		($package, $version) = @{shift(@packages_installed)};
 	}
