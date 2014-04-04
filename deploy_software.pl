@@ -2046,6 +2046,9 @@ if ($d) {
 		unless (defined $version) {
 			die "version not defined in --tag repo:ver";
 		}
+		
+		$version = \split('.', $version);
+		
 	} else {
 		($package, $version) = @{shift(@packages_installed)};
 	}
