@@ -2048,6 +2048,8 @@ if ($d) {
 	
 	if (defined $h->{'tag'}) {
 		($package, $version) = split(':', $h->{'tag'});
+		print "version: $package, $version\n";
+		exit(0);
 		unless (defined $version) {
 			die "version not defined in --tag repo:ver";
 		}
@@ -2061,7 +2063,7 @@ if ($d) {
 		($package, $version) = @{shift(@packages_installed)};
 	}
 	
-	print "version: $package, $version\n";
+	
 	
 	# docker version
 	my $result_hash = dockerSocket('GET', "/version");
