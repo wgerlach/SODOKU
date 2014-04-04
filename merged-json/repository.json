@@ -254,25 +254,13 @@
       ]
    },
    "docker" : {
-      "source" : {
-         "filename" : "docker",
-         "url" : "https://get.docker.io/builds/Linux/x86_64/docker-latest"
-      },
-      "build-exec" : [
-         "sudo stop docker ; chmod +x docker ; sudo mv docker /usr/bin; sudo start docker"
-      ],
-      "_comment" : "install docker first as described on theri website, then do this update",
-      "subpackages" : [
-         {
-            "exec" : [
-               "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list",
-               "apt-get update",
-               "apt-get install lxc-docker",
-               "groupadd docker",
-               "gpasswd -a $USER docker",
-               "service docker restart"
-            ]
-         }
+      "exec" : [
+         "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list",
+         "apt-get update",
+         "apt-get install lxc-docker",
+         "groupadd docker",
+         "gpasswd -a $USER docker",
+         "service docker restart"
       ]
    },
    "emirge-data-cached" : {
