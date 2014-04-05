@@ -163,7 +163,7 @@ sub createDockerImage {
 	
 	### create docker image ###
 	
-	my $docker_build_cmd = 'docker build -q=true --no-cache=true --rm --tag='.$repotag.' -';
+	my $docker_build_cmd = 'docker build --tag='.$repotag.' -'; #--no-cache=true --rm
 	
 	print "docker_build_cmd: $docker_build_cmd\n";
 	
