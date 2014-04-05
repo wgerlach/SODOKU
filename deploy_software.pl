@@ -30,7 +30,8 @@ my $ubuntu_cmd2package = {
 	'curl' => 'curl',
 	'make' => 'make build-essential',
 	'git' => 'git',
-	'unzip' => 'unzip'
+	'unzip' => 'unzip',
+	'add-apt-repository' => 'software-properties-common'
 };
 
 my $docker_socket = '/var/run/docker.sock';
