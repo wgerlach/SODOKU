@@ -225,7 +225,7 @@
          },
          {
             "depends" : [
-               "qiime-deploy(${target}qiime-${v1}.${v2}.${v3}/qiime.conf)"
+               "qiime-deploy(${target}qiime-deploy-conf/qiime-${v1}.${v2}.${v3}/qiime.conf)"
             ]
          }
       ]
