@@ -124,20 +124,6 @@
          }
       ]
    },
-   "qiime-wo" : {
-      "subpackages" : [
-         {
-            "source" : "https://raw.github.com/wgerlach/SODOKU/master/other/qiime-1.7.0-fixed.conf",
-            "source-type" : "download",
-            "source-remove-existing-file" : 1
-         },
-         {
-            "depends" : [
-               "qiime-deploy(${target}qiime-1.7.0-fixed.conf)"
-            ]
-         }
-      ]
-   },
    "picrust_data" : {
       "source" : [
          "ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/16S_13_5_precalculated.tab.gz",
@@ -219,9 +205,10 @@
          8,
          0
       ],
+      "_comment" : "uses forked conf files with fixes",
       "subpackages" : [
          {
-            "source-git" : "git://github.com/qiime/qiime-deploy-conf.git"
+            "source-git" : "git://github.com/wgerlach/qiime-deploy-conf.git"
          },
          {
             "depends" : [
@@ -336,13 +323,6 @@
          }
       ]
    },
-   "upstart-aweclient" : {
-      "source" : "http://www.mcs.anl.gov/~wtang/files/awe-client.conf",
-      "ptarget" : "/etc/init/",
-      "source-remove-existing-file" : 1,
-      "_comment" : "requires root",
-      "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
-   },
    "MG-RAST/databases" : {
       "source" : [
          "ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.1",
@@ -370,6 +350,13 @@
             "source-extract" : 1
          }
       ]
+   },
+   "upstart-aweclient" : {
+      "source" : "http://www.mcs.anl.gov/~wtang/files/awe-client.conf",
+      "ptarget" : "/etc/init/",
+      "source-remove-existing-file" : 1,
+      "_comment" : "requires root",
+      "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
    },
    "AWE" : {
       "source-go" : "github.com/MG-RAST/AWE/...",
@@ -541,6 +528,20 @@
       ],
       "install-binary" : [
          "samtools"
+      ]
+   },
+   "qiime-wo-deprecated" : {
+      "subpackages" : [
+         {
+            "source" : "https://raw.github.com/wgerlach/SODOKU/master/other/qiime-1.7.0-fixed.conf",
+            "source-type" : "download",
+            "source-remove-existing-file" : 1
+         },
+         {
+            "depends" : [
+               "qiime-deploy(${target}qiime-1.7.0-fixed.conf)"
+            ]
+         }
       ]
    },
    "gg_otus" : {
