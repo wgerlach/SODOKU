@@ -5,12 +5,15 @@
 	"ubuntu-base" : {
 		"source-apt" : "golang curl wget git mercurial bzr make build-essential cpanminus python-setuptools python-dev checkinstall"
 	},
-	"docker-update" : {
-		"_comment" : "install docker first as described on theri website, then do this update",
-		"source" : {	"url" : "https://get.docker.io/builds/Linux/x86_64/docker-latest",
-				"filename" : "docker"
-			},
-		"build-exec" : ["sudo stop docker ; chmod +x docker ; sudo mv docker /usr/bin; sudo start docker"]
+	"docker" : {
+		"exec" : [ 
+			"echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list",
+			"apt-get update",
+			"apt-get install lxc-docker",
+			"groupadd docker",
+			"gpasswd -a $USER docker",
+			"service docker restart"
+		]
 	},
 	"KBase/AMETHST": {
 		"source-git" : "https://github.com/MG-RAST/AMETHST",
@@ -41,7 +44,7 @@
 		"build-type" : "make",
 		"install-binary" : ["samtools"]
 	},
-	"qiime" : {
+	"qiime-deploy" : {
 		"_comment" : "QIIME uses a configuration file like qiime.conf for the deployment, which has to be given as an argument to this package",
 		"source" : "git://github.com/qiime/qiime-deploy.git",
 		"source-temporary" : 1,
@@ -49,15 +52,27 @@
 		"test" : ". ${target}qiime_software/activate.sh ; print_qiime_config.py -t",
 		"subpackages" : [
 			{
-				"exec" : "sudo add-apt-repository \"deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe multiverse\"",
+				"exec" : "add-apt-repository \"deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe multiverse\"",
 				"set-env" : {"JAVA_HOME":"/usr/lib/jvm/java-6-openjdk-amd64"}
 			},
 			{
-				"source-apt" : "python-dev libncurses5-dev libssl-dev libzmq-dev libgsl0-dev openjdk-6-jdk libxml2 libxslt1.1 libxslt1-dev ant git subversion build-essential zlib1g-dev libpng12-dev libfreetype6-dev mpich2 libreadline-dev gfortran unzip libmysqlclient18 libmysqlclient-dev ghc sqlite3 libsqlite3-dev"
+				"source-apt" : "python-dev libncurses5-dev libssl-dev libzmq-dev libgsl0-dev openjdk-6-jdk libxml2 libxslt1.1 libxslt1-dev ant git subversion build-essential zlib1g-dev libpng12-dev libfreetype6-dev mpich2 libreadline-dev gfortran unzip libmysqlclient18 libmysqlclient-dev ghc sqlite3 libsqlite3-dev libc6-i386 libbz2-dev"
 			}
 		]
 	},
-	"qiime-wo" : {
+	"qiime" : {
+		"_comment" : "uses forked conf files with fixes",
+		"version" : [1,8,0],
+		"subpackages" : [ 
+			{
+			"source-git" : "git://github.com/wgerlach/qiime-deploy-conf.git"
+			},
+			{
+			"depends": ["qiime-deploy(${target}qiime-deploy-conf/qiime-${v1}.${v2}.${v3}/qiime.conf)"]
+			}
+		]
+	},
+	"qiime-wo-deprecated" : {
 		"subpackages" : [
 						 {
 							"source" : "https://raw.github.com/wgerlach/SODOKU/master/other/qiime-1.7.0-fixed.conf",
@@ -65,7 +80,7 @@
 							"source-remove-existing-file" : 1
 						 },
 						 {
-							"depends": ["qiime(${target}qiime-1.7.0-fixed.conf)"]
+							"depends": ["qiime-deploy(${target}qiime-1.7.0-fixed.conf)"]
 						 }
 						]
 	},
@@ -110,7 +125,7 @@
 	},
 	"kbase_dev_container" : {
 		"_comment": "--target should be /kb/",
-		"source-git" : "kbase@git.kbase.us:dev_container"
+		"source-git" : "http://github.com/kbase/dev_container"
 	},
 	"kbase_dev_container_mgrast-deploy" : {
 		"_comment": "--target should be /kb/, here we used specifc branch",
