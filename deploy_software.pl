@@ -1484,6 +1484,7 @@ sub install_package {
 					die;
 				}
 				
+				
 				if (definedAndTrue($package_hash->{'source-extract'})) {
 					if ($downloaded_file =~ /\.tar\.gz$/) {
 						systemp("tar xvfz ".$downloaded_file." -C ".$temp_dir) ==0 or die;
@@ -1831,7 +1832,7 @@ if (defined $h->{'create'}) {
 		unless (-e $file) {
 			die "file \"$file\" not found";
 		}
-		my $cat_cmd = "cat ".$file;
+		my $cat_cmd = "cat ".$file." | grep -v ^# ";
 		my $repository_json = `$cat_cmd`;
 		chomp($repository_json);
 		my $repository;
