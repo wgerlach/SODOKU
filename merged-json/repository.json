@@ -106,6 +106,24 @@
    "ubuntu-base" : {
       "source-apt" : "golang curl wget git mercurial bzr make build-essential cpanminus python-setuptools python-dev checkinstall"
    },
+   "qiime-deploy" : {
+      "source-temporary" : 1,
+      "source" : "git://github.com/qiime/qiime-deploy.git",
+      "test" : ". ${target}qiime_software/activate.sh ; print_qiime_config.py -t",
+      "build-exec" : "cd ${source-dir} ; python qiime-deploy.py $target/qiime_software/ -f ${1} --force-remove-failed-dirs",
+      "_comment" : "QIIME uses a configuration file like qiime.conf for the deployment, which has to be given as an argument to this package",
+      "subpackages" : [
+         {
+            "set-env" : {
+               "JAVA_HOME" : "/usr/lib/jvm/java-6-openjdk-amd64"
+            },
+            "exec" : "add-apt-repository \"deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe multiverse\""
+         },
+         {
+            "source-apt" : "python-dev libncurses5-dev libssl-dev libzmq-dev libgsl0-dev openjdk-6-jdk libxml2 libxslt1.1 libxslt1-dev ant git subversion build-essential zlib1g-dev libpng12-dev libfreetype6-dev mpich2 libreadline-dev gfortran unzip libmysqlclient18 libmysqlclient-dev ghc sqlite3 libsqlite3-dev libc6-i386 libbz2-dev"
+         }
+      ]
+   },
    "qiime-wo" : {
       "subpackages" : [
          {
@@ -115,7 +133,7 @@
          },
          {
             "depends" : [
-               "qiime(${target}qiime-1.7.0-fixed.conf)"
+               "qiime-deploy(${target}qiime-1.7.0-fixed.conf)"
             ]
          }
       ]
@@ -196,20 +214,19 @@
       ]
    },
    "qiime" : {
-      "source-temporary" : 1,
-      "source" : "git://github.com/qiime/qiime-deploy.git",
-      "test" : ". ${target}qiime_software/activate.sh ; print_qiime_config.py -t",
-      "build-exec" : "cd ${source-dir} ; python qiime-deploy.py $target/qiime_software/ -f ${1} --force-remove-failed-dirs",
-      "_comment" : "QIIME uses a configuration file like qiime.conf for the deployment, which has to be given as an argument to this package",
+      "version" : [
+         1,
+         8,
+         0
+      ],
       "subpackages" : [
          {
-            "set-env" : {
-               "JAVA_HOME" : "/usr/lib/jvm/java-6-openjdk-amd64"
-            },
-            "exec" : "add-apt-repository \"deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe multiverse\""
+            "source-git" : "git://github.com/qiime/qiime-deploy-conf.git"
          },
          {
-            "source-apt" : "python-dev libncurses5-dev libssl-dev libzmq-dev libgsl0-dev openjdk-6-jdk libxml2 libxslt1.1 libxslt1-dev ant git subversion build-essential zlib1g-dev libpng12-dev libfreetype6-dev mpich2 libreadline-dev gfortran unzip libmysqlclient18 libmysqlclient-dev ghc sqlite3 libsqlite3-dev"
+            "depends" : [
+               "qiime-deploy(${target}qiime-${v1}.${v2}.${v3}/qiime.conf)"
+            ]
          }
       ]
    },
@@ -319,6 +336,13 @@
          }
       ]
    },
+   "upstart-aweclient" : {
+      "source" : "http://www.mcs.anl.gov/~wtang/files/awe-client.conf",
+      "ptarget" : "/etc/init/",
+      "source-remove-existing-file" : 1,
+      "_comment" : "requires root",
+      "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
+   },
    "MG-RAST/databases" : {
       "source" : [
          "ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.1",
@@ -346,13 +370,6 @@
             "source-extract" : 1
          }
       ]
-   },
-   "upstart-aweclient" : {
-      "source" : "http://www.mcs.anl.gov/~wtang/files/awe-client.conf",
-      "ptarget" : "/etc/init/",
-      "source-remove-existing-file" : 1,
-      "_comment" : "requires root",
-      "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
    },
    "AWE" : {
       "source-go" : "github.com/MG-RAST/AWE/...",
@@ -387,16 +404,16 @@
          "kbase_dev_container-deploy"
       ]
    },
+   "kbase_dev_container" : {
+      "source-git" : "http://github.com/kbase/dev_container",
+      "_comment" : "--target should be /kb/"
+   },
    "wgerlach/MG-RAST-Tools" : {
       "set-env" : {
          "PATH" : "${ptarget}MG-RAST-Tools/tools/bin:$PATH",
          "PERL5LIB" : "${ptarget}MG-RAST-Tools/tools/lib/:$PERL5LIB"
       },
       "source-git" : "https://github.com/wgerlach/MG-RAST-Tools"
-   },
-   "kbase_dev_container" : {
-      "source-git" : "http://github.com/kbase/dev_container",
-      "_comment" : "--target should be /kb/"
    },
    "emirge" : {
       "version" : [
