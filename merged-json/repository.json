@@ -185,20 +185,6 @@
          "emirge==0.60"
       ]
    },
-   "jellyfish" : {
-      "build-type" : "make-install",
-      "source-temporary" : 1,
-      "source" : {
-         "url" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-${v1}.${v2}.${v3}.tar.gz",
-         "subdir" : "jellyfish-${v1}.${v2}.${v3}"
-      },
-      "source-extract" : 1,
-      "version" : [
-         1,
-         1,
-         5
-      ]
-   },
    "qiime" : {
       "version" : [
          1,
@@ -215,6 +201,20 @@
                "qiime-deploy(${target}qiime-deploy-conf/qiime-${v1}.${v2}.${v3}/qiime.conf)"
             ]
          }
+      ]
+   },
+   "jellyfish" : {
+      "build-type" : "make-install",
+      "source-temporary" : 1,
+      "source" : {
+         "url" : "http://www.cbcb.umd.edu/software/jellyfish/jellyfish-${v1}.${v2}.${v3}.tar.gz",
+         "subdir" : "jellyfish-${v1}.${v2}.${v3}"
+      },
+      "source-extract" : 1,
+      "version" : [
+         1,
+         1,
+         5
       ]
    },
    "wgerlach/AWE" : {
@@ -244,11 +244,6 @@
          }
       ]
    },
-   "MG-RAST/FragGeneScan" : {
-      "source" : "http://www.mcs.anl.gov/~wtang/files/fgs.tar.gz",
-      "ptarget" : "${target}apps/FragGeneScan",
-      "source-extract" : 1
-   },
    "kbase-mgrast" : {
       "_comment" : "target=/kb, require kbase-git key",
       "depends" : [
@@ -256,6 +251,11 @@
          "kbase_dev_container_mgrast-deploy",
          "kbase_dev_container-deploy"
       ]
+   },
+   "MG-RAST/FragGeneScan" : {
+      "source" : "http://www.mcs.anl.gov/~wtang/files/fgs.tar.gz",
+      "ptarget" : "${target}apps/FragGeneScan",
+      "source-extract" : 1
    },
    "docker" : {
       "exec" : [
@@ -323,6 +323,13 @@
          }
       ]
    },
+   "upstart-aweclient" : {
+      "source" : "http://www.mcs.anl.gov/~wtang/files/awe-client.conf",
+      "ptarget" : "/etc/init/",
+      "source-remove-existing-file" : 1,
+      "_comment" : "requires root",
+      "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
+   },
    "MG-RAST/databases" : {
       "source" : [
          "ftp://ftp.metagenomics.anl.gov/data/misc/private/wtang/md5nr.1",
@@ -351,13 +358,6 @@
          }
       ]
    },
-   "upstart-aweclient" : {
-      "source" : "http://www.mcs.anl.gov/~wtang/files/awe-client.conf",
-      "ptarget" : "/etc/init/",
-      "source-remove-existing-file" : 1,
-      "_comment" : "requires root",
-      "exec" : "ln -s -f /lib/init/upstart-job /etc/init.d/awe-client"
-   },
    "AWE" : {
       "source-go" : "github.com/MG-RAST/AWE/...",
       "depends" : [
@@ -368,6 +368,9 @@
             "source-apt" : "mongodb-server"
          }
       ]
+   },
+   "deploy-deps" : {
+      "source-apt" : "git cpanminus python-setuptools python-dev checkinstall"
    },
    "kbase_bootstrap_mgrast" : {
       "build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
@@ -380,9 +383,6 @@
          }
       ]
    },
-   "deploy-deps" : {
-      "source-apt" : "git cpanminus python-setuptools python-dev checkinstall"
-   },
    "kbase" : {
       "_comment" : "example: target=/kb , kbase(KBaseFBAModeling), this does not include the bootstrap! Use . /kb/deployment/user-env.sh to activate",
       "depends" : [
@@ -391,16 +391,16 @@
          "kbase_dev_container-deploy"
       ]
    },
-   "kbase_dev_container" : {
-      "source-git" : "http://github.com/kbase/dev_container",
-      "_comment" : "--target should be /kb/"
-   },
    "wgerlach/MG-RAST-Tools" : {
       "set-env" : {
          "PATH" : "${ptarget}MG-RAST-Tools/tools/bin:$PATH",
          "PERL5LIB" : "${ptarget}MG-RAST-Tools/tools/lib/:$PERL5LIB"
       },
       "source-git" : "https://github.com/wgerlach/MG-RAST-Tools"
+   },
+   "kbase_dev_container" : {
+      "source-git" : "http://github.com/kbase/dev_container",
+      "_comment" : "--target should be /kb/"
    },
    "emirge" : {
       "version" : [
@@ -530,20 +530,6 @@
          "samtools"
       ]
    },
-   "qiime-wo-deprecated" : {
-      "subpackages" : [
-         {
-            "source" : "https://raw.github.com/wgerlach/SODOKU/master/other/qiime-1.7.0-fixed.conf",
-            "source-type" : "download",
-            "source-remove-existing-file" : 1
-         },
-         {
-            "depends" : [
-               "qiime-deploy(${target}qiime-1.7.0-fixed.conf)"
-            ]
-         }
-      ]
-   },
    "gg_otus" : {
       "source" : "ftp://greengenes.microbio.me/greengenes_release/gg_${v1}_${v2}/gg_${v1}_${v2}_otus.tar.gz",
       "source-extract" : 1,
@@ -556,6 +542,20 @@
       "exec" : [
          "mkdir -p $QIIME/../gg_otus-${v1}_${v2}-release/rep_set",
          "ln --force -s ${target}gg_${v1}_${v2}_otus $QIIME/../gg_otus-${v1}_${v2}-release/rep_set"
+      ]
+   },
+   "qiime-wo-deprecated" : {
+      "subpackages" : [
+         {
+            "source" : "https://raw.github.com/wgerlach/SODOKU/master/other/qiime-1.7.0-fixed.conf",
+            "source-type" : "download",
+            "source-remove-existing-file" : 1
+         },
+         {
+            "depends" : [
+               "qiime-deploy(${target}qiime-1.7.0-fixed.conf)"
+            ]
+         }
       ]
    },
    "cdbfasta" : {
