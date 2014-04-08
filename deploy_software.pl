@@ -204,8 +204,8 @@ sub createDockerImage {
 	$tag_converted =~ s/[\/]/\_/g;
 	my $docker_base_image_converted = $docker_base_image;
 	$docker_base_image_converted =~ s/[\/]/\_/g;
-	my $image_tarfile = $image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.complete.tar';
-	my $imagediff_tarfile = $image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.diff.tar';
+	my $image_tarfile = 'data/'.$image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.complete.tar';
+	my $imagediff_tarfile = 'data/'.$image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.diff.tar';
 	
 	my $skip_saving = 0;
 	
@@ -233,11 +233,11 @@ sub createDockerImage {
 	# open and modify tar archive
 	
 	
-	systemp("rm -rf tar_temp ; mkdir -p tar_temp ; rm -f ".$imagediff_tarfile);
-	systemp("cd tar_temp && tar xvf ../".$image_tarfile);
+	systemp("rm -rf data/tar_temp ; mkdir -p data/tar_temp ; rm -f ".$imagediff_tarfile);
+	systemp("cd data/tar_temp && tar xvf ../../".$image_tarfile);
 	
 	foreach my $layer (@base_layers) {
-		my $layer_dir = "tar_temp/".$layer;
+		my $layer_dir = "data/tar_temp/".$layer;
 		unless (-d $layer_dir) {
 			die "layer_dir $layer_dir not found !";
 		}
@@ -246,7 +246,7 @@ sub createDockerImage {
 	}
 	
 	print "create new tar without the base layers\n";
-	systemp("cd tar_temp && sudo tar -cf ../$imagediff_tarfile *") == 0 or die;
+	systemp("cd data/tar_temp && sudo tar -cf ../../$imagediff_tarfile *") == 0 or die;
 	systemp("sudo chmod 666 ".$imagediff_tarfile);
 	
 	print "insert tag information into tar\n";
