@@ -78,15 +78,6 @@
 					"ln --force -s ${target}picrust_data/ko_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/ko_13_5_precalculated.tab.gz"],
 		"depends" : ["picrust_data"]
 	},
-	"kbase_dev_container-deploy" : {
-		"exec" : [ "./bootstrap ${target}runtime",
-				  ". ${ptarget}user-env.sh ; make && make deploy"],
-		"ptarget" : "${target}dev_container"
-	},
-	"kbase_dev_container" : {
-		"_comment": "--target should be /kb/",
-		"source-git" : "http://github.com/kbase/dev_container"
-	},
 	"kbase_dev_container_mgrast-deploy" : {
 		"_comment": "--target should be /kb/, here we used specifc branch",
 		"subpackages" : [
@@ -121,21 +112,6 @@
 	"kbase-mgrast" : {
 		"_comment": "target=/kb, require kbase-git key",
 		"depends" : ["kbase_bootstrap_mgrast", "kbase_dev_container_mgrast-deploy", "kbase_dev_container-deploy"]
-	},
-	"kbase-modules" : {
-		"_comment" : "gets requested modules and dependencies",
-		"ptarget" : "${target}dev_container",
-		"depend-function" : [
-							 {
-							 "name" : "kbasemodules",
-							 "target" : "${ptarget}modules",
-							 "package-list" : "${arguments}"
-							 }
-							 ]
-	},
-	"kbase" : {
-		"_comment": "example: target=/kb , kbase(KBaseFBAModeling), this does not include the bootstrap! Use . /kb/deployment/user-env.sh to activate",
-		"depends" : ["kbase_dev_container", "kbase-modules(${arguments})", "kbase_dev_container-deploy"]
 	},
 	"MG-RAST" : {
 		"_comment" : "target: $HOME / upstart-aweclient needs root / databases via MG-RAST/databases",

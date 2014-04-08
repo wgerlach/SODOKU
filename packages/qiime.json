@@ -2,6 +2,7 @@
 #
 # examples: qiime==1.8.0
 #           qiime-deploy("my-qiime.conf")
+# use target=/
 # note that qiime points to a fork repository of qiime-deploy-conf.git that has some fixes 
 #
 # 

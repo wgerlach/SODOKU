@@ -1,0 +1,31 @@
+#
+# KBase
+#
+# example kbase("awe_service")
+#
+{
+	"kbase-modules" : {
+		"_comment" : "gets requested modules and dependencies",
+		"ptarget" : "${target}dev_container",
+		"depend-function" : [
+							 {
+							 "name" : "kbasemodules",
+							 "target" : "${ptarget}modules",
+							 "package-list" : "${arguments}"
+							 }
+							 ]
+	},
+	"kbase" : {
+		"_comment": "example: target=/kb , kbase(KBaseFBAModeling), this does not include the bootstrap! Use . /kb/deployment/user-env.sh to activate",
+		"depends" : ["kbase_dev_container", "kbase-modules(${arguments})", "kbase_dev_container-deploy"]
+	},
+	"kbase_dev_container-deploy" : {
+		"exec" : [ "./bootstrap ${target}runtime",
+				  ". ${ptarget}user-env.sh ; make && make deploy"],
+		"ptarget" : "${target}dev_container"
+	},
+	"kbase_dev_container" : {
+		"_comment": "--target should be /kb/",
+		"source-git" : "http://github.com/kbase/dev_container"
+	}
+}
