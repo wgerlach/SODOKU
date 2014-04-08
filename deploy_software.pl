@@ -223,7 +223,7 @@ sub createDockerImage {
 	if ($skip_saving == 0) {
 		my $docker_save_cmd = 'docker save '.$image_id.' > '.$image_tarfile;
 		print "cmd: ".$docker_save_cmd."\n";
-		system($docker_save_cmd);
+		systemp($docker_save_cmd);
 	}
 	
 	unless (defined $repotag) {
@@ -233,8 +233,8 @@ sub createDockerImage {
 	# open and modify tar archive
 	
 	
-	system("rm -rf tar_temp ; mkdir -p tar_temp ; rm -f ".$imagediff_tarfile);
-	system("cd tar_temp && tar xvf ../".$image_tarfile);
+	systemp("rm -rf tar_temp ; mkdir -p tar_temp ; rm -f ".$imagediff_tarfile);
+	systemp("cd tar_temp && tar xvf ../".$image_tarfile);
 	
 	foreach my $layer (@base_layers) {
 		my $layer_dir = "tar_temp/".$layer;
@@ -242,33 +242,33 @@ sub createDockerImage {
 			die "layer_dir $layer_dir not found !";
 		}
 		print "delete base layer $layer_dir\n";
-		system("sudo rm -rf ".$layer_dir);
+		systemp("sudo rm -rf ".$layer_dir);
 	}
 	
 	print "create new tar without the base layers\n";
-	system("cd tar_temp && sudo tar -cf ../$imagediff_tarfile *") == 0 or die;
-	system("sudo chmod 666 ".$imagediff_tarfile);
+	systemp("cd tar_temp && sudo tar -cf ../$imagediff_tarfile *") == 0 or die;
+	systemp("sudo chmod 666 ".$imagediff_tarfile);
 	
 	print "insert tag information into tar\n";
 	my $repositories_file_content = "{\\\"$repo\\\":{\\\"$tag\\\":\\\"$image_id\\\"}}";
 	
-	system("echo \"$repositories_file_content\" > repositories");
+	systemp("echo \"$repositories_file_content\" > repositories");
 	
 	
 	my $py_cmd = "python -c \"import tarfile; f=tarfile.open('".$imagediff_tarfile."', 'a'); f.add('repositories'); f.close()\"";
 	
-	system($py_cmd) == 0 or die;
+	systemp($py_cmd) == 0 or die;
 	
 	print "gzip tar file\n";
 	
-	system("gzip ".$imagediff_tarfile)==0 or die;
+	systemp("gzip ".$imagediff_tarfile)==0 or die;
 	
 	my $imagediff_tarfile_gz = $imagediff_tarfile.'.gz';
 	unless (-e $imagediff_tarfile_gz) {
 		die;
 	}
 	
-	system("rm -f ".$image_tarfile);
+	systemp("rm -f ".$image_tarfile);
 	
 	return [$imagediff_tarfile_gz, $image_id, $docker_base_image];
 }
@@ -330,7 +330,7 @@ sub upload_docker_image_to_shock {
 	print "Docker image uploaded.\n";
 	
 	
-	system("rm -f ".$image_tarfile);
+	systemp("rm -f ".$image_tarfile);
 	
 	return $shock_node_id;
 	
@@ -367,8 +367,8 @@ sub upload_dockerfile_to_shock {
 	$tar_filename =~ s/[\/\:]/_/g;
 	
 	$d = 0;
-	systemp("tar cf ".$tar_filename." Dockerfile") == 0 or die;
-	systemp("rm -f Dockerfile") == 0 or die;
+	system_install("tar cf ".$tar_filename." Dockerfile") == 0 or die;
+	system_install("rm -f Dockerfile") == 0 or die;
 	$d = 1;
 	
 
@@ -493,6 +493,11 @@ sub addDockerCmd {
 
 sub systemp {
 	print "cmd: ".join(' ', @_)."\n";
+	return system(@_);
+}
+
+sub system_install {
+	print "cmd: ".join(' ', @_)."\n";
 	
 	if ($d) {
 		addDockerCmd(@_);
@@ -615,7 +620,7 @@ sub downloadFile {
 	
 	if (-e $file) {
 		if ( (defined($h->{'new'}) ) || (definedAndTrue($args{'remove-existing-file'}) ) ) {
-			systemp("rm -f $file");
+			system_install("rm -f $file");
 		} else {
 			print "skip file: $file already exists....\n";
 			return $file;
@@ -650,7 +655,7 @@ sub downloadFile {
 	
 	
 	if ($file_downloaded == 0) {
-		systemp($curl_download_cmd) == 0 or die;
+		system_install($curl_download_cmd) == 0 or die;
 	} else {
 		# file was downloaded from SHOCK cache
 		if ($d) {
@@ -793,7 +798,7 @@ sub setenv {
 	
 	
 	my $envline = "export $key=$value";
-	#systemp("grep -q -e '$envline' ~/.bashrc || echo '$envline' >> ~/.bashrc");
+	#system_install("grep -q -e '$envline' ~/.bashrc || echo '$envline' >> ~/.bashrc");
 	
 	bashrc_append($envline);
 	
@@ -820,7 +825,7 @@ sub bashrc_append {
 	}
 	
 	my $cmd = "grep -q -e '$line' $bashrc || echo '$line' >> $bashrc";
-	systemp($cmd);
+	system_install($cmd);
 }
 
 
@@ -844,7 +849,7 @@ sub git_clone {
 	
 	my $usebranch="";
 	if (defined $gitbranch) {
-		#systemp("cd $gitdir && git checkout ".$gitbranch) == 0 or return undef;
+		#system_install("cd $gitdir && git checkout ".$gitbranch) == 0 or return undef;
 		$usebranch = ' -b '.$gitbranch;
 	}
 	
@@ -853,14 +858,14 @@ sub git_clone {
 	print "gitdir: $gitdir\n";
 	if (-d $gitdir) {
 		if (defined $h->{'update'}) {
-			systemp("cd $gitdir && git pull") == 0 or return undef;
+			system_install("cd $gitdir && git pull") == 0 or return undef;
 			return $gitdir;
 		}
 		if (defined $h->{'new'}) {
-			systemp("rm -rf $gitdir") == 0 or die;
+			system_install("rm -rf $gitdir") == 0 or die;
 		}
 	}
-	systemp("cd $dir && git clone --recursive $usebranch $source") == 0 or return undef;
+	system_install("cd $dir && git clone --recursive $usebranch $source") == 0 or return undef;
 	
 	
 	
@@ -881,15 +886,15 @@ sub hg_clone {
 	
 	if (-d $hgdir) {
 		if (defined $h->{'update'}) {
-			systemp("cd $hgdir && hg update") == 0 or die;
+			system_install("cd $hgdir && hg update") == 0 or die;
 			return $hgdir;
 		}
 		if (defined $h->{'new'}) {
-			systemp("rm -rf $hgdir") == 0 or die;
+			system_install("rm -rf $hgdir") == 0 or die;
 		}
 	}
 	
-	systemp("cd $dir && hg clone ".$source) == 0 or die;
+	system_install("cd $dir && hg clone ".$source) == 0 or die;
 	
 	return $hgdir;
 }
@@ -1159,7 +1164,7 @@ sub array_execute {
 		}
 		
 		print "exec:\n";
-		systemp($exec) == 0 or die;
+		system_install($exec) == 0 or die;
 	}
 	
 }
@@ -1253,7 +1258,7 @@ sub install_package {
 	
 
 	unless (-d $ptarget) {
-		systemp("mkdir -p ".$ptarget);
+		system_install("mkdir -p ".$ptarget);
 	}
 
 	
@@ -1343,8 +1348,8 @@ sub install_package {
 			
 			if ($d) {
 				$temp_dir = '/tmp/sodoku_deploy/';
-				systemp('rm -rf '.$temp_dir);
-				systemp('mkdir -p '.$temp_dir);
+				system_install('rm -rf '.$temp_dir);
+				system_install('mkdir -p '.$temp_dir);
 			} else {
 				$temp_dir_obj = File::Temp->newdir( TEMPLATE => 'deployXXXXX' );
 				$temp_dir = $temp_dir_obj->dirname.'/';
@@ -1414,7 +1419,7 @@ sub install_package {
 					
 					my $update_works = 0;
 					if (defined $h->{'update'}) {
-						if (systemp("go get -fix -u ".$source) == 0){
+						if (system_install("go get -fix -u ".$source) == 0){
 							$update_works = 1;
 						}
 					}
@@ -1441,17 +1446,17 @@ sub install_package {
 								chop($src_dir);
 							}
 							if (-d $src_dir) {
-								systemp("rm -rf ".$src_dir);
+								system_install("rm -rf ".$src_dir);
 								sleep(1);
 							}
 						} else {
-							systemp("mkdir -p ".$ENV{'GOPATH'});
+							system_install("mkdir -p ".$ENV{'GOPATH'});
 						}
 						
 					}
 					
 					if ($update_works == 0) {
-						systemp("cd ".$ENV{'GOPATH'}." && go get ".$source) == 0 or die;
+						system_install("cd ".$ENV{'GOPATH'}." && go get ".$source) == 0 or die;
 					}
 				} else {
 					die "repository type unknown";
@@ -1466,13 +1471,13 @@ sub install_package {
 				unless ($is_root_user) {
 					$pip_cmd = "sudo ".$pip_cmd;
 				}
-				systemp($pip_cmd) == 0 or die;
+				system_install($pip_cmd) == 0 or die;
 			} elsif ($st eq 'apt') {
 				my $apt_cmd =  "apt-get --force-yes -y install ".$source;
 				unless ($is_root_user) {
 					$apt_cmd = "sudo ".$apt_cmd;
 				}
-				systemp($apt_cmd) == 0 or die;
+				system_install($apt_cmd) == 0 or die;
 			} elsif ($st eq 'download') {
 				#simple download
 				
@@ -1487,32 +1492,32 @@ sub install_package {
 				
 				if (definedAndTrue($package_hash->{'source-extract'})) {
 					if ($downloaded_file =~ /\.tar\.gz$/) {
-						systemp("tar xvfz ".$downloaded_file." -C ".$temp_dir) ==0 or die;
+						system_install("tar xvfz ".$downloaded_file." -C ".$temp_dir) ==0 or die;
 					} elsif ($downloaded_file =~ /\.tgz$/) {
-						systemp("tar xvfz ".$downloaded_file." -C ".$temp_dir) ==0 or die;
+						system_install("tar xvfz ".$downloaded_file." -C ".$temp_dir) ==0 or die;
 					} elsif ($downloaded_file =~ /\.zip$/) {
-						systemp("unzip ".$downloaded_file." -d ".$temp_dir) ==0 or die;
+						system_install("unzip ".$downloaded_file." -d ".$temp_dir) ==0 or die;
 					} elsif ($downloaded_file =~ /\.tar\.bz2$/) {
 						
 						my ($tarfile) = $downloaded_file =~ /^(.*)\.bz2$/;
 						defined($tarfile) or die;
-						systemp("rm -f ".$tarfile);
-						systemp("bzip2 -d ".$downloaded_file) ==0 or die;
+						system_install("rm -f ".$tarfile);
+						system_install("bzip2 -d ".$downloaded_file) ==0 or die;
 						
 						unless (-e $tarfile || $d) {
 							die "tarfile \"$tarfile\" not found";
 						}
 						
-						systemp("tar xvf ".$tarfile." -C ".$temp_dir) ==0 or die;
+						system_install("tar xvf ".$tarfile." -C ".$temp_dir) ==0 or die;
 						
 						
 					} elsif ($downloaded_file =~ /\.gz$/) {
 						my ($uncompressed) = $downloaded_file =~ /^(.*)\.gz$/;
 						if (defined $h->{'new'}) {
-							systemp("rm -f ".$temp_dir.$uncompressed);
+							system_install("rm -f ".$temp_dir.$uncompressed);
 						}
 						
-						systemp("gzip -d ".$downloaded_file) ==0 or die;
+						system_install("gzip -d ".$downloaded_file) ==0 or die;
 						
 						
 						
@@ -1579,17 +1584,17 @@ sub install_package {
 			
 			
 			if (-e $build_dir.'configure') {
-				systemp("cd $build_dir && ./configure --prefix=$ptarget") == 0 or die;
+				system_install("cd $build_dir && ./configure --prefix=$ptarget") == 0 or die;
 			}
 			
 			if (-e $build_dir.'Makefile' || $d) {
-				systemp("cd $build_dir && make")== 0 or die; #TODO make -j4
+				system_install("cd $build_dir && make")== 0 or die; #TODO make -j4
 			} else {
 				die "Makefile in $build_dir not found";
 			}
 			if ($build_type eq 'make-install') {
 				if (-e $build_dir.'Makefile'  || $d) {
-					systemp("cd $build_dir && make install")== 0 or die; #TODO make -j4
+					system_install("cd $build_dir && make install")== 0 or die; #TODO make -j4
 				} else {
 					die "Makefile in $build_dir not found";
 				}
@@ -1615,7 +1620,7 @@ sub install_package {
 					} else {
 						$install_target = $ENV{"HOME"}.'/bin/';
 					}
-					systemp('mkdir -p '.$install_target);
+					system_install('mkdir -p '.$install_target);
 					
 				}
 				
@@ -1625,10 +1630,10 @@ sub install_package {
 							
 				foreach my $install_file (@install_files_array) {
 					
-					systemp('cp -f '.$build_dir.$install_file.' '.$install_target) == 0 or die;
+					system_install('cp -f '.$build_dir.$install_file.' '.$install_target) == 0 or die;
 					
 					if ($inst_type eq 'binary') {
-						systemp('chmod +x '.$install_target.$install_file) == 0 or die;
+						system_install('chmod +x '.$install_target.$install_file) == 0 or die;
 					}
 					
 				}
@@ -1641,7 +1646,7 @@ sub install_package {
 		
 		
 		if (definedAndTrue($package_hash->{'source-temporary'})  && $d) {
-			systemp('rm -rf '.$temp_dir)
+			system_install('rm -rf '.$temp_dir)
 		}
 		
 		chdirp($ptarget);
@@ -1703,7 +1708,7 @@ sub install_package {
 	
 	if (defined $package_hash->{'test'}) {
 		print "test_exec:\n";
-		systemp($package_hash->{'test'}) == 0 or die;
+		system_install($package_hash->{'test'}) == 0 or die;
 	}
 	
 
@@ -1927,7 +1932,7 @@ if (substr($target, -1, 1) ne "/") {
 }
 
 if (defined($h->{'forcetarget'}) && ! -d $target) {
-	systemp("mkdir -p ".$target);
+	system_install("mkdir -p ".$target);
 }
 
 if (defined $target) {
