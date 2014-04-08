@@ -114,7 +114,7 @@ sub createDockerFile {
 	
 	print "------\nDockerfile\n";
 	print $dockerfile;
-	exit(0);
+	#exit(0);
 	#my $tag = 'wgerlach/'.$package.':'.$version_str;
 	
 	#print "tag: \"$tag\"\n";
@@ -287,7 +287,7 @@ sub createDockerImage {
 sub upload_docker_image_to_shock {
 	
 	
-	my ($image_tarfile, $repo, $tag, $image_id, $docker_base_image) = @_;
+	my ($image_tarfile, $repo, $tag, $image_id, $docker_base_image, $dockerfile) = @_;
 	### upload image to SHOCK ###
 	#check token
 	#check server
@@ -312,6 +312,11 @@ sub upload_docker_image_to_shock {
 		$shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
 	}
 	
+	
+	require MIME::Base64;
+	my $dockerfile_encoded = encode_base64($dockerfile);
+	
+	
 	my $json = JSON->new;
 	my $docker_version_info_str = $json->encode( $docker_version_info );
 
@@ -323,6 +328,7 @@ sub upload_docker_image_to_shock {
 						' "name":"'.$repotag.'",'.
 						' "id":"'.$image_id.'",'.
 						' "base_image_tag":"'.$docker_base_image.'"'.
+						' "dockerfile":"'.$dockerfile_encoded.'"'.
 						'}';
 	
 	print "upload image to SHOCK docker repository\n";
@@ -346,80 +352,6 @@ sub upload_docker_image_to_shock {
 	
 }
 
-sub upload_dockerfile_to_shock {
-	my ($dockerfile, $repo, $tag, $docker_base_image) = @_;
-	### upload image to SHOCK ###
-	#check token
-	#check server
-	
-	
-	unless (defined $tag) {
-		die;
-	}
-	
-	
-	my $repotag = $repo.':'.$tag;
-	
-	
-	require SHOCK::Client;
-	
-	
-	if (!defined($ENV{'GLOBUSONLINE'}) ||  $ENV{'GLOBUSONLINE'} eq '') {
-		die 'GLOBUSONLINE token not found';
-	}
-	
-	
-	
-	# prepare tar-file
-	write_file('Dockerfile', $dockerfile ) ;
-	
-	my $tar_filename = $repotag.'.dockerfile.tar';
-	$tar_filename =~ s/[\/\:]/_/g;
-	
-	$d = 0;
-	system_install("tar cf ".$tar_filename." Dockerfile") == 0 or die;
-	system_install("rm -f Dockerfile") == 0 or die;
-	$d = 1;
-	
-
-	
-	unless (defined $shock) {
-		$shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
-	}
-	
-	my $json = JSON->new;
-	my $docker_version_info_str = $json->encode( $docker_version_info );
-	
-	
-	my $shock_json =	'{'.
-						' "temporary":"1",'.
-						' "type":"dockerfile",'.
-						' "docker_version":'.$docker_version_info_str.','.
-						' "tag":"'.$repotag.'",'.
-						' "base_image_tag":"'.$docker_base_image.'"'.
-						'}';
-	
-	#print "tag: \"$tag\"\n";
-	#print "docker_base_image: \"$docker_base_image\"\n";
-	#print "shock_json: \"$shock_json\"\n";
-	#exit(0);
-	print "upload dockerfile to SHOCK docker repository\n";
-	my $up_result = $shock->upload('file' => $tar_filename, 'attr' => $shock_json) || die;
-	
-	print Dumper($up_result);
-	unless ($up_result->{'status'} == 200) {
-		die;
-	}
-	
-	my $shock_node_id = $up_result->{'data'}->{'id'} || die "SHOCK node id not found for uploaded dockerfile";
-	
-	$shock->permisson_readable($shock_node_id) || die "error makeing node readable";
-	print "Dockerfile uploaded.\n";
-	
-	
-	return $shock_node_id;
-	
-}
 
 sub dockerSocket {
 	my ($request_type, $endpoint) = @_;
@@ -1746,7 +1678,7 @@ sub install_package {
 
 print "deploy arguments: ".join(' ', @ARGV)."\n";
 
-GetOptions ($h, 'target=s', 'data_target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'docker', 'dockerfile', 'dockerimage','docker_show_only', 'docker_reuse_image', 'docker_noupload', 'private', 'tag=s', 'nossl', 'forcetarget', 'list', 'create', 'nodeps');
+GetOptions ($h, 'target=s', 'data_target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'docker',  'dockerimage','docker_show_only', 'docker_reuse_image', 'docker_noupload', 'private', 'tag=s', 'nossl', 'forcetarget', 'list', 'create', 'nodeps');
 
 if ( @ARGV == 0 && ! defined $h->{'list'}) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
@@ -1790,12 +1722,11 @@ if ( @ARGV == 0 && ! defined $h->{'list'}) {
 
 
 
-if (defined($h->{'docker'}) || defined($h->{'dockerfile'}) || defined($h->{'dockerimage'})) {
+if (defined($h->{'docker'}) ||  defined($h->{'dockerimage'})) {
 	$d = 1;
 }
 
 if (defined($h->{'docker'})) {
-	$h->{'dockerfile'} = 1;
 	$h->{'dockerimage'} = 1;
 }
 
@@ -2132,12 +2063,6 @@ if ($d) {
 	}
 	
 	
-	# upload Dockerfile
-	if (defined($h->{'dockerfile'}) && 0) {
-		unless (defined $h->{'docker_noupload'}) {
-			my $shock_node_id = upload_dockerfile_to_shock($dockerfile, $repo, $tag, $docker_base_image) || die;
-		}
-	}
 	
 	if (defined($h->{'dockerimage'})) {
 		# create docker image
@@ -2147,7 +2072,7 @@ if ($d) {
 		
 		# upload docker image
 		unless (defined $h->{'docker_noupload'}) {
-			my $shock_node_id = upload_docker_image_to_shock($image_tarfile, $repo, $tag, $image_id, $docker_base_image) || die;
+			my $shock_node_id = upload_docker_image_to_shock($image_tarfile, $repo, $tag, $image_id, $docker_base_image, $dockerfile) || die;
 		}
 	}
 }
