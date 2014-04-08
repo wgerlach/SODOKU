@@ -36,22 +36,6 @@
          }
       ]
    },
-   "KBase/AMETHST" : {
-      "set-env" : {
-         "PATH" : "${ptarget}AMETHST:$PATH"
-      },
-      "source-git" : "https://github.com/MG-RAST/AMETHST",
-      "depends" : [
-         "wgerlach/MG-RAST-Tools",
-         "wgerlach/AWE-git",
-         "SHOCK-lib"
-      ],
-      "subpackages" : [
-         {
-            "source-pip" : "qcli"
-         }
-      ]
-   },
    "aweclient/cfg-awec.cfg" : {
       "set-ini-values" : {
          "cfg-string" : "${arguments}",
@@ -358,6 +342,9 @@
          }
       ]
    },
+   "deploy-deps" : {
+      "source-apt" : "git cpanminus python-setuptools python-dev checkinstall"
+   },
    "AWE" : {
       "source-go" : "github.com/MG-RAST/AWE/...",
       "depends" : [
@@ -368,9 +355,6 @@
             "source-apt" : "mongodb-server"
          }
       ]
-   },
-   "deploy-deps" : {
-      "source-apt" : "git cpanminus python-setuptools python-dev checkinstall"
    },
    "kbase_bootstrap_mgrast" : {
       "build-exec" : "cd ${source-dir} ; ./bootstrap_modules.pl -d ${target}runtime -m modules-mgrast-pipeline.dat",
@@ -483,6 +467,17 @@
          }
       ]
    },
+   "picrust_symlink" : {
+      "_comment" : "makes symlink in QIIME/picrust installation to picrust_data",
+      "depends" : [
+         "picrust_data"
+      ],
+      "exec" : [
+         "mkdir -p $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data",
+         "ln --force -s ${target}picrust_data/16S_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/16S_13_5_precalculated.tab.gz",
+         "ln --force -s ${target}picrust_data/ko_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/ko_13_5_precalculated.tab.gz"
+      ]
+   },
    "bowtie" : {
       "build-type" : "make",
       "source-temporary" : 1,
@@ -502,15 +497,18 @@
          "bowtie-inspect"
       ]
    },
-   "picrust_symlink" : {
-      "_comment" : "makes symlink in QIIME/picrust installation to picrust_data",
-      "depends" : [
-         "picrust_data"
+   "gg_otus" : {
+      "source" : "ftp://greengenes.microbio.me/greengenes_release/gg_${v1}_${v2}/gg_${v1}_${v2}_otus.tar.gz",
+      "source-extract" : 1,
+      "version" : [
+         13,
+         5
       ],
+      "data" : 1,
+      "_comment" : "creates symlink for use in QIIME",
       "exec" : [
-         "mkdir -p $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data",
-         "ln --force -s ${target}picrust_data/16S_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/16S_13_5_precalculated.tab.gz",
-         "ln --force -s ${target}picrust_data/ko_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/ko_13_5_precalculated.tab.gz"
+         "mkdir -p $QIIME/../gg_otus-${v1}_${v2}-release/rep_set",
+         "ln --force -s ${target}gg_${v1}_${v2}_otus $QIIME/../gg_otus-${v1}_${v2}-release/rep_set"
       ]
    },
    "samtools" : {
@@ -528,20 +526,6 @@
       ],
       "install-binary" : [
          "samtools"
-      ]
-   },
-   "gg_otus" : {
-      "source" : "ftp://greengenes.microbio.me/greengenes_release/gg_${v1}_${v2}/gg_${v1}_${v2}_otus.tar.gz",
-      "source-extract" : 1,
-      "version" : [
-         13,
-         5
-      ],
-      "data" : 1,
-      "_comment" : "creates symlink for use in QIIME",
-      "exec" : [
-         "mkdir -p $QIIME/../gg_otus-${v1}_${v2}-release/rep_set",
-         "ln --force -s ${target}gg_${v1}_${v2}_otus $QIIME/../gg_otus-${v1}_${v2}-release/rep_set"
       ]
    },
    "qiime-wo-deprecated" : {
