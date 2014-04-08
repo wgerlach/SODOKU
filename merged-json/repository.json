@@ -1,4 +1,10 @@
 {
+   "aweclient/cfg-awe.cfg" : {
+      "set-ini-values" : {
+         "cfg-string" : "${arguments}",
+         "file" : "${target}awe.cfg"
+      }
+   },
    "kbase-modules" : {
       "depend-function" : [
          {
@@ -9,12 +15,6 @@
       ],
       "ptarget" : "${target}dev_container",
       "_comment" : "gets requested modules and dependencies"
-   },
-   "aweclient/cfg-awe.cfg" : {
-      "set-ini-values" : {
-         "cfg-string" : "${arguments}",
-         "file" : "${target}awe.cfg"
-      }
    },
    "kbase-mgrast-update" : {
       "ptarget" : "/kb/dev_container/modules/mgrast_pipeline/",
@@ -483,17 +483,6 @@
          }
       ]
    },
-   "picrust_symlink" : {
-      "_comment" : "makes symlink in QIIME/picrust installation to picrust_data",
-      "depends" : [
-         "picrust_data"
-      ],
-      "exec" : [
-         "mkdir -p $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data",
-         "ln --force -s ${target}picrust_data/16S_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/16S_13_5_precalculated.tab.gz",
-         "ln --force -s ${target}picrust_data/ko_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/ko_13_5_precalculated.tab.gz"
-      ]
-   },
    "bowtie" : {
       "build-type" : "make",
       "source-temporary" : 1,
@@ -511,6 +500,17 @@
          "bowtie",
          "bowtie-build",
          "bowtie-inspect"
+      ]
+   },
+   "picrust_symlink" : {
+      "_comment" : "makes symlink in QIIME/picrust installation to picrust_data",
+      "depends" : [
+         "picrust_data"
+      ],
+      "exec" : [
+         "mkdir -p $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data",
+         "ln --force -s ${target}picrust_data/16S_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/16S_13_5_precalculated.tab.gz",
+         "ln --force -s ${target}picrust_data/ko_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/ko_13_5_precalculated.tab.gz"
       ]
    },
    "samtools" : {
