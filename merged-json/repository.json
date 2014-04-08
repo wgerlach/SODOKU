@@ -94,7 +94,7 @@
       "source-temporary" : 1,
       "source" : "git://github.com/qiime/qiime-deploy.git",
       "test" : ". ${target}qiime_software/activate.sh ; print_qiime_config.py -t",
-      "build-exec" : "cd ${source-dir} ; python qiime-deploy.py $target/qiime_software/ -f ${1} --force-remove-failed-dirs",
+      "build-exec" : "cd ${source-dir} ; python qiime-deploy.py ${target}/qiime_software/ -f ${1} --force-remove-failed-dirs",
       "_comment" : "QIIME uses a configuration file like qiime.conf for the deployment, which has to be given as an argument to this package",
       "subpackages" : [
          {
@@ -289,6 +289,9 @@
       "install-binary" : [
          "bowtie2*"
       ]
+   },
+   "qiime-pip" : {
+      "source-pip" : "numpy==1.7.1 qiime"
    },
    "usearch" : {
       "source" : {
