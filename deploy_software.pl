@@ -315,7 +315,7 @@ sub upload_docker_image_to_shock {
 	
 	require MIME::Base64;
 	my $dockerfile_encoded = MIME::Base64::encode_base64($dockerfile);
-	$dockerfile_encoded =~ s/\n//g;
+	#$dockerfile_encoded =~ s/\n//g;
 	print "dockerfile_encoded:\n$dockerfile_encoded\n";
 	
 	my $json = JSON->new;
@@ -328,7 +328,7 @@ sub upload_docker_image_to_shock {
 						' "docker_version":'.$docker_version_info_str.','.
 						' "name":"'.$repotag.'",'.
 						' "id":"'.$image_id.'",'.
-						' "base_image_tag":"'.$docker_base_image.'"'.
+						' "base_image_tag":"'.$docker_base_image.'",'.
 						' "dockerfile":"'.$dockerfile_encoded.'"'.
 						'}';
 	print "shock_json:\n$shock_json\n";
