@@ -1723,28 +1723,6 @@ if ($h->{'help'} || keys(%$h)==0) {
 	exit(0);
 }
 
-if ( @ARGV == 0 && ! defined $h->{'list'}) {
-	print "usage: deploy_software.pl [--target=] [packages]\n";
-	#print "default target=$target\n";
-	print "example: deploy_software.pl --target=/home/ubuntu/ aweclient\n";
-	print "     --data_target different target for packages marked with data=1\n";
-	print "     --update to update existing packages if possible \n";
-	print "     --new to delete packages before cloning \n";
-	print "     --all to install all packages in repository \n";
-	print "     --ignore=package1,package2\n";
-	print "     --list\n";
-	print "     --repo_file\n";
-	print "     --repo_url\n";
-	print "     --create  write repository.json by merging multiple json files\n";
-	print "     --nodeps do not install dependencies\n";
-	print "     \n";
-	print "     --docker create and upload Dockerfile and Dockerimage\n";
-	print "     --dockerfile create and upload Dockerfile\n";
-	print "     --dockerimage create and upload Dockerimage\n";
-	exit 1;
-}
-
-
 
 #my $error   = '';
 #my $package = 'SHOCK::Client';
