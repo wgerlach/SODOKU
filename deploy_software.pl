@@ -1684,8 +1684,8 @@ sub install_package {
 print "deploy arguments: ".join(' ', @ARGV)."\n";
 
 
-
-my ($h, $help_text) = &parse_options (
+my $help_text;
+($h, $help_text) = &parse_options (
 'name' => 'SODOKU deploy software',
 'version' => '1',
 'synopsis' => 'deploy_software.pl',
