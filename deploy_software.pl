@@ -178,7 +178,7 @@ sub createDockerImage {
 	
 	
 	
-	unless (defined($h->{'docker_show_only'}) || defined($image_id) ) {
+	unless (defined($image_id) ) {
 		open(my $fh, "|-", $docker_build_cmd)
 			or die "cannot run docker: $!";
 	
@@ -1683,9 +1683,45 @@ sub install_package {
 
 print "deploy arguments: ".join(' ', @ARGV)."\n";
 
-GetOptions ($h,
-'target=s', 'data_target=s', 'version=s', 'update', 'new', 'root', 'all', 'repo_file=s', 'repo_url=s', 'ignore=s', 'forcetarget', 'list', 'create', 'nodeps', 'nossl',
-'docker', 'base_image', 'docker_show_only', 'docker_reuse_image', 'docker_noupload', 'private', 'tag=s');
+
+
+my ($h, $help_text) = &parse_options (
+'name' => 'SODOKU deploy software',
+'version' => '1',
+'synopsis' => 'deploy_software.pl',
+'examples' => 'ls',
+'authors' => 'Wolfgang Gerlach',
+'options' => [
+'deploy:',
+	['target=s', ''],
+	['data_target=s', 'different target for packages marked with data=1'],
+	['version=s', ''],
+	['update', 'to update existing packages if possible'],
+	['new', 'delete packages before cloning'],
+	['root', ''],
+	['all', ' to install all packages in repository'],
+	['repo_file=s', ''],
+	['repo_url=s', ''],
+	['ignore=s', 'ignore packages'],
+	['forcetarget', ''],
+	['list', ''],
+	['create', 'write repository.json by merging multiple json files'],
+	['nodeps', 'do not install dependencies'],
+	['nossl', ''],
+'',
+'docker image ceration:'
+	['docker', 'create docker image'],
+	['base_image', ''],
+	['docker_reuse_image', ''],
+	['docker_noupload', ''],
+	['private', 'do make image public on shock server'],
+	['tag=s', 'specifiy image name, e.g. me/mytool:1.0.1'],
+]);
+
+if ($h->{'help'} || keys(%$h)==0) {
+	print $help_text;
+	exit(0);
+}
 
 if ( @ARGV == 0 && ! defined $h->{'list'}) {
 	print "usage: deploy_software.pl [--target=] [packages]\n";
