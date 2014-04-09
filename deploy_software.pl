@@ -315,7 +315,7 @@ sub upload_docker_image_to_shock {
 	
 	require MIME::Base64;
 	my $dockerfile_encoded = MIME::Base64::encode_base64($dockerfile);
-	
+	print "dockerfile_encoded:\n$dockerfile_encoded\n";
 	
 	my $json = JSON->new;
 	my $docker_version_info_str = $json->encode( $docker_version_info );
