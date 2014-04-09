@@ -1709,7 +1709,7 @@ my $help_text;
 	['nodeps', 'do not install dependencies'],
 	['nossl', ''],
 '',
-'docker image ceration:'
+'docker image ceration:',
 	['docker', 'create docker image'],
 	['base_image', ''],
 	['docker_reuse_image', ''],
