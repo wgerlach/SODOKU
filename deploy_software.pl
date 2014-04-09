@@ -331,6 +331,8 @@ sub upload_docker_image_to_shock {
 						' "base_image_tag":"'.$docker_base_image.'"'.
 						' "dockerfile":"'.$dockerfile_encoded.'"'.
 						'}';
+	print "shock_json:\n$shock_json\n";
+	
 	
 	print "upload image to SHOCK docker repository\n";
 	my $up_result = $shock->upload('file' => $image_tarfile, 'attr' => $shock_json) || die;
