@@ -1739,7 +1739,7 @@ if ($h->{'help'} || keys(%$h)==0) {
 #}
 
 
-if (defined($h->{'base_image'})
+if (defined($h->{'base_image'}) {
 	$docker_base_image = $h->{'base_image'};
 }
 
