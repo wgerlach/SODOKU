@@ -1762,7 +1762,7 @@ my $help_text;
 '',
 'other docker operations:',
 	['remove_base_layers=s', 'combine with --base_image and --tag'],
-	['upload'			'upload tar-balled image to shock'],
+	['upload',	'upload tar-balled image to shock'],
 	['test']
 ]);
 
