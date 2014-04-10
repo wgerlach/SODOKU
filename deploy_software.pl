@@ -433,18 +433,18 @@ sub dockerSocket {
 }
 
 sub get_diff_layers {
-	my ($docker_image) = @_;
+	my ($image_id) = @_;
 	
-	my $history = dockerSocket('GET', "/images/$docker_image/history");
+	my $history = dockerSocket('GET', "/images/$image_id/history");
 
 	my $images = dockerSocket('GET', "/images/json"); # maybe ?all=0 or ?all=1
 	
 	
 	my $imageid_to_tags={};
 	foreach my $image_obj (@{$images}) {
-		my $image_id = $image_obj->{'Id'} || die "Id not found";
+		my $id = $image_obj->{'Id'} || die "Id not found";
 		my $repotags =  $image_obj->{'RepoTags'} || die "RepoTags not found";
-		$imageid_to_tags->{$image_id} = $repotags;
+		$imageid_to_tags->{$id} = $repotags;
 	}
 	
 	
@@ -455,21 +455,46 @@ sub get_diff_layers {
 	
 	
 	#exit(0);
-	my @base_layers= ();
+	my @ancestor_images= ();
 
-	foreach my $layer (@{$history}) {
+	unless ($history->[0]->{'Id'} eq $image_id) {
+		die "history broken ?";
+	}
+	
+	# check history of image
+	for (my $i = 1; $i < @{$history}; ++$i) {
+		
+		my $layer = $history->[$i];
 		my $id = $layer->{'Id'};
+		unless (defined $id) {
+			die;
+		}
 		
 		if (defined $imageid_to_tags->{$id}) {
-			print $id." layer has tag: ".join(',', @{$imageid_to_tags->{$id}})."\n";
+			print $id." layer has image tag: ".join(',', @{$imageid_to_tags->{$id}})."\n";
+			push(@ancestor_images, $id);
+			
+			if (@ancestor_images == 1) {
+				my $parent = $ancestor_images[0];
+				# parent image, make sure it is in SHOCK
+				print "check if parent image $parent is in SHOCK\n";
+				
+				unless (defined $shock) {
+					$shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
+				}
+
+				my $node_obj = $shock->query({'type' => 'dockerimage', 'id' => $parent})
+				print 'parent: '.Dumper($node_obj);
+			}
+			
+			
+			
 		} else {
 			print $id." layer\n";
 		}
 		
-		unless (defined $id) {
-			die;
-		}
-		push(@base_layers, $id);
+		
+		
 	}
 
 	#print "found ".@base_layers." layers for image ".$docker_base_image."\n";
