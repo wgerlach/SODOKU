@@ -502,7 +502,7 @@ sub get_diff_layers {
 #		die;
 #	}
 	
-	return @base_layers;
+	return ();
 }
 
 sub addDockerCmd {
