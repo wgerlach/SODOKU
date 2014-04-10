@@ -1834,7 +1834,7 @@ if (defined($h->{'remove_base_layers'})) {
 	
 	my ($repo, $tag) = split(',', $h->{'tag'});
 		
-	remove_base_from_image_and_set_tag($image_tarfile, $imagediff_tarfile, $repo, $tag, $image_id);
+	remove_base_from_image_and_set_tag($image_tarfile, $imagediff_tarfile, $repo, $tag, "image_id");
 
 	
 	
