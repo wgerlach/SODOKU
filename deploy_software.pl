@@ -453,11 +453,18 @@ sub get_diff_layers {
 	
 	
 	
-	exit(0);
+	#exit(0);
 	my @base_layers= ();
 
 	foreach my $layer (@{$history}) {
 		my $id = $layer->{'Id'};
+		
+		if (defined $imageid_to_tags->{$id}) {
+			print $id." layer has tag: ".join(',', @{$imageid_to_tags->{$id}})."\n";
+		} else {
+			print $id." layer\n";
+		}
+		
 		unless (defined $id) {
 			die;
 		}
