@@ -15,7 +15,7 @@ or die "USAGEPOD is missing:\n sudo apt-get install cpanminus \n sudo cpanm git:
 
 
 use File::Temp;
-#use LWP::UserAgent;
+use LWP::UserAgent;
 use Data::Dumper;
 #eval "use Try::Tiny; 1"
 #or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm install Try::Tiny";
