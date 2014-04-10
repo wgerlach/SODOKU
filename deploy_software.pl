@@ -483,7 +483,7 @@ sub get_diff_layers {
 					$shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
 				}
 
-				my $node_obj = $shock->query({'type' => 'dockerimage', 'id' => $parent})
+				my $node_obj = $shock->query({'type' => 'dockerimage', 'id' => $parent});
 				print 'parent: '.Dumper($node_obj);
 			}
 			
