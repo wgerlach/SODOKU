@@ -439,7 +439,19 @@ sub get_diff_layers {
 
 	my $images = dockerSocket('GET', "/images/json"); # maybe ?all=0 or ?all=1
 	
+	
+	my $imageid_to_tags={};
+	foreach my $image_obj (@{$images}) {
+		my $image_id = $image_obj->{'Id'} || die "Id not found";
+		my $repotags =  $image_obj->{'RepoTags'} || die "RepoTags not found";
+		$imageid_to_tags->{$image_id} = $repotags;
+	}
+	
+	
 	print Dumper($images);
+	print Dumper($imageid_to_tags);
+	
+	
 	
 	exit(0);
 	my @base_layers= ();
