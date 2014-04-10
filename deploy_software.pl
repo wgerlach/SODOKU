@@ -433,7 +433,7 @@ sub dockerSocket {
 }
 
 sub get_diff_layers {
-	my $docker_image = @_;
+	my ($docker_image) = @_;
 	
 	my $history = dockerSocket('GET', "/images/$docker_image/history");
 
