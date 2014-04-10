@@ -40,6 +40,9 @@ my $author = 'Wolfgang Gerlach';
 
 my $shock_server = 'http://shock.metagenomics.anl.gov:80';
 
+# for temporary files
+my $datadir='/mnt/tmp/';
+my $tartemp = $datadir.'tar_temp/';
 
 #########################################
 
@@ -59,7 +62,7 @@ my @docker_file_content=();
 my $docker_deps={};
 
 my $is_root_user = undef;
-my @base_layers=();
+
 
 
 
@@ -160,11 +163,11 @@ sub createDockerImage {
 		
 	
 	
-	my $cwd = getcwd;
-	my $datadir=$cwd.'/data/';
+	#my $cwd = getcwd;
+	
 	
 	unless (-d $datadir) {
-		die "data dir noct found";
+		die "data dir not found";
 	}
 	
 		
@@ -243,10 +246,34 @@ sub createDockerImage {
 	
 	# open and modify tar archive
 	
-	my $tartemp = $datadir.'tar_temp/';
+	
+	remove_base_from_image_and_set_tag($image_tarfile, $imagediff_tarfile, $repo, $tag, $image_id);
+		
+	
+	print "gzip tar file\n";
+	
+	systemp("gzip ".$imagediff_tarfile)==0 or die;
+	
+	my $imagediff_tarfile_gz = $imagediff_tarfile.'.gz';
+	unless (-e $imagediff_tarfile_gz) {
+		die;
+	}
+	
+	systemp("rm -f ".$image_tarfile);
+	
+	return [$imagediff_tarfile_gz, $image_id, $docker_base_image];
+}
+
+
+sub remove_base_from_image_and_set_tag {
+	
+	
+	my ($image_tarfile, $imagediff_tarfile, $repo, $tag, $image_id) = @_;
 	
 	systemp("rm -rf $tartemp ; mkdir -p $tartemp ; rm -f ".$imagediff_tarfile);
 	systemp("cd $tartemp && tar xvf ".$image_tarfile);
+	
+	my @base_layers = get_base_layers($docker_base_image);
 	
 	foreach my $layer (@base_layers) {
 		my $layer_dir = $tartemp.$layer;
@@ -271,18 +298,7 @@ sub createDockerImage {
 	
 	systemp($py_cmd) == 0 or die;
 	
-	print "gzip tar file\n";
-	
-	systemp("gzip ".$imagediff_tarfile)==0 or die;
-	
-	my $imagediff_tarfile_gz = $imagediff_tarfile.'.gz';
-	unless (-e $imagediff_tarfile_gz) {
-		die;
-	}
-	
-	systemp("rm -f ".$image_tarfile);
-	
-	return [$imagediff_tarfile_gz, $image_id, $docker_base_image];
+	return;
 }
 
 
@@ -416,6 +432,33 @@ sub dockerSocket {
 
 }
 
+sub get_diff_layers {
+	my $docker_image = @_;
+	
+	my $history = dockerSocket('GET', "/images/$docker_image/history");
+
+	my $images = dockerSocket('GET', "/images/json"); # maybe ?all=0 or ?all=1
+	
+	print Dumper($images);
+	
+	exit(0);
+	my @base_layers= ();
+
+	foreach my $layer (@{$history}) {
+		my $id = $layer->{'Id'};
+		unless (defined $id) {
+			die;
+		}
+		push(@base_layers, $id);
+	}
+
+	#print "found ".@base_layers." layers for image ".$docker_base_image."\n";
+	#if (@base_layers == 0) {
+#		die;
+#	}
+	
+	return @base_layers;
+}
 
 sub addDockerCmd {
 	my $docker_line = 'RUN '.join(' ', @_);
@@ -1693,29 +1736,33 @@ my $help_text;
 'authors' => 'Wolfgang Gerlach',
 'options' => [
 'deploy:',
-	['target=s', ''],
-	['data_target=s', 'different target for packages marked with data=1'],
-	['version=s', ''],
-	['update', 'to update existing packages if possible'],
-	['new', 'delete packages before cloning'],
-	['root', ''],
-	['all', ' to install all packages in repository'],
-	['repo_file=s', ''],
-	['repo_url=s', ''],
-	['ignore=s', 'ignore packages'],
-	['forcetarget', ''],
-	['list', ''],
-	['create', 'write repository.json by merging multiple json files'],
-	['nodeps', 'do not install dependencies'],
-	['nossl', ''],
+	['target=s',		''],
+	['data_target=s',	'different target for packages marked with data=1'],
+	['version=s',		''],
+	['update',			'to update existing packages if possible'],
+	['new',				'delete packages before cloning'],
+	['root',			''],
+	['all',				'to install all packages in repository'],
+	['repo_file=s',		''],
+	['repo_url=s',		''],
+	['ignore=s',		'ignore packages'],
+	['forcetarget',		''],
+	['list',			''],
+	['create',			'write repository.json by merging multiple json files'],
+	['nodeps',			'do not install dependencies'],
+	['nossl',			''],
 '',
-'docker image ceration:',
-	['docker', 'create docker image'],
-	['base_image', ''],
+'docker image creation:',
+	['docker',	'create docker image'],
+	['base_image',		''],
 	['docker_reuse_image', ''],
 	['docker_noupload', ''],
-	['private', 'do make image public on shock server'],
-	['tag=s', 'specifiy image name, e.g. me/mytool:1.0.1'],
+	['private',			'do make image public on shock server'],
+	['tag=s',			'specifiy image name, e.g. me/mytool:1.0.1'],
+'',
+'other docker operations:',
+	['remove_base_layers=s', 'combine with --base_image and --tag'],
+	['upload'			'upload tar-balled image to shock']
 ]);
 
 if ($h->{'help'} || keys(%$h)==0) {
@@ -1723,20 +1770,6 @@ if ($h->{'help'} || keys(%$h)==0) {
 	exit(0);
 }
 
-
-#my $error   = '';
-#my $package = 'SHOCK::Client';
-#{
-#	no strict;
-#	eval "require $package;";
-#	$error = $@;
-#}
-#if ($error) {
-#	$shock_client_module_available = 0;
-#} else {
-#	#my $resource_obj = $package->new($params);
-#	$shock_client_module_available = 1;
-#}
 
 
 if (defined($h->{'base_image'})) {
@@ -1776,6 +1809,34 @@ if (defined($d) && ($d == 1)) {
 		my $error = $@;
 		print "not using File::Slurp: $error\n";
 	};
+}
+
+if (defined($h->{'test'})) {
+
+	get_diff_layers("test:0.1");
+	exit(0);
+}
+
+if (defined($h->{'remove_base_layers'})) {
+	
+	
+	my $image_tarfile = $h->{'remove_base_layers'};
+	
+	unless ($image_tarfile =~ /\.tar$/) {
+		die "tar expected";
+	}
+	
+	my ($imagediff_tarfile) = $image_tarfile =~ /^(.*)\.tar$/;
+	$imagediff_tarfile .= ".diff.tar";
+	
+	my ($repo, $tag)
+	
+	my ($repo, $tag) = split(/,/, $h->{'tag'});
+		
+	remove_base_from_image_and_set_tag($image_tarfile, $imagediff_tarfile, $repo, $tag, $image_id);
+
+	
+	
 }
 
 
@@ -2055,22 +2116,7 @@ if ($d) {
 	
 	
 	
-	my $history = dockerSocket('GET', "/images/$docker_base_image/history");
-	
-	
-	
-	foreach my $layer (@{$history}) {
-		my $id = $layer->{'Id'};
-		unless (defined $id) {
-			die;
-		}
-		push(@base_layers, $id);
-	}
-	
-	print "found ".@base_layers." layers for image ".$docker_base_image."\n";
-	if (@base_layers == 0) {
-		die;
-	}
+
 	
 	
 	
