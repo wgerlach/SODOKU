@@ -1830,9 +1830,9 @@ if (defined($h->{'remove_base_layers'})) {
 	my ($imagediff_tarfile) = $image_tarfile =~ /^(.*)\.tar$/;
 	$imagediff_tarfile .= ".diff.tar";
 	
-	my ($repo, $tag)
+	#my ($repo, $tag)
 	
-	my ($repo, $tag) = split(/,/, $h->{'tag'});
+	my ($repo, $tag) = split(',', $h->{'tag'});
 		
 	remove_base_from_image_and_set_tag($image_tarfile, $imagediff_tarfile, $repo, $tag, $image_id);
 
