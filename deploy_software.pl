@@ -448,7 +448,8 @@ sub get_diff_layers {
 	}
 	
 	
-	print Dumper($images);
+	print "history: ".Dumper($history);
+	print "images: ". Dumper($images);
 	print Dumper($imageid_to_tags);
 	
 	
