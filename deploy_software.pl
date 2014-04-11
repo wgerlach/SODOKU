@@ -2077,7 +2077,7 @@ if (defined $h->{'save_image'}) {
 	my $image_obj = get_image_object($h->{'save_image'});
 	
 	my $name  = $image_obj->{'name'};
-	$name =~ /[\:\_\/]/\_/g;
+	$name =~ s/[\:\_\/]/\_/g;
 	
 	my $filename = $image_obj->{'id'}.'_'.$name.'.tar';
 	
