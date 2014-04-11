@@ -445,11 +445,6 @@ sub findImageinShock {
 	my $node_obj = $shock->query('type' => 'dockerimage', 'id' => $image_id);
 	print 'node: '.Dumper($node_obj);
 	
-	if (@{} == 0) {
-			} elsif (@{$node_obj->{'data'}} > 1) {
-		die "parent image  not unique !";
-	}
-	
 	my @nodes = ();
 	
 	if (defined $node_obj->{'data'}) {
