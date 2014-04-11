@@ -272,7 +272,6 @@ sub save_image_to_tar {
 	
 	if ($skip_saving == 0) {
 		my $docker_save_cmd = 'docker save '.$image_id.' > '.$image_tarfile; # TODO: use API
-		print "cmd: ".$docker_save_cmd."\n";
 		systemp($docker_save_cmd) == 0 or die;
 	}
 	
@@ -321,13 +320,26 @@ sub remove_base_from_image_and_set_tag {
 	systemp("cd $tartemp && sudo tar -cf $imagediff_tarfile *") == 0 or die;
 	systemp("sudo chmod 666 ".$imagediff_tarfile);
 	
-	print "insert tag information into tar\n";
-	my $repositories_file_content = "{\\\"$repo\\\":{\\\"$tag\\\":\\\"$image_id\\\"}}";
 	
-	systemp("echo \"$repositories_file_content\" > repositories");
+	
+	
+	if (defined($tag) && defined($repo)) {
+	
+		print "insert tag information into tar\n";
+		my $repositories_file_content = "{\\\"$repo\\\":{\\\"$tag\\\":\\\"$image_id\\\"}}";
+	
+		
+		systemp("echo \"$repositories_file_content\" > repositories");
+	} else {
+		
+		die "tag and repo need to be defined --tag=repo:tag"; # TODO can I save without adding file ?
+		
+	}
+	
 	
 	
 	my $py_cmd = "python -c \"import tarfile; f=tarfile.open('".$imagediff_tarfile."', 'a'); f.add('repositories'); f.close()\"";
+	
 	
 	systemp($py_cmd) == 0 or die;
 	
@@ -2063,8 +2075,13 @@ if (defined($h->{'remove_base_layers'})) {
 	
 	#my ($repo, $tag)
 	
-	my ($repo, $tag) = split(',', $h->{'tag'});
-		
+	my $repo = undef;
+	my $tag = undef;
+	
+	if (defined $h->{'tag'}) {
+		($repo, $tag) = split(',', $h->{'tag'});
+	}
+	
 	remove_base_from_image_and_set_tag($image_tarfile, $imagediff_tarfile, $repo, $tag, "image_id");
 
 	
