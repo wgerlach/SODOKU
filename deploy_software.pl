@@ -974,10 +974,19 @@ sub hg_clone {
 sub get_image_object{
 	my ($something) = @_;
 	
-	my $result_hash = dockerSocket('GET', "/images/$something/json");
+	my $result_hash = dockerSocket('GET', "/images/$something/json") || die "error: image not found";
+
 	
 	print "something: ".Dumper($result_hash);
+
 	
+	my $obj = {};
+	$obj->{'id'} = $result_hash->{'id'} || die "error: id not found in image object";
+	
+
+	my $history = dockerSocket('GET', "/images/".$obj->{'id'}."/history");
+	
+	print Dumper($history);
 	
 	#64 hex
 	#my ($id) =~ $something = /^([:xdigit:]{64}?)$/;
