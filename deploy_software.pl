@@ -2080,6 +2080,9 @@ if (defined($h->{'remove_base_layers'})) {
 	
 	if (defined $h->{'tag'}) {
 		($repo, $tag) = split(',', $h->{'tag'});
+	} else {
+		die "error: please define --tag , e.g. --tag=namespace/repo:version";
+		
 	}
 	
 	remove_base_from_image_and_set_tag($image_tarfile, $imagediff_tarfile, $repo, $tag, "image_id");
