@@ -1981,7 +1981,7 @@ my $help_text;
 	['force_base',		'force upload of image even if baseimage is not in shock'],
 '',
 'other docker operations:',
-	['save_image',		'save image in tar file']
+	['save_image=s',		'save image in tar file'],
 	['remove_base_layers=s', 'combine with --base_image and --tag'],
 	['upload',	'upload tar-balled image to shock'],
 	['test=s']
