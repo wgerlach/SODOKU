@@ -2222,8 +2222,8 @@ if ($d) {
 	
 	
 	my $docker_base_image = {};
-	$docker_base_image->{'id'} =
-	$docker_base_image->{'name'} =
+	$docker_base_image->{'id'} = 'id';
+	$docker_base_image->{'name'} = 'name';
 	
 	#$docker_base_image
 	#$docker_base_image_name
@@ -2239,7 +2239,7 @@ if ($d) {
 	
 	
 	# create docker image
-	my $ref = createDockerImage($repo, $tag, $dockerfile, $docker_base_image_name);
+	my $ref = createDockerImage($repo, $tag, $dockerfile, $docker_base_image->{'name'});
 	my ($image_tarfile, $image_id) = @{$ref};
 	
 	
