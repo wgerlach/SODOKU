@@ -1981,6 +1981,7 @@ my $help_text;
 	['force_base',		'force upload of image even if baseimage is not in shock'],
 '',
 'other docker operations:',
+	['save_image',		'save image in tar file']
 	['remove_base_layers=s', 'combine with --base_image and --tag'],
 	['upload',	'upload tar-balled image to shock'],
 	['test=s']
@@ -1993,13 +1994,19 @@ if ($h->{'help'} || keys(%$h)==0) {
 
 
 
-if (defined($h->{'base_image'})) {
-	
-	$base_image_object = get_image_object($h->{'base_image'});
-}
+
 
 if (defined($h->{'docker'}) ) {
 	$d = 1;
+	
+	
+	
+	unless (defined($h->{'base_image'})) {
+		die "please define --base_image";
+	}
+	
+	$base_image_object = get_image_object($h->{'base_image'});
+	
 }
 
 
@@ -2065,7 +2072,19 @@ if (defined($h->{'remove_base_layers'})) {
 }
 
 
-
+if (defined $h->{'save_image'}) {
+	
+	my $image_obj = get_image_object($h->{'save_image'});
+	
+	my $name  = $image_obj->{'name'};
+	$name =~ /[\:\_\/]/\_/g;
+	
+	my $filename = $image_obj->{'id'}.'_'.$name.'.tar';
+	
+	save_image_to_tar($image_obj->{'id'}, $filename);
+		
+	exit(0);
+}
 
 if (defined $h->{'create'}) {
 	
