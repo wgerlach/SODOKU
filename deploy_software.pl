@@ -1835,7 +1835,7 @@ my $help_text;
 	['docker_noupload', ''],
 	['private',			'do not make image public on shock server'],
 	['tag=s',			'specifiy image name, e.g. me/mytool:1.0.1'],
-	['force_base',		'force upload of image even if baseimage is not in shock']
+	['force_base',		'force upload of image even if baseimage is not in shock'],
 '',
 'other docker operations:',
 	['remove_base_layers=s', 'combine with --base_image and --tag'],
