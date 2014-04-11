@@ -435,6 +435,8 @@ sub dockerSocket {
 sub get_diff_layers {
 	my ($image_id) = @_;
 	
+	require SHOCK::Client;
+	
 	my $history = dockerSocket('GET', "/images/$image_id/history");
 
 	my $images = dockerSocket('GET', "/images/json"); # maybe ?all=0 or ?all=1
