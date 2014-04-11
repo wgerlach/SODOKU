@@ -544,7 +544,7 @@ sub get_diff_layers {
 	my @diff_layers= ();
 
 	unless ($history->[0]->{'Id'} eq $image_id) {
-		die "history broken ?";
+		die "history broken for $image_id ?";
 	}
 	
 	# check history of image
