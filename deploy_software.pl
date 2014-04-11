@@ -226,24 +226,8 @@ sub createDockerImage {
 	my $image_tarfile = $datadir.$image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.complete.tar';
 	my $imagediff_tarfile = $datadir.$image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.diff.tar';
 	
-	my $skip_saving = 0;
 	
-	
-	if (defined $h->{'docker_reuse_image'}) {
-		if (-e $image_tarfile) {
-			$skip_saving = 1;
-		}
-	} else {
-		if (-e $image_tarfile) {
-			die "docker image file $image_tarfile already exists";
-		}
-	}
-	
-	if ($skip_saving == 0) {
-		my $docker_save_cmd = 'docker save '.$image_id.' > '.$image_tarfile;
-		print "cmd: ".$docker_save_cmd."\n";
-		systemp($docker_save_cmd);
-	}
+	save_image_to_tar($image_id, $image_tarfile);
 	
 	unless (defined $repotag) {
 		die;
@@ -269,6 +253,30 @@ sub createDockerImage {
 	return [$imagediff_tarfile_gz, $image_id];
 }
 
+sub save_image_to_tar {
+	my ($image_id, $image_tarfile) = @_;
+	
+	
+	my $skip_saving = 0;
+	
+	
+	if (defined $h->{'docker_reuse_image'}) {
+		if (-e $image_tarfile) {
+			$skip_saving = 1;
+		}
+	} else {
+		if (-e $image_tarfile) {
+			die "docker image file $image_tarfile already exists";
+		}
+	}
+	
+	if ($skip_saving == 0) {
+		my $docker_save_cmd = 'docker save '.$image_id.' > '.$image_tarfile; # TODO: use API
+		print "cmd: ".$docker_save_cmd."\n";
+		systemp($docker_save_cmd) == 0 or die;
+	}
+	
+}
 
 sub remove_base_from_image_and_set_tag {
 	
@@ -278,15 +286,35 @@ sub remove_base_from_image_and_set_tag {
 	systemp("rm -rf $tartemp ; mkdir -p $tartemp ; rm -f ".$imagediff_tarfile);
 	systemp("cd $tartemp && tar xvf ".$image_tarfile);
 	
-	my @base_layers = get_base_layers($base_image_object->{'id'});
+	#old: my @base_layers = get_base_layers($base_image_object->{'id'});
 	
-	foreach my $layer (@base_layers) {
-		my $layer_dir = $tartemp.$layer;
+	
+	
+	my @diff_layers = get_diff_layers($image_id, $base_image_object->{'id'});
+	
+	
+	my $diff_layers_hash = {};
+	foreach my $layer (@diff_layers) {
+		$diff_layers_hash->{$layer} = 1;
+	}
+	
+	
+	my @directories = glob ($tartemp.'*');
+	
+	
+	foreach my $dir (@directories) {
+		
+		my $layer_dir = $tartemp.$dir;
+		
 		unless (-d $layer_dir) {
-			die "layer_dir $layer_dir not found !";
+			die "layer_dir $layer_dir not found !?";
 		}
-		print "delete base layer $layer_dir\n";
-		systemp("sudo rm -rf ".$layer_dir);
+		
+		unless (defined $diff_layers_hash->{$dir}) {
+			print "delete non-diff layer directory $layer_dir\n";
+			systemp("sudo rm -rf ".$layer_dir);
+		}
+		
 	}
 	
 	print "create new tar without the base layers\n";
@@ -1294,6 +1322,62 @@ sub array_execute {
 	
 }
 
+sub create_repository {
+	my $repo_file = 'repository.json';
+	
+	if (-e $repo_file) {
+		die "Repository file $repo_file already exists. Please delete old first.";
+	}
+	
+	
+	my $repository_merge={};
+	
+	my @error_file=();
+	foreach my $file (@ARGV) {
+		
+		unless (-e $file) {
+			die "file \"$file\" not found";
+		}
+		my $cat_cmd = "cat ".$file." | grep -v ^# ";
+		my $repository_json = `$cat_cmd`;
+		chomp($repository_json);
+		my $repository;
+		
+		#try {
+		$repository = decode_json($repository_json);
+		#}
+		#catch {
+		#warn "caught error: $_"; # not $@
+		#print Dumper($repository);
+		#	print STDERR "warning: could not parse json in $file\n";
+		#	push(@error_file, $file);
+		#next;
+		#};
+		
+		foreach my $key (keys(%$repository)) {
+			if (defined $repository_merge->{$key}) {
+				die "key $key already defined";
+			}
+			$repository_merge->{$key} = $repository->{$key};
+			
+		}
+	}
+	#print Dumper($repository_merge);
+	
+	my $json = JSON->new;
+	my $repository_merge_pretty = $json->pretty->encode( $repository_merge );
+	print $repository_merge_pretty ."\n";
+	
+	open(my $fh, '>', $repo_file);
+	print $fh $repository_merge_pretty."\n";
+	close $fh;
+	
+	
+	if (@error_file > 0) {
+		print "warning: problems with following files:".join(',',@error_file)."\n"
+	}
+}
+
 sub chdirp {
 	my $ptarget = shift(@_);
 	if ($d) {
@@ -1981,61 +2065,14 @@ if (defined($h->{'remove_base_layers'})) {
 }
 
 
+
+
 if (defined $h->{'create'}) {
 	
-	my $repo_file = 'repository.json';
 	
-	if (-e $repo_file) {
-		die "Repository file $repo_file already exists. Please delete old first.";
-	}
+	create_repository();
 	
 	
-	my $repository_merge={};
-	
-	my @error_file=();
-	foreach my $file (@ARGV) {
-
-		unless (-e $file) {
-			die "file \"$file\" not found";
-		}
-		my $cat_cmd = "cat ".$file." | grep -v ^# ";
-		my $repository_json = `$cat_cmd`;
-		chomp($repository_json);
-		my $repository;
-		
-		#try {
-			$repository = decode_json($repository_json);
-		#}
-		#catch {
-			#warn "caught error: $_"; # not $@
-			#print Dumper($repository);
-		#	print STDERR "warning: could not parse json in $file\n";
-		#	push(@error_file, $file);
-			#next;
-		#};
-		
-		foreach my $key (keys(%$repository)) {
-			if (defined $repository_merge->{$key}) {
-				die "key $key already defined";
-			}
-			$repository_merge->{$key} = $repository->{$key};
-			
-		}
-	}
-	#print Dumper($repository_merge);
-	
-	my $json = JSON->new;
-	my $repository_merge_pretty = $json->pretty->encode( $repository_merge );
-	print $repository_merge_pretty ."\n";
-	
-	open(my $fh, '>', $repo_file);
-	print $fh $repository_merge_pretty."\n";
-	close $fh;
-	
-	
-	if (@error_file > 0) {
-		print "warning: problems with following files:".join(',',@error_file)."\n"
-	}
 	
 	exit(0);
 }
