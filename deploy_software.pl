@@ -432,14 +432,57 @@ sub dockerSocket {
 
 }
 
-sub get_diff_layers {
+# check if base image is in shock
+sub findImageinShock {
 	my ($image_id) = @_;
 	
 	require SHOCK::Client;
 	
+	unless (defined $shock) {
+		$shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
+	}
+	
+	my $node_obj = $shock->query('type' => 'dockerimage', 'id' => $image_id);
+	print 'node: '.Dumper($node_obj);
+	
+	if (@{} == 0) {
+			} elsif (@{$node_obj->{'data'}} > 1) {
+		die "parent image  not unique !";
+	}
+	
+	my @nodes = ();
+	
+	if (defined $node_obj->{'data'}) {
+		push (@nodes, @{$node_obj->{'data'}});
+	}
+	
+	return @nodes;
+}
+
+
+# get diff layers and check if base is in shock
+sub get_diff_layers {
+	my ($image_id, $base_id) = @_;
+	
+	
+	if (defined $base_id) {
+	
+		my @base_in_shock = findImageinShock($base_id);
+		
+		if (@base_in_shock > 1) {
+			die "base image multiple times in shock !";
+		}
+		
+		unless (defined $h->{'force_base'}) {
+			if (@base_in_shock == 0 ) {
+				die "base image not found in shock! upload base first or use --force_base";
+			}
+		}
+	}
+	
 	my $history = dockerSocket('GET', "/images/$image_id/history");
 
-	my $images = dockerSocket('GET', "/images/json"); # maybe ?all=0 or ?all=1
+	my $images = dockerSocket('GET', "/images/json");
 	
 	
 	my $imageid_to_tags={};
@@ -457,14 +500,14 @@ sub get_diff_layers {
 	
 	
 	#exit(0);
-	my @ancestor_images= ();
+	my @diff_layers= ();
 
 	unless ($history->[0]->{'Id'} eq $image_id) {
 		die "history broken ?";
 	}
 	
 	# check history of image
-	for (my $i = 1; $i < @{$history}; ++$i) {
+	for (my $i = 0; $i < @{$history}; ++$i) {
 		
 		my $layer = $history->[$i];
 		my $id = $layer->{'Id'};
@@ -472,39 +515,30 @@ sub get_diff_layers {
 			die;
 		}
 		
-		if (defined $imageid_to_tags->{$id}) {
+		
+		if (defined($base_id) && $id eq $base_id) {
+			last;
+		}
+		
+		if (defined $imageid_to_tags->{$id} && ($i > 0)) {
 			print $id." layer has image tag: ".join(',', @{$imageid_to_tags->{$id}})."\n";
-			push(@ancestor_images, $id);
-			
-			if (@ancestor_images == 1) {
-				my $parent = $ancestor_images[0];
-				# parent image, make sure it is in SHOCK
-				print "check if parent image $parent is in SHOCK\n";
-				
-				unless (defined $shock) {
-					$shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
-				}
-
-				my $node_obj = $shock->query('type' => 'dockerimage', 'id' => $parent);
-				print 'parent: '.Dumper($node_obj);
-			}
-			
-			
 			
 		} else {
 			print $id." layer\n";
 		}
 		
+		push(@diff_layers, $id);
 		
 		
 	}
 
-	#print "found ".@base_layers." layers for image ".$docker_base_image."\n";
-	#if (@base_layers == 0) {
-#		die;
-#	}
+	print "found ".@diff_layers." diff layers (layers on top of base image) for image ".$image_id."\n";
+
+	if (@diff_layers == 0 ) {
+		die;
+	}
 	
-	return ();
+	return @diff_layers;
 }
 
 sub addDockerCmd {
@@ -1800,12 +1834,13 @@ my $help_text;
 	['nossl',			''],
 '',
 'docker image creation:',
-	['docker',	'create docker image'],
-	['base_image',		''],
+	['docker',			'create docker image'],
+	['base_image=s',	'specify base_image to build from, e.g. ubuntu:13.10'],
 	['docker_reuse_image', ''],
 	['docker_noupload', ''],
-	['private',			'do make image public on shock server'],
+	['private',			'do not make image public on shock server'],
 	['tag=s',			'specifiy image name, e.g. me/mytool:1.0.1'],
+	['force_base',		'force upload of image even if baseimage is not in shock']
 '',
 'other docker operations:',
 	['remove_base_layers=s', 'combine with --base_image and --tag'],
