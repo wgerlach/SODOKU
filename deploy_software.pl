@@ -1919,7 +1919,7 @@ if (defined($h->{'test'})) {
 
 	get_image_object($h->{'test'});
 	
-	exit(0)
+	exit(0);
 	get_diff_layers("364a9c36214d9f933ce8d9f733d3096a6d6cc61adad8b30ee2ae213297b70c32");
 	exit(0);
 }
