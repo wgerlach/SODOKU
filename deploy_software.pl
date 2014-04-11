@@ -1016,7 +1016,7 @@ sub get_image_object{
 	} else {
 		# user specified image by its name
 		
-		$obj->{'name'} =something;
+		$obj->{'name'} = $something;
 	}
 	
 	
