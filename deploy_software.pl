@@ -35,7 +35,7 @@ my $ubuntu_cmd2package = {
 };
 
 my $docker_socket = '/var/run/docker.sock';
-my $docker_base_image = 'ubuntu:13.10';
+my $docker_base_image = undef; #'ubuntu:13.10';
 my $author = 'Wolfgang Gerlach';
 
 my $shock_server = 'http://shock.metagenomics.anl.gov:80';
@@ -68,7 +68,12 @@ my $is_root_user = undef;
 
 
 sub createDockerFile {
-	my ($package, $version) = @_;
+	my ($package, $version, $docker_base_image) = @_;
+	
+	
+	unless (defined $docker_base_image) {
+		die "error: base image not defined";
+	}
 	
 	my $version_str = undef;
 	if (defined $version) {
@@ -130,7 +135,7 @@ sub createDockerFile {
 
 sub createDockerImage {
 	
-	my ($repo, $tag, $dockerfile) = @_;
+	my ($repo, $tag, $dockerfile, $docker_base_image_name) = @_;
 
 	my $repotag = $repo.':'.$tag;
 	
@@ -213,7 +218,7 @@ sub createDockerImage {
 	
 	my $tag_converted = $repotag;
 	$tag_converted =~ s/[\/]/\_/g;
-	my $docker_base_image_converted = $docker_base_image;
+	my $docker_base_image_converted = $docker_base_image_name;
 	$docker_base_image_converted =~ s/[\/]/\_/g;
 	
 	
@@ -261,7 +266,7 @@ sub createDockerImage {
 	
 	systemp("rm -f ".$image_tarfile);
 	
-	return [$imagediff_tarfile_gz, $image_id, $docker_base_image];
+	return [$imagediff_tarfile_gz, $image_id];
 }
 
 
@@ -963,6 +968,27 @@ sub hg_clone {
 	system_install("cd $dir && hg clone ".$source) == 0 or die;
 	
 	return $hgdir;
+}
+
+
+sub get_image_object{
+	my ($something) = @_;
+	
+	my $result_hash = dockerSocket('GET', "/images/$something/json");
+	
+	print "something: ".Dumper($result_hash);
+	
+	
+	#64 hex
+	#my ($id) =~ $something = /^([:xdigit:]{64}?)$/;
+	
+	#if (defined $id) {
+	#	my $result_hash = dockerSocket('GET', "/images/$id/json");
+	#}
+	
+	exit(0);
+	#$docker_base_image->{'id'} =
+	#$docker_base_image->{'name'} =
 }
 
 
@@ -1840,7 +1866,7 @@ my $help_text;
 'other docker operations:',
 	['remove_base_layers=s', 'combine with --base_image and --tag'],
 	['upload',	'upload tar-balled image to shock'],
-	['test']
+	['test=s']
 ]);
 
 if ($h->{'help'} || keys(%$h)==0) {
@@ -1891,12 +1917,15 @@ if (defined($d) && ($d == 1)) {
 
 if (defined($h->{'test'})) {
 
+	get_image_object($h->{'test'});
+	
+	exit(0)
 	get_diff_layers("364a9c36214d9f933ce8d9f733d3096a6d6cc61adad8b30ee2ae213297b70c32");
 	exit(0);
 }
 
 if (defined($h->{'remove_base_layers'})) {
-	
+	# tarfile, image_id, base_image_id,
 	
 	my $image_tarfile = $h->{'remove_base_layers'};
 	
@@ -2192,22 +2221,26 @@ if ($d) {
 	print Dumper($docker_info);
 	
 	
+	my $docker_base_image = {};
+	$docker_base_image->{'id'} =
+	$docker_base_image->{'name'} =
 	
-	
-
+	#$docker_base_image
+	#$docker_base_image_name
 	
 	
 	
 	# create Dockerfile
-	my ($repo, $tag, $dockerfile) = @{createDockerFile($package, $version)};
+	my ($repo, $tag, $dockerfile) = @{createDockerFile($package, $version, $docker_base_image->{'name'})};
 	unless (defined $tag) {
 		die;
 	}
 	
 	
+	
 	# create docker image
-	my $ref = createDockerImage($repo, $tag, $dockerfile);
-	my ($image_tarfile, $image_id, $docker_base_image) = @{$ref};
+	my $ref = createDockerImage($repo, $tag, $dockerfile, $docker_base_image_name);
+	my ($image_tarfile, $image_id) = @{$ref};
 	
 	
 	# upload docker image
