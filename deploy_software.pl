@@ -35,7 +35,7 @@ my $ubuntu_cmd2package = {
 };
 
 my $docker_socket = '/var/run/docker.sock';
-my $docker_base_image = undef; #'ubuntu:13.10';
+my $base_image_object = undef; # containes name and id ! 'ubuntu:13.10';
 my $author = 'Wolfgang Gerlach';
 
 my $shock_server = 'http://shock.metagenomics.anl.gov:80';
@@ -278,7 +278,7 @@ sub remove_base_from_image_and_set_tag {
 	systemp("rm -rf $tartemp ; mkdir -p $tartemp ; rm -f ".$imagediff_tarfile);
 	systemp("cd $tartemp && tar xvf ".$image_tarfile);
 	
-	my @base_layers = get_base_layers($docker_base_image);
+	my @base_layers = get_base_layers($base_image_object->{'id'});
 	
 	foreach my $layer (@base_layers) {
 		my $layer_dir = $tartemp.$layer;
@@ -310,7 +310,7 @@ sub remove_base_from_image_and_set_tag {
 sub upload_docker_image_to_shock {
 	
 	
-	my ($image_tarfile, $repo, $tag, $image_id, $docker_base_image, $dockerfile) = @_;
+	my ($image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile) = @_;
 	### upload image to SHOCK ###
 	#check token
 	#check server
@@ -351,7 +351,8 @@ sub upload_docker_image_to_shock {
 						' "docker_version":'.$docker_version_info_str.','.
 						' "name":"'.$repotag.'",'.
 						' "id":"'.$image_id.'",'.
-						' "base_image_tag":"'.$docker_base_image.'",'.
+						' "base_image_tag":"'.$base_image_object->{'name'}.'",'.
+						' "base_image_id":"'.$base_image_object->{'id'}.'",'.
 						' "dockerfile":"'.$dockerfile_encoded.'"'.
 						'}';
 	print "shock_json:\n$shock_json\n";
@@ -979,25 +980,48 @@ sub get_image_object{
 	
 	print "something: ".Dumper($result_hash);
 
+	my $id =  $result_hash->{'id'} || die "error: id not found in image object";
 	
 	my $obj = {};
-	$obj->{'id'} = $result_hash->{'id'} || die "error: id not found in image object";
+	$obj->{'id'} = $id;
 	
 
-	my $history = dockerSocket('GET', "/images/".$obj->{'id'}."/history");
+	# if user used id to identify image, try to find a tag
+	if (lc($something) eq lc(substr($id, 0 , length($something)))) {
 	
-	print Dumper($history);
+		my $history = dockerSocket('GET', "/images/".$obj->{'id'}."/history");
+		
+		print Dumper($history);
+		
+		my $tags  = $history->[0]->{'Tags'} || die "error: tags not found";
+		
+		if (@$tags == 0) {
+			die "error: tags empty";
+		}
+		
+		if (@$tags == 1) {
+			$obj->{'name'} = $tags->[0];
+			return $obj;
+		}
+		
+		my $longest_tag = $tags->[0];
+		foreach my $t (@{$tags}) {
+			if (length($t) > length($longest_tag)) {
+				$longest_tag = $t;
+			}
+		}
+		
+		$obj->{'name'} =$longest_tag;
+		
+	} else {
+		# user specified image by its name
+		
+		$obj->{'name'} =something;
+	}
 	
-	#64 hex
-	#my ($id) =~ $something = /^([:xdigit:]{64}?)$/;
 	
-	#if (defined $id) {
-	#	my $result_hash = dockerSocket('GET', "/images/$id/json");
-	#}
+	return $obj;
 	
-	exit(0);
-	#$docker_base_image->{'id'} =
-	#$docker_base_image->{'name'} =
 }
 
 
@@ -1886,7 +1910,8 @@ if ($h->{'help'} || keys(%$h)==0) {
 
 
 if (defined($h->{'base_image'})) {
-	$docker_base_image = $h->{'base_image'};
+	
+	$base_image_object = get_image_object($h->{'base_image'});
 }
 
 if (defined($h->{'docker'}) ) {
@@ -2230,17 +2255,10 @@ if ($d) {
 	print Dumper($docker_info);
 	
 	
-	my $docker_base_image = {};
-	$docker_base_image->{'id'} = 'id';
-	$docker_base_image->{'name'} = 'name';
-	
-	#$docker_base_image
-	#$docker_base_image_name
-	
-	
+		
 	
 	# create Dockerfile
-	my ($repo, $tag, $dockerfile) = @{createDockerFile($package, $version, $docker_base_image->{'name'})};
+	my ($repo, $tag, $dockerfile) = @{createDockerFile($package, $version, $base_image_object->{'name'})};
 	unless (defined $tag) {
 		die;
 	}
@@ -2248,13 +2266,13 @@ if ($d) {
 	
 	
 	# create docker image
-	my $ref = createDockerImage($repo, $tag, $dockerfile, $docker_base_image->{'name'});
+	my $ref = createDockerImage($repo, $tag, $dockerfile, $base_image_object->{'name'});
 	my ($image_tarfile, $image_id) = @{$ref};
 	
 	
 	# upload docker image
 	unless (defined $h->{'docker_noupload'}) {
-		my $shock_node_id = upload_docker_image_to_shock($image_tarfile, $repo, $tag, $image_id, $docker_base_image, $dockerfile) || die;
+		my $shock_node_id = upload_docker_image_to_shock($image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile) || die;
 	}
 
 }
