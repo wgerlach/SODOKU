@@ -1270,8 +1270,12 @@ sub function_kbasemodules {
 				open my $fh, "<", $filename
 				or die "could not open $filename: $!";
 				my @deps = <$fh>;
-				chomp(@deps);
-				push(@kbase_modules, @deps);
+				foreach my $dep (@deps) {
+					chomp($dep);
+					if ($dep ne '') {
+						push(@kbase_modules, $dep);
+					}
+				}
 			}
 				
 			
