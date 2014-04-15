@@ -304,7 +304,7 @@ sub remove_base_from_image_and_set_tag {
 	my $diff_layers_hash = {};
 	foreach my $layer (@diff_layers) {
 		
-		my $layer_dir = $tartemp.$dir;
+		my $layer_dir = $tartemp.$layer;
 		
 		unless (-d $layer_dir) {
 			die "error: exepcte layer dorectory not found";
