@@ -2089,7 +2089,25 @@ if (defined($h->{'remove_base_layers'})) {
 		
 	}
 	
-	remove_base_from_image_and_set_tag($image_tarfile, $imagediff_tarfile, $repo, $tag, "image_id");
+	
+	my $image_id=undef;
+	
+	
+	
+	unless (defined ($image_id)) {
+		my ($parsed_image_id) = $image_tarfile =~ /^[0-9A-Fa-f]{64}/;
+		if (defined($parsed_image_id)) {
+			$image_id = $parsed_image_id;
+		}
+		
+	}
+	
+	
+	unless (defined($image_id)) {
+		die "error: image_id unknown\n";
+	}
+	
+	remove_base_from_image_and_set_tag($image_tarfile, $imagediff_tarfile, $repo, $tag, $image_id);
 
 	
 	
