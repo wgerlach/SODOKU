@@ -2095,7 +2095,7 @@ if (defined($h->{'remove_base_layers'})) {
 	
 	
 	unless (defined ($image_id)) {
-		my ($parsed_image_id) = $image_tarfile =~ /^[0-9A-Fa-f]{64}/;
+		my ($parsed_image_id) = $image_tarfile =~ /^([0-9A-Fa-f]{64})/;
 		if (defined($parsed_image_id)) {
 			$image_id = $parsed_image_id;
 		}
