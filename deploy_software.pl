@@ -307,9 +307,10 @@ sub remove_base_from_image_and_set_tag {
 	my @directories = glob ($tartemp.'*');
 	
 	
-	foreach my $dir (@directories) {
+	foreach my $layer_dir (@directories) {
 		
-		my $layer_dir = $tartemp.$dir;
+		my $dir = basename($layer_dir);
+		#my $layer_dir = $tartemp.$dir;
 		
 		unless (-d $layer_dir) {
 			die "layer_dir $layer_dir not found !?";
