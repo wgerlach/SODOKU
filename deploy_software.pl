@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Cwd; #'abs_path getcwd'
+use Cwd 'abs_path'; #'abs_path getcwd'
 #use Getopt::Long;
 use File::Basename;
 
@@ -2097,7 +2097,7 @@ if (defined($h->{'test'})) {
 if (defined($h->{'remove_base_layers'})) {
 	# tarfile, image_id, base_image_id,
 	
-	my $image_tarfile = $h->{'remove_base_layers'};
+	my $image_tarfile = abs_path($h->{'remove_base_layers'});
 	
 	unless ($image_tarfile =~ /\.tar$/) {
 		die "tar expected";
