@@ -282,7 +282,13 @@ sub remove_base_from_image_and_set_tag {
 	
 	my ($image_tarfile, $imagediff_tarfile, $repo, $tag, $image_id) = @_;
 	
-	systemp("rm -rf $tartemp ; mkdir -p $tartemp ; rm -f ".$imagediff_tarfile);
+	systemp("rm -rf $tartemp");
+	
+	if (-d $tartemp) {
+		die;
+	}
+	
+	systemp("mkdir -p $tartemp ; rm -f ".$imagediff_tarfile);
 	systemp("cd $tartemp && tar xvf ".$image_tarfile);
 	
 	#old: my @base_layers = get_base_layers($base_image_object->{'id'});
