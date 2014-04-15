@@ -324,7 +324,7 @@ sub remove_base_from_image_and_set_tag {
 	}
 	
 	print "create new tar without the base layers\n";
-	systemp("cd $tartemp && sudo tar -cf $imagediff_tarfile *") == 0 or die;
+	systemp("cd $tartemp && ls ; sudo tar -cf $imagediff_tarfile *") == 0 or die;
 	systemp("sudo chmod 666 ".$imagediff_tarfile);
 	
 	
