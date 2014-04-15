@@ -297,6 +297,9 @@ sub remove_base_from_image_and_set_tag {
 	
 	my @diff_layers = get_diff_layers($image_id, $base_image_object->{'id'});
 	
+	if (@diff_layers == 0) {
+		die ;
+	}
 	
 	my $diff_layers_hash = {};
 	foreach my $layer (@diff_layers) {
