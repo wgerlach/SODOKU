@@ -306,7 +306,7 @@ sub remove_base_from_image_and_set_tag {
 	
 	my @directories = glob ($tartemp.'*');
 	
-	
+	my $count_keep_layers = 0;
 	foreach my $layer_dir (@directories) {
 		
 		my $dir = basename($layer_dir);
@@ -319,8 +319,14 @@ sub remove_base_from_image_and_set_tag {
 		unless (defined $diff_layers_hash->{$dir}) {
 			print "delete non-diff layer directory $layer_dir\n";
 			systemp("sudo rm -rf ".$layer_dir);
+		} else {
+			$count_keep_layers++;
 		}
 		
+	}
+	
+	if ($count_keep_layers == 0) {
+		die "all layers deleted...";
 	}
 	
 	print "create new tar without the base layers\n";
