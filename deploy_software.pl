@@ -2112,7 +2112,7 @@ if (defined($h->{'remove_base_layers'})) {
 	my $tag = undef;
 	
 	if (defined $h->{'tag'}) {
-		($repo, $tag) = split(',', $h->{'tag'});
+		($repo, $tag) = split(':', $h->{'tag'});
 	} else {
 		die "error: please define --tag , e.g. --tag=namespace/repo:version";
 		
