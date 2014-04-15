@@ -289,7 +289,7 @@ sub remove_base_from_image_and_set_tag {
 	}
 	
 	systemp("mkdir -p $tartemp ; rm -f ".$imagediff_tarfile);
-	systemp("cd $tartemp && tar xvf ".$image_tarfile);
+	systemp("cd $tartemp && tar xvf ".$image_tarfile) ==0 or die;
 	
 	#old: my @base_layers = get_base_layers($base_image_object->{'id'});
 	
@@ -307,7 +307,7 @@ sub remove_base_from_image_and_set_tag {
 		my $layer_dir = $tartemp.$layer;
 		
 		unless (-d $layer_dir) {
-			die "error: exepcte layer dorectory not found";
+			die "error: expected layer directory not found";
 		}
 		
 		$diff_layers_hash->{$layer} = 1;
