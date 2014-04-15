@@ -410,25 +410,30 @@ sub upload_docker_image_to_shock {
 	$dockerfile_encoded =~ s/\n//g;
 	print "dockerfile_encoded:\n$dockerfile_encoded\n";
 	
+	
+	
+	
+	my $node_attributes = {
+		"temporary"				=> "1",
+		"type"					=> "dockerimage",
+		"name"					=> $repotag						|| die,
+		"id"					=> $image_id					|| die,
+		"docker_version"		=> $docker_version_info			|| die,
+		"base_image_tag"		=> $base_image_object->{'name'} || "",
+		"base_image_id"			=> $base_image_object->{'id'}	|| "",
+		"dockerfile"			=> $dockerfile_encoded			|| ""
+	};
+	
 	my $json = JSON->new;
-	my $docker_version_info_str = $json->encode( $docker_version_info );
+	my $node_attributes_str = $json->encode( $node_attributes );
 
 	
-	my $shock_json =	'{'.
-						' "temporary":"1",'.
-						' "type":"dockerimage",'.
-						' "docker_version":'.$docker_version_info_str.','.
-						' "name":"'.$repotag.'",'.
-						' "id":"'.$image_id.'",'.
-						' "base_image_tag":"'.$base_image_object->{'name'}.'",'.
-						' "base_image_id":"'.$base_image_object->{'id'}.'",'.
-						' "dockerfile":"'.$dockerfile_encoded.'"'.
-						'}';
-	print "shock_json:\n$shock_json\n";
+	
+	print "node_attributes_str:\n$node_attributes_str\n";
 	
 	
 	print "upload image to SHOCK docker repository\n";
-	my $up_result = $shock->upload('file' => $image_tarfile, 'attr' => $shock_json) || die;
+	my $up_result = $shock->upload('file' => $image_tarfile, 'attr' => $node_attributes_str) || die;
 	#same as: my $curl_cmd = 'curl -X POST -H "Authorization: OAuth $GLOBUSONLINE"  -F "attributes=@sodoku_docker.json" -F "upload=@'.$image_tarfile.'" "'.$shock_server.'/node"';
 	print Dumper($up_result);
 	unless ($up_result->{'status'} == 200) {
@@ -2094,6 +2099,51 @@ if (defined($h->{'test'})) {
 	exit(0);
 }
 
+if (defined($h->{'upload'})) {
+	
+	my $image_tarfile = $h->{'upload'};
+	unless (-e $image_tarfile) {
+		die;
+	}
+	
+	unless ($image_tarfile =~ /gz$/) {
+		die "error please gzip the tar ball first";
+	}
+	
+	
+	unless (defined ($image_id)) {
+		my $image_tarfile_base = basename($image_tarfile);
+		
+		my ($parsed_image_id) = $image_tarfile_base =~ /^([0-9A-Fa-f]{64})/;
+		if (defined($parsed_image_id)) {
+			$image_id = $parsed_image_id;
+		}
+		
+	}
+	
+	unless (defined($image_id)) {
+		die "error: image_id unknown\n";
+	}
+	
+	my $repo = undef;
+	my $tag = undef;
+	
+	if (defined $h->{'tag'}) {
+		($repo, $tag) = split(':', $h->{'tag'});
+	} else {
+		die "error: please define --tag , e.g. --tag=namespace/repo:version";
+		
+	}
+	
+	my $base_image_object = undef;
+	my $dockerfile = undef;
+	
+	upload_docker_image_to_shock($image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile);
+	
+	exit(0);
+}
+
+
 if (defined($h->{'remove_base_layers'})) {
 	# tarfile, image_id, base_image_id,
 	
@@ -2126,12 +2176,10 @@ if (defined($h->{'remove_base_layers'})) {
 	unless (defined ($image_id)) {
 		my $image_tarfile_base = basename($image_tarfile);
 		
-		my ($parsed_image_id) = $image_tarfile_base =~ /^([0-9A-Fa-f]{64})/g;
+		my ($parsed_image_id) = $image_tarfile_base =~ /^([0-9A-Fa-f]{64})/;
 		if (defined($parsed_image_id)) {
 			$image_id = $parsed_image_id;
 		}
-		
-		
 		
 	}
 	
@@ -2144,7 +2192,7 @@ if (defined($h->{'remove_base_layers'})) {
 	
 	remove_base_from_image_and_set_tag($image_tarfile, $imagediff_tarfile, $repo, $tag, $image_id);
 
-	
+	exit(0);
 	
 }
 
