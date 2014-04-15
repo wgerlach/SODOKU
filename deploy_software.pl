@@ -309,7 +309,7 @@ sub remove_base_from_image_and_set_tag {
 	
 	my @directories = glob ($tartemp.'*');
 	
-	print "total layers: ".@directories."\n";
+	print "total layers: ".@directories." in $tartemp\n";
 	if (@directories == 0) {
 		die ;
 	}
