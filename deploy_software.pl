@@ -2134,9 +2134,14 @@ if (defined($h->{'upload'})) {
 	
 	my $tar_extr = "tar -xvOf $image_tarfile --wildcards '*/json'";
 	
-	my $tar_json = `$tar_extr`;
+	my $tar_json = '['.`$tar_extr`.']';
 	
 	print "json has: ".$tar_json."\n";
+	
+	my $json = JSON->new;
+	my $tar_hash = $json->decode( $tar_json );
+	
+	print Dumper($tar_hash);
 	
 	exit(0);
 	#9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e/json
