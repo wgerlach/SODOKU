@@ -2110,7 +2110,7 @@ if (defined($h->{'upload'})) {
 		die "error please gzip the tar ball first";
 	}
 	
-	
+	my $image_id =undef;
 	unless (defined ($image_id)) {
 		my $image_tarfile_base = basename($image_tarfile);
 		
