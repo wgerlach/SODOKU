@@ -2106,9 +2106,9 @@ if (defined($h->{'upload'})) {
 		die;
 	}
 	
-	unless ($image_tarfile =~ /gz$/) {
-		die "error please gzip the tar ball first";
-	}
+	#unless ($image_tarfile =~ /gz$/) {
+	#	die "error please gzip the tar ball first";
+	#}
 	
 	
 	
