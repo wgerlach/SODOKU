@@ -2135,6 +2135,8 @@ if (defined($h->{'upload'})) {
 	my $tar_json = `$tar_extr`;
 	
 	print "json has: ".$tar_json."\n";
+	
+	exit(0);
 	#9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e/json
 	#tar -xvOf ./9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e_ubuntu_13.10.tar 9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e/json
 	
