@@ -171,7 +171,7 @@
    },
    "kbase_R3" : {
       "exec" : [
-         "apt-get -y remove r-base-core",
+         "apt-get -y remove r-base-core ; echo ok",
          "rm -rf /kb/runtime/lib/R/ /kb/runtime/bin/R",
          "echo 'deb http://cran.rstudio.com/bin/linux/ubuntu precise/' >> /etc/apt/sources.list",
          "apt-get update",
