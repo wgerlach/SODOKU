@@ -2129,8 +2129,10 @@ if (defined($h->{'upload'})) {
 		die "error: image_id unknown\n";
 	}
 	
+	# extract all jsons: tar -xvOf $image_tarfile --wildcards '*/json'
+	#my $tar_extr = "tar -xvOf $image_tarfile ".$image_id.'/json';
 	
-	my $tar_extr = "tar -xvOf $image_tarfile ".$image_id.'/json';
+	my $tar_extr = "tar -xvOf $image_tarfile --wildcards '*/json'";
 	
 	my $tar_json = `$tar_extr`;
 	
