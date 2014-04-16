@@ -2110,6 +2110,10 @@ if (defined($h->{'upload'})) {
 		die "error please gzip the tar ball first";
 	}
 	
+	
+	
+	
+	
 	my $image_id =undef;
 	unless (defined ($image_id)) {
 		my $image_tarfile_base = basename($image_tarfile);
@@ -2124,6 +2128,16 @@ if (defined($h->{'upload'})) {
 	unless (defined($image_id)) {
 		die "error: image_id unknown\n";
 	}
+	
+	
+	my $tar_extr = "tar -xvOf $image_tarfile ".$image_id.'/json';
+	
+	my $tar_json = `$tar_extr`;
+	
+	print "json has: ".$tar_json."\n";
+	#9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e/json
+	#tar -xvOf ./9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e_ubuntu_13.10.tar 9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e/json
+	
 	
 	my $repo = undef;
 	my $tag = undef;
