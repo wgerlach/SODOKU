@@ -2099,6 +2099,32 @@ if (defined($h->{'test'})) {
 	exit(0);
 }
 
+
+sub read_history_from_tar_image {
+
+	my ($image_tarfile) = @_;
+	
+	# extract all jsons: tar -xvOf $image_tarfile --wildcards '*/json'
+	#my $tar_extr = "tar -xvOf $image_tarfile ".$image_id.'/json';
+
+	
+	my $tar_extr = "tar -xvOf $image_tarfile --wildcards '*/json'";
+	
+	my $tar_json = '['.`$tar_extr`.']';
+	
+	# insert commas: TODO this is ugly!
+	$tar_json =~ s/\}\{\"id\"/\},\{\"id\"/g;
+		
+		print "json has: ".$tar_json."\n";
+		
+		my $json = JSON->new;
+		my $tar_hash = $json->decode( $tar_json );
+	print Dumper($tar_hash);
+	return $tar_hash;
+		
+}
+
+
 if (defined($h->{'upload'})) {
 	
 	my $image_tarfile = $h->{'upload'};
@@ -2129,22 +2155,17 @@ if (defined($h->{'upload'})) {
 		die "error: image_id unknown\n";
 	}
 	
-	# extract all jsons: tar -xvOf $image_tarfile --wildcards '*/json'
-	#my $tar_extr = "tar -xvOf $image_tarfile ".$image_id.'/json';
+		
+	my $image_history = read_history_from_tar_image($image_tarfile);
 	
-	my $tar_extr = "tar -xvOf $image_tarfile --wildcards '*/json'";
+	foreach my $layer (@{$image_history}) {
+		print $layer->{'id'}."\n";
+		if (defined $layer->{'parent'}) {
+			print "parent: ".$layer->{'parent'}."\n";
+		}
+		
+	}
 	
-	my $tar_json = '['.`$tar_extr`.']';
-	
-	# insert commas: TODO this is ugly!
-	$tar_json =~ s/\}\{\"id\"/\},\{\"id\"/g;
-	
-	print "json has: ".$tar_json."\n";
-	
-	my $json = JSON->new;
-	my $tar_hash = $json->decode( $tar_json );
-	
-	print Dumper($tar_hash);
 	
 	exit(0);
 	#9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e/json
