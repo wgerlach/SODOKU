@@ -2136,8 +2136,8 @@ if (defined($h->{'upload'})) {
 	
 	my $tar_json = '['.`$tar_extr`.']';
 	
-	# insert commas: 
-	$tar_json =~ s/\{\"id\"/,\{\"id\"/g;
+	# insert commas: TODO this is ugly!
+	$tar_json =~ s/\}\{\"id\"/\},\{\"id\"/g;
 	
 	print "json has: ".$tar_json."\n";
 	
