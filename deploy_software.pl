@@ -1583,7 +1583,7 @@ sub commandline_upload {
 			
 			if ($base_image_object->{'id'} ne $image_id) {
 				print STDERR  $err_str."\n";
-				print SDTERR "error: id not identical \n\"".$base_image_object->{'id'}."\"\n\"".$baseimage_id."\"";
+				print STDERR "error: id not identical \n\"".$base_image_object->{'id'}."\"\n\"".$baseimage_id."\"\n";
 				
 				my $a = $base_image_object->{'id'};
 				my $b = $baseimage_id;
