@@ -62,7 +62,7 @@ my @docker_file_content=();
 my $docker_deps={};
 
 my $is_root_user = undef;
-
+my $shocktoken=undef;
 
 
 
@@ -379,12 +379,14 @@ sub remove_base_from_image_and_set_tag {
 sub upload_docker_image_to_shock {
 	
 	
-	my ($image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile) = @_;
+	my ($token, $image_file, $repo, $tag, $image_id, $base_image_object, $dockerfile, $image_docker_version_hash) = @_;
 	### upload image to SHOCK ###
 	#check token
 	#check server
 	
-	
+	unless (defined $token) {
+		die;
+	}
 	
 	unless (defined $tag) {
 		die;
@@ -396,20 +398,23 @@ sub upload_docker_image_to_shock {
 	require SHOCK::Client;
 	
 	
-	if (!defined($ENV{'GLOBUSONLINE'}) ||  $ENV{'GLOBUSONLINE'} eq '') {
-		die 'GLOBUSONLINE token not found';
+	unless (defined($token)) {
+		die 'SHOCK token not found';
 	}
 	
 	unless (defined $shock) {
-		$shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
+		$shock = new SHOCK::Client($shock_server, $token);
 	}
 	
 	
-	require MIME::Base64;
-	my $dockerfile_encoded = MIME::Base64::encode_base64($dockerfile);
-	$dockerfile_encoded =~ s/\n//g;
-	print "dockerfile_encoded:\n$dockerfile_encoded\n";
+	my $dockerfile_encoded = '';
 	
+	if (defined $dockerfile && $dockerfile ne 'none') {
+		require MIME::Base64;
+		$dockerfile_encoded = MIME::Base64::encode_base64($dockerfile);
+		$dockerfile_encoded =~ s/\n//g;
+		print "dockerfile_encoded:\n$dockerfile_encoded\n";
+	}
 	
 	
 	
@@ -418,7 +423,7 @@ sub upload_docker_image_to_shock {
 		"type"					=> "dockerimage",
 		"name"					=> $repotag						|| die,
 		"id"					=> $image_id					|| die,
-		"docker_version"		=> $docker_version_info			|| die,
+		"docker_version"		=> $image_docker_version_hash	|| die,
 		"base_image_tag"		=> $base_image_object->{'name'} || "",
 		"base_image_id"			=> $base_image_object->{'id'}	|| "",
 		"dockerfile"			=> $dockerfile_encoded			|| ""
@@ -433,7 +438,7 @@ sub upload_docker_image_to_shock {
 	
 	
 	print "upload image to SHOCK docker repository\n";
-	my $up_result = $shock->upload('file' => $image_tarfile, 'attr' => $node_attributes_str) || die;
+	my $up_result = $shock->upload('file' => $image_file, 'attr' => $node_attributes_str) || die;
 	#same as: my $curl_cmd = 'curl -X POST -H "Authorization: OAuth $GLOBUSONLINE"  -F "attributes=@sodoku_docker.json" -F "upload=@'.$image_tarfile.'" "'.$shock_server.'/node"';
 	print Dumper($up_result);
 	unless ($up_result->{'status'} == 200) {
@@ -445,9 +450,6 @@ sub upload_docker_image_to_shock {
 	$shock->permisson_readable($shock_node_id) || die "error makeing node readable";
 	
 	print "Docker image uploaded.\n";
-	
-	
-	systemp("rm -f ".$image_tarfile);
 	
 	return $shock_node_id;
 	
@@ -1175,6 +1177,57 @@ sub replacePtarget {
 }
 
 
+sub commandline_remove_base_layers {
+	
+	my $image_tarfile = abs_path(shift(@_));
+	
+	unless ($image_tarfile =~ /\.tar$/) {
+		die "tar expected";
+	}
+	
+	my ($imagediff_tarfile) = $image_tarfile =~ /^(.*)\.tar$/;
+	$imagediff_tarfile .= ".diff.tar";
+	
+	#my ($repo, $tag)
+	
+	my $repo = undef;
+	my $tag = undef;
+	
+	if (defined $h->{'tag'}) {
+		($repo, $tag) = split(':', $h->{'tag'});
+	} else {
+		die "error: please define --tag , e.g. --tag=namespace/repo:version";
+		
+	}
+	
+	
+	my $image_id=undef;
+	
+	
+	
+	unless (defined ($image_id)) {
+		my $image_tarfile_base = basename($image_tarfile);
+		
+		my ($parsed_image_id) = $image_tarfile_base =~ /^([0-9A-Fa-f]{64})/;
+		if (defined($parsed_image_id)) {
+			$image_id = $parsed_image_id;
+		}
+		
+	}
+	
+	
+	unless (defined($image_id)) {
+		die "error: image_id unknown\n";
+	}
+	
+	print "use imaged_id: $image_id\n";
+	
+	remove_base_from_image_and_set_tag($image_tarfile, $imagediff_tarfile, $repo, $tag, $image_id);
+	
+	
+}
+
+
 sub parsePackageString{
 	my $package_string = shift(@_);
 	
@@ -1374,6 +1427,109 @@ sub array_execute {
 	
 }
 
+sub commandline_upload {
+	
+	my $image_tarfile = shift(@_);
+	
+	unless (-e $image_tarfile) {
+		die;
+	}
+	
+	my $repo = undef;
+	my $tag = undef;
+	
+	if (defined $h->{'tag'}) {
+		($repo, $tag) = split(':', $h->{'tag'});
+	} else {
+		die "error: please define --tag , e.g. --tag=namespace/repo:version";
+		
+	}
+	
+	my $dockerfile = $h->{'dockerfile'};
+	unless (defined $dockerfile)) {
+		die "error: please specify docker file. if not available explicitly specifiy --dockerfile=none"
+	}
+	
+	if ($dockerfile eq 'none') {
+		$dockerfile = undef;
+	}
+	
+	if (defined $dockerfile) {
+		$dockerfile = read_file($dockerfile);
+	}
+	
+	
+	my $image_history = read_history_from_tar_image($image_tarfile);
+	my $image_history_hash = {};
+	
+	my @baseimages=();
+	my $inverse_layer_graph={}; # points to child
+	foreach my $layer (@{$image_history}) {
+		my $id =  $layer->{'id'};
+		$image_history_hash->{$id} = $layer;
+		if (defined $layer->{'parent'}) {
+			$inverse_layer_graph->{$layer->{'parent'}}=$id
+		} else {
+			push(@baseimages, $id);
+		}
+	}
+	
+	if (@baseimages != 1) {
+		die "baseimages != 1";
+	}
+	my $baseimage_id = shift(@baseimages);
+	print "baseimage_id: $baseimage_id\n";
+	
+	
+	my @leaves=();
+	print Dumper($inverse_layer_graph);
+	foreach my $layer (@{$image_history}) {
+		
+		my $id =  $layer->{'id'};
+		
+		unless (defined $inverse_layer_graph->{$id}) {
+			push(@leaves, $id);
+		}
+		
+	}
+	
+	unless (@leaves == 1) {
+		die "leaves != 1";
+	}
+	
+	my $image_id = shift(@leaves);
+	print "image_id: $image_id\n";
+	
+	my $image_docker_version = $image_history_hash->{$image_id}->{'docker_version'};
+	
+	
+	
+	
+	
+	exit(0);
+	#9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e/json
+	#tar -xvOf ./9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e_ubuntu_13.10.tar 9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e/json
+	
+	
+	
+	
+	my $base_image_object = {};
+	$base_image_object->{'id'} = $baseimage_id;
+	
+	
+	
+	my $docker_info = {};
+	$docker_info->{'Version'} = $image_docker_version; # other info not available from tarball
+	
+	
+	upload_docker_image_to_shock($shocktoken, $image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile, $docker_info);
+	
+	
+}
+
+
+
+
 sub create_repository {
 	my $repo_file = 'repository.json';
 	
@@ -1428,6 +1584,30 @@ sub create_repository {
 	if (@error_file > 0) {
 		print "warning: problems with following files:".join(',',@error_file)."\n"
 	}
+}
+
+sub read_history_from_tar_image {
+	
+	my ($image_tarfile) = @_;
+	
+	# extract all jsons: tar -xvOf $image_tarfile --wildcards '*/json'
+	#my $tar_extr = "tar -xvOf $image_tarfile ".$image_id.'/json';
+	
+	
+	my $tar_extr = "tar -xvOf $image_tarfile --wildcards '*/json'";
+	
+	my $tar_json = '['.`$tar_extr`.']';
+	
+	# insert commas: TODO this is ugly!
+	$tar_json =~ s/\}\{\"id\"/\},\{\"id\"/g;
+		
+	print "json has: ".$tar_json."\n";
+		
+	my $json = JSON->new;
+	my $tar_hash = $json->decode( $tar_json );
+	print Dumper($tar_hash);
+	return $tar_hash;
+		
 }
 
 sub chdirp {
@@ -2002,41 +2182,47 @@ my $help_text;
 ($h, $help_text) = &parse_options (
 'name' => 'SODOKU deploy software',
 'version' => '1',
-'synopsis' => 'deploy_software.pl',
+'synopsis' => 'deploy_software.pl --target=. package1 package2',
 'examples' => 'ls',
 'authors' => 'Wolfgang Gerlach',
 'options' => [
 'deploy:',
-	['target=s',		''],
-	['data_target=s',	'different target for packages marked with data=1'],
-	['version=s',		''],
-	['update',			'to update existing packages if possible'],
-	['new',				'delete packages before cloning'],
-	['root',			''],
-	['all',				'to install all packages in repository'],
-	['repo_file=s',		''],
-	['repo_url=s',		''],
-	['ignore=s',		'ignore packages'],
-	['forcetarget',		''],
-	['list',			''],
-	['create',			'write repository.json by merging multiple json files'],
-	['nodeps',			'do not install dependencies'],
-	['nossl',			''],
+	['target=s',			''],
+	['data_target=s',		'different target for packages marked with data=1'],
+	['update',				'to update existing packages if possible'],
+	['new',					'delete packages before cloning'],
+	['root',				''],
+	['all',					'to install all packages in repository'],
+	['repo_file=s',			''],
+	['repo_url=s',			''],
+	['ignore=s',			'ignore packages'],
+	['forcetarget',			'create target directory if not existing'],
+	['list',				'list all SODOKU packages'],
+	['nodeps',				'do not install dependencies'],
+	['nossl',				''],
+	'',
+'update SODOKU repository file:',
+	['create',				'write repository.json by merging multiple json files'],
+	'',
+'create docker image:',
+	['docker',				'create docker image from SODOKU package'],
+	['base_image=s',		'specify base_image to build from, e.g. ubuntu:13.10'],
+	['docker_reuse_image',	''],
+	['docker_noupload',		''],
+	['private',				'do not make image public on shock server'],
+	['tag=s',				'specifiy image name, e.g. me/mytool:1.0.1'],
+	['force_base',			'force upload of image even if baseimage is not in shock'],
 '',
-'docker image creation:',
-	['docker',			'create docker image'],
-	['base_image=s',	'specify base_image to build from, e.g. ubuntu:13.10'],
-	['docker_reuse_image', ''],
-	['docker_noupload', ''],
-	['private',			'do not make image public on shock server'],
-	['tag=s',			'specifiy image name, e.g. me/mytool:1.0.1'],
-	['force_base',		'force upload of image even if baseimage is not in shock'],
-'',
-'other docker operations:',
+'save image to tar:',
 	['save_image=s',		'save image in tar file'],
+'',
+'remove base layers:',
 	['remove_base_layers=s', 'combine with --base_image and --tag'],
-	['upload=s',	'upload tar-balled image to shock'],
-	['test=s']
+'',
+'upload image to shock:',
+	['upload=s',			'upload tar-balled image to shock'],
+	['dockerfile=s',		'(required) specify dockerfile used to create image'],
+	['token=s',				'SHOCK token for image upload']
 ]);
 
 if ($h->{'help'} || keys(%$h)==0) {
@@ -2045,7 +2231,17 @@ if ($h->{'help'} || keys(%$h)==0) {
 }
 
 
+if (defined $ENV{'GLOBUSONLINE'} && $ENV{'GLOBUSONLINE'} ne '') {
+	$shocktoken = $ENV{'GLOBUSONLINE'};
+}
 
+if (defined $ENV{'KB_AUTH_TOKEN'} && $ENV{'KB_AUTH_TOKEN'} ne '') {
+	$shocktoken = $ENV{'KB_AUTH_TOKEN'};
+}
+
+if (defined $h->{'token'}) {
+	$shocktoken = $h->{'token'};
+}
 
 
 if (defined($h->{'docker'}) ) {
@@ -2054,7 +2250,7 @@ if (defined($h->{'docker'}) ) {
 	
 	
 	unless (defined($h->{'base_image'})) {
-		die "please define --base_image";
+		die "please define --base_image, e.g. --base_image=ubuntu:13.10";
 	}
 	
 	$base_image_object = get_image_object($h->{'base_image'});
@@ -2092,166 +2288,23 @@ if (defined($d) && ($d == 1)) {
 	};
 }
 
-if (defined($h->{'test'})) {
-
-	get_image_object($h->{'test'});
-	
-	exit(0);
-	get_diff_layers("364a9c36214d9f933ce8d9f733d3096a6d6cc61adad8b30ee2ae213297b70c32");
-	exit(0);
-}
-
-
-sub read_history_from_tar_image {
-
-	my ($image_tarfile) = @_;
-	
-	# extract all jsons: tar -xvOf $image_tarfile --wildcards '*/json'
-	#my $tar_extr = "tar -xvOf $image_tarfile ".$image_id.'/json';
-
-	
-	my $tar_extr = "tar -xvOf $image_tarfile --wildcards '*/json'";
-	
-	my $tar_json = '['.`$tar_extr`.']';
-	
-	# insert commas: TODO this is ugly!
-	$tar_json =~ s/\}\{\"id\"/\},\{\"id\"/g;
-		
-		print "json has: ".$tar_json."\n";
-		
-		my $json = JSON->new;
-		my $tar_hash = $json->decode( $tar_json );
-	print Dumper($tar_hash);
-	return $tar_hash;
-		
-}
 
 
 if (defined($h->{'upload'})) {
-	
-	my $image_tarfile = $h->{'upload'};
-	unless (-e $image_tarfile) {
-		die;
-	}
-		
-	my $image_history = read_history_from_tar_image($image_tarfile);
-	
-	
-	my @baseimages=();
-	my $inverse_layer_graph={}; # points to child
-	foreach my $layer (@{$image_history}) {
-		my $id =  $layer->{'id'};
-		if (defined $layer->{'parent'}) {
-			$inverse_layer_graph->{$layer->{'parent'}}=$id
-		} else {
-			push(@baseimages, $id);
-		}
-	}
-
-	if (@baseimages != 1) {
-		die "baseimages != 1";
-	}
-	my $baseimage_id = shift(@baseimages);
-	print "baseimage_id: $baseimage_id\n";
-	
-	
-	my @leaves=();
-	print Dumper($inverse_layer_graph);
-	foreach my $layer (@{$image_history}) {
-		
-		my $id =  $layer->{'id'};
-
-		unless (defined $inverse_layer_graph->{$id}) {
-			push(@leaves, $id);
-		}
-		
-	}
-	
-	unless (@leaves == 1) {
-		die "leaves != 1";
-	}
-	
-	my $image_id = shift(@leaves);
-	print "image_id: $image_id\n";
-	
-	
-	exit(0);
-	#9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e/json
-	#tar -xvOf ./9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e_ubuntu_13.10.tar 9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e/json
-	
-	
-	my $repo = undef;
-	my $tag = undef;
-	
-	if (defined $h->{'tag'}) {
-		($repo, $tag) = split(':', $h->{'tag'});
-	} else {
-		die "error: please define --tag , e.g. --tag=namespace/repo:version";
-		
-	}
-	
-	my $base_image_object = {};
-	$base_image_object->{'id'} = $baseimage_id;
-	
-	my $dockerfile = undef;
-	
-	upload_docker_image_to_shock($image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile);
-	
+	commandline_upload($h->{'upload'});
 	exit(0);
 }
+
+
 
 
 if (defined($h->{'remove_base_layers'})) {
-	# tarfile, image_id, base_image_id,
-	
-	my $image_tarfile = abs_path($h->{'remove_base_layers'});
-	
-	unless ($image_tarfile =~ /\.tar$/) {
-		die "tar expected";
-	}
-	
-	my ($imagediff_tarfile) = $image_tarfile =~ /^(.*)\.tar$/;
-	$imagediff_tarfile .= ".diff.tar";
-	
-	#my ($repo, $tag)
-	
-	my $repo = undef;
-	my $tag = undef;
-	
-	if (defined $h->{'tag'}) {
-		($repo, $tag) = split(':', $h->{'tag'});
-	} else {
-		die "error: please define --tag , e.g. --tag=namespace/repo:version";
-		
-	}
-	
-	
-	my $image_id=undef;
-	
-	
-	
-	unless (defined ($image_id)) {
-		my $image_tarfile_base = basename($image_tarfile);
-		
-		my ($parsed_image_id) = $image_tarfile_base =~ /^([0-9A-Fa-f]{64})/;
-		if (defined($parsed_image_id)) {
-			$image_id = $parsed_image_id;
-		}
-		
-	}
-	
-	
-	unless (defined($image_id)) {
-		die "error: image_id unknown\n";
-	}
-	
-	print "use imaged_id: $image_id\n";
-	
-	remove_base_from_image_and_set_tag($image_tarfile, $imagediff_tarfile, $repo, $tag, $image_id);
-
+	commandline_remove_base_layers($h->{'remove_base_layers'});
 	exit(0);
-	
 }
+
+
+
 
 
 if (defined $h->{'save_image'}) {
@@ -2269,12 +2322,7 @@ if (defined $h->{'save_image'}) {
 }
 
 if (defined $h->{'create'}) {
-	
-	
 	create_repository();
-	
-	
-	
 	exit(0);
 }
 
@@ -2510,7 +2558,7 @@ if ($d) {
 	
 	# upload docker image
 	unless (defined $h->{'docker_noupload'}) {
-		my $shock_node_id = upload_docker_image_to_shock($image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile) || die;
+		my $shock_node_id = upload_docker_image_to_shock($shocktoken, $image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile, $docker_version_info) || die;
 	}
 
 }
