@@ -1581,36 +1581,25 @@ sub commandline_upload {
 				die $err_str;
 			}
 			
-			my $image_id_a = $base_image_object->{'id'};
-			my $image_id_b = $image_id;
 			
 			
-			print Dumper($image_id_a);
-			
-			print Dumper($image_id_b);
-			
-			
-			if ($image_id_a eq $image_id_b) {
-					die "OK!"
-			}
-			
-			if ($image_id_a ne $image_id_b) {
+			if ($base_image_object->{'id'} ne $baseimage_id) {
 				print STDERR  $err_str."\n";
 				print STDERR "error: id not identical \n\"".$base_image_object->{'id'}."\"\n\"".$baseimage_id."\"\n";
 				
-				my $a = $base_image_object->{'id'};
-				my $b = $baseimage_id;
-				$a =~ s/(.)/ord($1)/eg;
-				$b =~ s/(.)/ord($1)/eg;
+				#my $a = $base_image_object->{'id'};
+				#my $b = $baseimage_id;
+				#$a =~ s/(.)/ord($1)/eg;
+				#$b =~ s/(.)/ord($1)/eg;
 				
 				
 				
-				print "Ascii a: $a\n";
-				print "Ascii b: $b\n";
+				#print "Ascii a: $a\n";
+				#print "Ascii b: $b\n";
 				
-				my $c = $a - $b;
+				#my $c = $a - $b;
 				
-				print "diff: $c\n";
+				#print "diff: $c\n";
 				
 				exit(1);
 			}
