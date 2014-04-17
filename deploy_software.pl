@@ -1581,7 +1581,10 @@ sub commandline_upload {
 				die $err_str;
 			}
 			
-			if ($base_image_object->{'id'} ne $image_id) {
+			my $image_id_a = $base_image_object->{'id'};
+			my $image_id_b = $image_id;
+			
+			if ($image_id_a ne $image_id_b) {
 				print STDERR  $err_str."\n";
 				print STDERR "error: id not identical \n\"".$base_image_object->{'id'}."\"\n\"".$baseimage_id."\"\n";
 				
