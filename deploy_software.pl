@@ -1077,27 +1077,32 @@ sub get_image_object{
 	
 		my $history = dockerSocket('GET', "/images/".$obj->{'id'}."/history");
 		
-		print Dumper($history);
+		print "history: ".Dumper($history);
 		
-		my $tags  = $history->[0]->{'Tags'} || die "error: tags not found";
+		my $tags = $history->[0]->{'Tags'};
 		
-		if (@$tags == 0) {
-			die "error: tags empty";
+		unless (defined($tags) || @$tags > 0) {
+			print STDERR "warning: tags not found";
 		}
 		
-		if (@$tags == 1) {
-			$obj->{'name'} = $tags->[0];
-			return $obj;
-		}
 		
-		my $longest_tag = $tags->[0];
-		foreach my $t (@{$tags}) {
-			if (length($t) > length($longest_tag)) {
-				$longest_tag = $t;
+		if (defined $tags && @$tags > 0) {
+			
+			if (@$tags == 1) {
+				$obj->{'name'} = $tags->[0];
+				
+			} else {
+			
+				my $longest_tag = $tags->[0];
+				foreach my $t (@{$tags}) {
+					if (length($t) > length($longest_tag)) {
+						$longest_tag = $t;
+					}
+				}
+				$obj->{'name'} = $longest_tag;
 			}
+			
 		}
-		
-		$obj->{'name'} =$longest_tag;
 		
 	} else {
 		# user specified image by its name
@@ -2296,7 +2301,9 @@ if (defined($h->{'docker'}) ) {
 	}
 	
 	$base_image_object = get_image_object($h->{'base_image'});
-	
+	unless (defined $base_image_object->{'id'} && defined $base_image_object->{'name'}) {
+		die ;
+	}
 }
 
 
@@ -2352,6 +2359,10 @@ if (defined($h->{'remove_base_layers'})) {
 if (defined $h->{'save_image'}) {
 	
 	my $image_obj = get_image_object($h->{'save_image'});
+	
+	unless (defined $image_obj->{'id'} && defined $image_obj->{'name'}) {
+		die ;
+	}
 	
 	my $name  = $image_obj->{'name'};
 	$name =~ s/[\:\_\/]/\_/g;
