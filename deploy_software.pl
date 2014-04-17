@@ -1585,6 +1585,11 @@ sub commandline_upload {
 			my $image_id_b = $image_id;
 			
 			
+			print Dumper($image_id_a);
+			
+			print Dumper($image_id_b);
+			
+			
 			if ($image_id_a eq $image_id_b) {
 					die "OK!"
 			}
