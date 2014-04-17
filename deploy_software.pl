@@ -471,6 +471,8 @@ sub dockerSocket {
 	
 	my $url = 'http:'.$docker_socket.'/'.$endpoint;
 	
+	print "request: $request_type $url\n";
+	
 	my $agent = LWP::UserAgent->new;
 	
 	require LWP::Protocol::http::SocketUnixAlt;
