@@ -1081,7 +1081,7 @@ sub get_image_object{
 		
 		my $tags = $history->[0]->{'Tags'};
 		
-		unless (defined($tags) || @$tags > 0) {
+		if (! defined($tags) || @$tags == 0) {
 			print STDERR "warning: tags not found";
 		}
 		
