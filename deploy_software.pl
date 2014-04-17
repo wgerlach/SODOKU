@@ -1486,33 +1486,41 @@ sub commandline_upload {
 	my $image_history = read_history_from_tar_image($image_tarfile);
 	my $image_history_hash = {};
 	
-	my @baseimages=();
-	my $inverse_layer_graph={}; # points to child
+	my @noparents=();
+	my $layer_graph_inverse={}; # points to child
+	my $layer_graph={};
 	foreach my $layer (@{$image_history}) {
 		my $id =  $layer->{'id'};
 		$image_history_hash->{$id} = $layer;
 		if (defined $layer->{'parent'}) {
-			$inverse_layer_graph->{$layer->{'parent'}}=$id
+			$layer_graph_inverse->{$layer->{'parent'}}=$id
+			$layer_graph->{$id} = $layer->{'parent'};
 		} else {
-			push(@baseimages, $id);
+			push(@noparents, $id);
 		}
 	}
 	
-	if (@baseimages != 1) {
-		die "baseimages != 1";
+	if (@noparents > 1) {
+		die "baseimages > 1";
 	}
-	my $baseimage_id = shift(@baseimages);
-	print "baseimage_id: $baseimage_id\n";
+	
+	#my $baseimage_id = shift(@noparents);
+	#print "baseimage_id: $baseimage_id\n";
 	
 	
 	my @leaves=();
-	print Dumper($inverse_layer_graph);
+	my @parent_leaf=();
+	print Dumper($layer_graph_inverse);
 	foreach my $layer (@{$image_history}) {
 		
 		my $id =  $layer->{'id'};
 		
-		unless (defined $inverse_layer_graph->{$id}) {
+		unless (defined $layer_graph_inverse->{$id}) {
 			push(@leaves, $id);
+		}
+		
+		unless (defined $layer_graph->{$id}) {
+			push(@parent_leaf, $id);
 		}
 		
 	}
@@ -1520,6 +1528,16 @@ sub commandline_upload {
 	unless (@leaves == 1) {
 		die "leaves != 1";
 	}
+	
+	if (@parent_leaf > 1) {
+		die "parent_leaf > 1, ".scalar(@parent_leaf);
+	}
+	
+	my $baseimage_id=undef;
+	if (@parent_leaf == 1) {
+		$baseimage_id = shift(@parent_leaf);
+	}
+	
 	
 	my $image_id = shift(@leaves);
 	print "image_id: $image_id\n";
@@ -1536,39 +1554,43 @@ sub commandline_upload {
 	
 	
 	my $base_image_object = {};
-		
-	if (defined($h->{'base_image_name'})) {
-		
-		if ($h->{'base_image_name'} ne 'none') {
-			$base_image_object->{'name'} = $h->{'base_image_name'};
-			$base_image_object->{'id'} = $baseimage_id;
+	
+	if (defined $baseimage_id) {
+	
+		if (defined($h->{'base_image_name'})) {
+			
+			if ($h->{'base_image_name'} ne 'none') {
+				$base_image_object->{'name'} = $h->{'base_image_name'};
+				$base_image_object->{'id'} = $baseimage_id;
+			} else {
+				$base_image_object = undef;
+			}
 		} else {
-			$base_image_object = undef;
+			print "base_image_name not defined, try to infer from docker...\n";
+			$base_image_object = get_image_object($baseimage_id);
+			
+			my $err_str = "error: please define --base_image_name, e.g. --base_image_name=ubuntu:13.10";
+			
+			unless (defined $base_image_object) {
+				die $err_str;
+			}
+			unless (defined $base_image_object->{'id'}) {
+				die $err_str;
+			}
+			unless (defined $base_image_object->{'name'}) {
+				die $err_str;
+			}
+			
+			if ($base_image_object->{'id'} ne $image_id) {
+				print STDERR  $err_str."\n";
+				die "error: id not identical ".$base_image_object->{'id'}." and ".$baseimage_id;
+			}
+			
+			
 		}
 	} else {
-		print "base_image_name not defined, try to infer from docker...\n";
-		$base_image_object = get_image_object($baseimage_id);
-		
-		my $err_str = "error: please define --base_image_name, e.g. --base_image_name=ubuntu:13.10";
-		
-		unless (defined $base_image_object) {
-			die $err_str;
-		}
-		unless (defined $base_image_object->{'id'}) {
-			die $err_str;
-		}
-		unless (defined $base_image_object->{'name'}) {
-			die $err_str;
-		}
-		
-		if ($base_image_object->{'id'} ne $image_id) {
-			print STDERR  $err_str."\n";
-			die "error: id not identical ".$base_image_object->{'id'}." and ".$image_id;
-		}
-		
-		
+		$base_image_object = undef; # no baseimage exists
 	}
-	
 		
 	my $docker_info = {};
 	$docker_info->{'Version'} = $image_docker_version; # other info not available from tarball
