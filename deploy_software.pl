@@ -1594,6 +1594,11 @@ sub commandline_upload {
 				
 				print "Ascii a: $a\n";
 				print "Ascii b: $b\n";
+				
+				my $c = $a - $b;
+				
+				print "diff: $c\n";
+				
 				exit(1);
 			}
 			
