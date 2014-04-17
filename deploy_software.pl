@@ -2175,7 +2175,7 @@ if (defined($h->{'upload'})) {
 	}
 
 	my @leaves=();
-	print Dumper($layer_graph);
+	print Dumper($inverse_layer_graph);
 	foreach my $layer (@{$image_history}) {
 		
 		my $id =  $layer->{'id'};
