@@ -1447,7 +1447,7 @@ sub commandline_upload {
 	
 	my $dockerfile = $h->{'dockerfile'};
 	unless (defined $dockerfile)) {
-		die "error: please specify docker file. if not available explicitly specifiy --dockerfile=none"
+		die "error: please specify docker file. if not available explicitly specifiy --dockerfile=none";
 	}
 	
 	if ($dockerfile eq 'none') {
