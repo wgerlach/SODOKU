@@ -2133,47 +2133,28 @@ if (defined($h->{'upload'})) {
 	unless (-e $image_tarfile) {
 		die;
 	}
-	
-	#unless ($image_tarfile =~ /gz$/) {
-	#	die "error please gzip the tar ball first";
-	#}
-	
-	
-	
-	
-	
-	#my $image_id =undef;
-	#unless (defined ($image_id)) {
-	#	my $image_tarfile_base = basename($image_tarfile);
-	#
-	#	my ($parsed_image_id) = $image_tarfile_base =~ /^([0-9A-Fa-f]{64})/;
-	#	if (defined($parsed_image_id)) {
-	#		$image_id = $parsed_image_id;
-	#	}
-	#
-	#}
-	
-	#unless (defined($image_id)) {
-	#	die "error: image_id unknown\n";
-	#}
-	
 		
 	my $image_history = read_history_from_tar_image($image_tarfile);
 	
-	my $inverse_layer_graph={}; # points to child
 	
+	my @baseimages=();
+	my $inverse_layer_graph={}; # points to child
 	foreach my $layer (@{$image_history}) {
-		
 		my $id =  $layer->{'id'};
-		print $id."\n";
 		if (defined $layer->{'parent'}) {
-			#print "parent: ".$layer->{'parent'}."\n";
-			
 			$inverse_layer_graph->{$layer->{'parent'}}=$id
+		} else {
+			push(@baseimages, $id);
 		}
-		
 	}
 
+	if (@baseimages != 1) {
+		die "baseimages != 1";
+	}
+	my $baseimage_id = shift(@baseimages);
+	print "baseimage_id: $baseimage_id\n";
+	
+	
 	my @leaves=();
 	print Dumper($inverse_layer_graph);
 	foreach my $layer (@{$image_history}) {
@@ -2209,7 +2190,9 @@ if (defined($h->{'upload'})) {
 		
 	}
 	
-	my $base_image_object = undef;
+	my $base_image_object = {};
+	$base_image_object->{'id'} = $baseimage_id;
+	
 	my $dockerfile = undef;
 	
 	upload_docker_image_to_shock($image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile);
