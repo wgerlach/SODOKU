@@ -2142,20 +2142,20 @@ if (defined($h->{'upload'})) {
 	
 	
 	
-	my $image_id =undef;
-	unless (defined ($image_id)) {
-		my $image_tarfile_base = basename($image_tarfile);
-		
-		my ($parsed_image_id) = $image_tarfile_base =~ /^([0-9A-Fa-f]{64})/;
-		if (defined($parsed_image_id)) {
-			$image_id = $parsed_image_id;
-		}
-		
-	}
+	#my $image_id =undef;
+	#unless (defined ($image_id)) {
+	#	my $image_tarfile_base = basename($image_tarfile);
+	#
+	#	my ($parsed_image_id) = $image_tarfile_base =~ /^([0-9A-Fa-f]{64})/;
+	#	if (defined($parsed_image_id)) {
+	#		$image_id = $parsed_image_id;
+	#	}
+	#
+	#}
 	
-	unless (defined($image_id)) {
-		die "error: image_id unknown\n";
-	}
+	#unless (defined($image_id)) {
+	#	die "error: image_id unknown\n";
+	#}
 	
 		
 	my $image_history = read_history_from_tar_image($image_tarfile);
@@ -2163,16 +2163,35 @@ if (defined($h->{'upload'})) {
 	my $layer_graph={};
 	
 	foreach my $layer (@{$image_history}) {
-		print $layer->{'id'}."\n";
+		
+		my $id =  $layer->{'id'};
+		print $id."\n";
 		if (defined $layer->{'parent'}) {
 			print "parent: ".$layer->{'parent'}."\n";
-			$layer_graph->{$layer->{'id'}} = $layer->{'parent'};
-		} else {
-			$layer_graph->{$layer->{'id'}} = '-';
+			$layer_graph->{$id} = $layer->{'parent'};
 		}
 		
 	}
+
+	my @leaves=();
 	print Dumper($layer_graph);
+	foreach my $layer (@{$image_history}) {
+		
+		my $id =  $layer->{'id'};
+
+		unless (defined $layer_graph->{$id}) {
+			push(@leaves, $id);
+		}
+		
+	}
+	
+	unless (@leaves == 1) {
+		die "leaves != 1";
+	}
+	
+	my $image_id = shift(@leaves);
+	print "image_id: $image_id\n";
+	
 	
 	exit(0);
 	#9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e/json
