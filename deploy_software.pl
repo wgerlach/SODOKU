@@ -1515,12 +1515,19 @@ sub commandline_upload {
 		
 		my $id =  $layer->{'id'};
 		
+		#child
 		unless (defined $layer_graph_inverse->{$id}) {
 			push(@leaves, $id);
 		}
 		
-		unless (defined $layer_graph->{$id}) {
-			push(@parent_leaf, $id);
+		#parent
+		my $parent = $layer_graph->{$id};
+		if (defined $parent) {
+			
+			unless (defined $image_history_hash->{$parent}) {
+				# parent has ID but is not part of the image
+				push(@parent_leaf, $parent);
+			}
 		}
 		
 	}
