@@ -1082,7 +1082,7 @@ sub get_image_object{
 		my $tags = $history->[0]->{'Tags'};
 		
 		if (! defined($tags) || @$tags == 0) {
-			print STDERR "warning: tags not found";
+			print STDERR "warning: no tag found for image in docker\n";
 		}
 		
 		
@@ -1538,8 +1538,13 @@ sub commandline_upload {
 	my $base_image_object = {};
 		
 	if (defined($h->{'base_image_name'})) {
-		$base_image_object->{'name'} = $h->{'base_image_name'};
-		$base_image_object->{'id'} = $baseimage_id;
+		
+		if ($h->{'base_image_name'} ne 'none') {
+			$base_image_object->{'name'} = $h->{'base_image_name'};
+			$base_image_object->{'id'} = $baseimage_id;
+		} else {
+			$base_image_object = undef;
+		}
 	} else {
 		print "base_image_name not defined, try to infer from docker...\n";
 		$base_image_object = get_image_object($baseimage_id);
@@ -2267,7 +2272,8 @@ my $help_text;
 '',
 'upload image to shock:',
 	['upload=s',			'upload tar-balled image to shock'],
-	['dockerfile=s',		'(required) specify dockerfile used to create image'],
+	['dockerfile=s',		'(required) specify dockerfile used to create image, possible:none'],
+	['base_image_name=s',	'required if not retrievable from docker, possible:none'],
 	['docker_noupload',		''],
 	['token=s',				'SHOCK token for image upload']
 ]);
