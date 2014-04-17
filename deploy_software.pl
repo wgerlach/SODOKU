@@ -1059,7 +1059,7 @@ sub hg_clone {
 sub get_image_object{
 	my ($something) = @_;
 	
-	my $result_hash = dockerSocket('GET', "/images/$something/json") || die "error: image not found";
+	my $result_hash = dockerSocket('GET', "/images/$something/json") || die "error: image \"$something\" not found";
 
 	
 	print "something: ".Dumper($result_hash);
@@ -1535,7 +1535,7 @@ sub commandline_upload {
 		$base_image_object->{'id'} = $baseimage_id;
 	} else {
 		print "base_image_name not defined, try to infer from docker...\n";
-		$base_image_object = get_image_object($h->{'base_image_name'});
+		$base_image_object = get_image_object($baseimage_id);
 		
 		my $err_str = "error: please define --base_image_name, e.g. --base_image_name=ubuntu:13.10";
 		
