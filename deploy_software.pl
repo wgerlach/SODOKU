@@ -2160,14 +2160,19 @@ if (defined($h->{'upload'})) {
 		
 	my $image_history = read_history_from_tar_image($image_tarfile);
 	
+	my $layer_graph={};
+	
 	foreach my $layer (@{$image_history}) {
 		print $layer->{'id'}."\n";
 		if (defined $layer->{'parent'}) {
 			print "parent: ".$layer->{'parent'}."\n";
+			$layer_graph->{$layer->{'id'}} = $layer->{'parent'};
+		} else {
+			$layer_graph->{$layer->{'id'}} = '-';
 		}
 		
 	}
-	
+	print Dumper($layer_graph);
 	
 	exit(0);
 	#9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e/json
