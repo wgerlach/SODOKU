@@ -434,8 +434,16 @@ sub upload_docker_image_to_shock {
 
 	
 	
-	print "node_attributes_str:\n$node_attributes_str\n";
+	#print "node_attributes_str:\n$node_attributes_str\n";
+	print "node_attributes: ".Dumper($node_attributes) ;
 	
+	
+	print "uploading file \"".$image_file."\" ...\n";
+	
+	if (defined $h->{'docker_noupload'}) {
+		print "--docker_noupload invoked.\n";
+		exit(0)
+	}
 	
 	print "upload image to SHOCK docker repository\n";
 	my $up_result = $shock->upload('file' => $image_file, 'attr' => $node_attributes_str) || die;
@@ -449,7 +457,7 @@ sub upload_docker_image_to_shock {
 	
 	$shock->permisson_readable($shock_node_id) || die "error makeing node readable";
 	
-	print "Docker image uploaded.\n";
+	print "Docker image uploaded ($shock_node_id).\n";
 	
 	return $shock_node_id;
 	
@@ -1435,6 +1443,7 @@ sub commandline_upload {
 		die;
 	}
 	
+	# tag
 	my $repo = undef;
 	my $tag = undef;
 	
@@ -1445,6 +1454,7 @@ sub commandline_upload {
 		
 	}
 	
+	# dockerfile
 	my $dockerfile = $h->{'dockerfile'};
 	unless (defined($dockerfile)) {
 		die "error: please specify docker file. if not available explicitly specifiy --dockerfile=none";
@@ -1459,6 +1469,13 @@ sub commandline_upload {
 	}
 	
 	
+	
+	
+	
+		
+	
+	
+	# image history
 	my $image_history = read_history_from_tar_image($image_tarfile);
 	my $image_history_hash = {};
 	
@@ -1500,24 +1517,47 @@ sub commandline_upload {
 	my $image_id = shift(@leaves);
 	print "image_id: $image_id\n";
 	
+	
+	
+	
+	
+	
 	my $image_docker_version = $image_history_hash->{$image_id}->{'docker_version'};
 	
 	
 	
 	
 	
-	exit(0);
-	#9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e/json
-	#tar -xvOf ./9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e_ubuntu_13.10.tar 9f676bd305a43a931a8d98b13e5840ffbebcd908370765373315926024c7c35e/json
-	
-	
-	
-	
 	my $base_image_object = {};
-	$base_image_object->{'id'} = $baseimage_id;
+		
+	if (defined($h->{'base_image_name'})) {
+		$base_image_object->{'name'} = $h->{'base_image_name'}
+		$base_image_object->{'id'} = $baseimage_id;
+	} else {
+		print "base_image_name not defined, try to infer from docker...\n";
+		$base_image_object = get_image_object($h->{'base_image_name'});
+		
+		my $err_str = "error: please define --base_image_name, e.g. --base_image_name=ubuntu:13.10";
+		
+		unless (defined $base_image_object) {
+			die $err_str;
+		}
+		unless (defined $base_image_object->{'id'}) {
+			die $err_str;
+		}
+		unless (defined $base_image_object->{'name'}) {
+			die $err_str;
+		}
+		
+		if ($base_image_object->{'id'} ne $image_id) {
+			print STDERR  $err_str."\n";
+			die "error: id not idential"
+		}
+		
+		
+	}
 	
-	
-	
+		
 	my $docker_info = {};
 	$docker_info->{'Version'} = $image_docker_version; # other info not available from tarball
 	
@@ -2208,7 +2248,6 @@ my $help_text;
 	['docker',				'create docker image from SODOKU package'],
 	['base_image=s',		'specify base_image to build from, e.g. ubuntu:13.10'],
 	['docker_reuse_image',	''],
-	['docker_noupload',		''],
 	['private',				'do not make image public on shock server'],
 	['tag=s',				'specifiy image name, e.g. me/mytool:1.0.1'],
 	['force_base',			'force upload of image even if baseimage is not in shock'],
@@ -2222,6 +2261,7 @@ my $help_text;
 'upload image to shock:',
 	['upload=s',			'upload tar-balled image to shock'],
 	['dockerfile=s',		'(required) specify dockerfile used to create image'],
+	['docker_noupload',		''],
 	['token=s',				'SHOCK token for image upload']
 ]);
 
@@ -2557,9 +2597,9 @@ if ($d) {
 	
 	
 	# upload docker image
-	unless (defined $h->{'docker_noupload'}) {
-		my $shock_node_id = upload_docker_image_to_shock($shocktoken, $image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile, $docker_version_info) || die;
-	}
+	
+	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile, $docker_version_info) || die;
+	
 
 }
 
