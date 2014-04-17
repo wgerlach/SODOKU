@@ -1531,7 +1531,7 @@ sub commandline_upload {
 	my $base_image_object = {};
 		
 	if (defined($h->{'base_image_name'})) {
-		$base_image_object->{'name'} = $h->{'base_image_name'}
+		$base_image_object->{'name'} = $h->{'base_image_name'};
 		$base_image_object->{'id'} = $baseimage_id;
 	} else {
 		print "base_image_name not defined, try to infer from docker...\n";
