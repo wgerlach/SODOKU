@@ -81,6 +81,9 @@
          ". ${ptarget}user-env.sh ; make && make deploy"
       ]
    },
+   "kbase_bootstrap_git" : {
+      "source-git" : "kbase@git.kbase.us:bootstrap.git"
+   },
    "SHOCK-lib" : {
       "set-env" : {
          "PERL5LIB" : "${ptarget}Shock/libs/:$PERL5LIB"
@@ -167,6 +170,20 @@
          "bowtie==0.12.8",
          "samtools==0.1.18",
          "emirge==0.60"
+      ]
+   },
+   "kbase_R3" : {
+      "depends" : [
+         "kbase_bootstrap_git"
+      ],
+      "exec" : [
+         "#apt-get -y remove r-base-core ; echo ok",
+         "#rm -rf ${target}runtime/lib/R/ ${target}runtime/bin/R",
+         "#echo 'deb http://cran.rstudio.com/bin/linux/ubuntu precise/' >> /etc/apt/sources.list",
+         "#apt-get update",
+         "apt-get install --force-yes -y -f r-base=3.1.0-1precise0 ; echo ok",
+         "mkdir -p ${target}deployment/lib/R/library",
+         "tpage --define rlib=${target}deployment/lib/R/library ${target}bootstrap/kb_r_runtime/r-packages.R | R --vanilla --slave"
       ]
    },
    "qiime" : {

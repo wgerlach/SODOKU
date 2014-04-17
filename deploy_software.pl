@@ -1366,8 +1366,10 @@ sub array_execute {
 			}
 		}
 		
-		print "exec:\n";
-		system_install($exec) == 0 or die;
+		unless ($exec =~ /^\#/) {
+			print "exec:\n";
+			system_install($exec) == 0 or die;
+		}
 	}
 	
 }
