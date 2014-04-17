@@ -2160,15 +2160,16 @@ if (defined($h->{'upload'})) {
 		
 	my $image_history = read_history_from_tar_image($image_tarfile);
 	
-	my $layer_graph={};
+	my $inverse_layer_graph={}; # points to child
 	
 	foreach my $layer (@{$image_history}) {
 		
 		my $id =  $layer->{'id'};
 		print $id."\n";
 		if (defined $layer->{'parent'}) {
-			print "parent: ".$layer->{'parent'}."\n";
-			$layer_graph->{$id} = $layer->{'parent'};
+			#print "parent: ".$layer->{'parent'}."\n";
+			
+			$inverse_layer_graph->{$layer->{'parent'}}=$id
 		}
 		
 	}
@@ -2179,7 +2180,7 @@ if (defined($h->{'upload'})) {
 		
 		my $id =  $layer->{'id'};
 
-		unless (defined $layer_graph->{$id}) {
+		unless (defined $inverse_layer_graph->{$id}) {
 			push(@leaves, $id);
 		}
 		
