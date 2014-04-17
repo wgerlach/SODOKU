@@ -1493,7 +1493,7 @@ sub commandline_upload {
 		my $id =  $layer->{'id'};
 		$image_history_hash->{$id} = $layer;
 		if (defined $layer->{'parent'}) {
-			$layer_graph_inverse->{$layer->{'parent'}}=$id
+			$layer_graph_inverse->{$layer->{'parent'}}=$id;
 			$layer_graph->{$id} = $layer->{'parent'};
 		} else {
 			push(@noparents, $id);
