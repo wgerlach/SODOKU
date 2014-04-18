@@ -1721,7 +1721,7 @@ sub commandline_docker2shock {
 	##### upload
 	print "### upload image\n";
 	
-	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $imagediff_tar_gz, $repo, $tag, $image_id, undef, undef, $docker_version_info);
+	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $imagediff_tar_gz, $repo, $tag, $image_id, undef, undef, get_docker_version());
 	
 	print "uploaded. shock node id: ".$shock_node_id."\n";
 }
@@ -1819,6 +1819,17 @@ sub read_history_from_tar_image {
 		
 }
 
+sub get_docker_version {
+	unless (defined $docker_version_info) {
+		
+		my $result_hash = dockerSocket('GET', "/version");
+		unless (defined $result_hash) {
+			die;
+		}
+		$docker_version_info = $result_hash;
+	}
+	return $docker_version_info;
+}
 
 sub read_name_from_tar_image {
 	
@@ -2782,12 +2793,8 @@ if ($d) {
 	
 	
 	
-	# docker version
-	my $result_hash = dockerSocket('GET', "/version");
-	unless (defined $result_hash) {
-		die;
-	}
-	$docker_version_info = $result_hash;
+	
+	
 	
 	# docker info
 	my $docker_info = dockerSocket('GET', "/info");
@@ -2814,7 +2821,7 @@ if ($d) {
 	
 	# upload docker image
 	
-	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile, $docker_version_info) || die;
+	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile, get_docker_version()) || die;
 	
 	print "uploaded. shock node id: ".$shock_node_id."\n";
 }
