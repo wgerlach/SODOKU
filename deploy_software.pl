@@ -236,7 +236,7 @@ sub createDockerImage {
 	# open and modify tar archive
 	
 	
-	my $imagediff_tarfile_gz = remove_base_from_image_and_set_tag($image_tarfile, $imagediff_tarfile, $repo, $tag, $image_id);
+	my $imagediff_tarfile_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id);
 		
 	
 		
@@ -575,6 +575,9 @@ sub findImageinShock {
 sub get_diff_layers {
 	my ($image_id, $base_id) = @_;
 	
+	unless (defined $image_id) {
+		die;
+	}
 	
 	if (defined $base_id) {
 	
@@ -597,10 +600,16 @@ sub get_diff_layers {
 	
 	
 	my $imageid_to_tags={};
+	
+	my $tag_to_imageid = {};
 	foreach my $image_obj (@{$images}) {
 		my $id = $image_obj->{'Id'} || die "Id not found";
 		my $repotags =  $image_obj->{'RepoTags'} || die "RepoTags not found";
 		$imageid_to_tags->{$id} = $repotags;
+		
+		foreach my $t (@{$repotags}) {
+			$tag_to_imageid->{$t}=$id;
+		}
 	}
 	
 	
@@ -1261,7 +1270,7 @@ sub commandline_remove_base_layers {
 	
 	print "use imaged_id: $image_id\n";
 	
-	remove_base_from_image_and_set_tag($image_tarfile, $imagediff_tarfile, $repo, $tag, $image_id);
+	my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id);
 	
 	
 }
