@@ -1473,7 +1473,9 @@ sub commandline_upload {
 		my $i_tag =  shift(@i_tags)  || die;
 		
 		print "got: ".$i_repo . ":".$i_tag."\n";
-		die "error: please define --tag , e.g. --tag=namespace/repo:version";
+		#die "error: please define --tag , e.g. --tag=namespace/repo:version";
+		$repo = $i_repo;
+		$tag = $i_tag;
 		
 	}
 	
