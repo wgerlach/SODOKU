@@ -236,14 +236,11 @@ sub createDockerImage {
 	# open and modify tar archive
 	
 	
-	remove_base_from_image_and_set_tag($image_tarfile, $imagediff_tarfile, $repo, $tag, $image_id);
+	my $imagediff_tarfile_gz = remove_base_from_image_and_set_tag($image_tarfile, $imagediff_tarfile, $repo, $tag, $image_id);
 		
 	
-	print "gzip tar file\n";
-	
-	systemp("gzip ".$imagediff_tarfile)==0 or die;
-	
-	my $imagediff_tarfile_gz = $imagediff_tarfile.'.gz';
+		
+	#my $imagediff_tarfile_gz = $imagediff_tarfile.'.gz';
 	unless (-e $imagediff_tarfile_gz) {
 		die;
 	}
@@ -280,7 +277,25 @@ sub save_image_to_tar {
 sub remove_base_from_image_and_set_tag {
 	
 	
-	my ($image_tarfile, $imagediff_tarfile, $repo, $tag, $image_id) = @_;
+	my ($image_tarfile, $repo, $tag, $image_id) = @_;
+	
+	unless ($image_tarfile =~ /\.tar$/) {
+		die "tar expected";
+	}
+	
+	my ($output_tar) = $image_tarfile =~ /^(.*)\.tar$/;
+	
+	unless (defined $output_tar) {
+		die;
+	}
+	
+	$output_tar .= '.diff.tar';
+	
+	my $output_targz  = $output_tar.'.gz';
+	
+	if (-e $output_targz) {
+		die "error: \"".$output_targz."\" already exists";
+	}
 	
 	systemp("rm -rf $tartemp");
 	
@@ -288,10 +303,10 @@ sub remove_base_from_image_and_set_tag {
 		die;
 	}
 	
-	systemp("mkdir -p $tartemp ; rm -f ".$imagediff_tarfile);
+	systemp("mkdir -p $tartemp ; rm -f ".$output_tar);
 	systemp("cd $tartemp && tar xvf ".$image_tarfile) ==0 or die;
 	
-	#old: my @base_layers = get_base_layers($base_image_object->{'id'});
+	
 	
 	
 	
@@ -346,8 +361,8 @@ sub remove_base_from_image_and_set_tag {
 	
 	print "create new tar without the base layers\n";
 	systemp("cd $tartemp && ls -la") == 0 or die;
-	systemp("cd $tartemp && sudo tar -cf $imagediff_tarfile *") == 0 or die;
-	systemp("sudo chmod 666 ".$imagediff_tarfile);
+	systemp("cd $tartemp && sudo tar -cf $output_tar *") == 0 or die;
+	systemp("sudo chmod 666 ".$output_tar);
 	
 	
 	
@@ -367,12 +382,21 @@ sub remove_base_from_image_and_set_tag {
 	
 	
 	
-	my $py_cmd = "python -c \"import tarfile; f=tarfile.open('".$imagediff_tarfile."', 'a'); f.add('repositories'); f.close()\"";
+	my $py_cmd = "python -c \"import tarfile; f=tarfile.open('".$output_tar."', 'a'); f.add('repositories'); f.close()\"";
 	
 	
 	systemp($py_cmd) == 0 or die;
 	
-	return;
+	
+	print "gzip tar file\n";
+	
+	systemp("gzip ".$output_tar)==0 or die;
+
+	unless (-e $output_targz) {
+		die;
+	}
+	
+	return $output_targz;
 }
 
 
