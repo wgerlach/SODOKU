@@ -1467,9 +1467,9 @@ sub commandline_upload {
 		
 		
 		
-		my $i_repo = shift(@{keys(%$image_repo)}) || die;
+		my $i_repo = shift( keys(%{$image_repo}) ) || die;
 		my $i_repo_hash = $image_repo->{$i_repo};
-		my $i_tag =  shift( @{keys(%{$i_repo_hash})} ) || die;
+		my $i_tag =  shift( keys(%{$i_repo_hash}) ) || die;
 		
 		print "got: ".$i_repo . ":".$i_tag."\n";
 		die "error: please define --tag , e.g. --tag=namespace/repo:version";
