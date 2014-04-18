@@ -53,7 +53,7 @@ my %already_installed;
 my $h = {};
 
 my $shock=undef;
-my $docker_version_info = {};
+my $docker_version_info = undef;
 my $shock_client_module_available = 0;
 
 my $d=undef; # docker inidicator
