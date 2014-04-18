@@ -298,7 +298,7 @@ sub remove_base_from_image_and_set_tag {
 		die "error: \"".$output_targz."\" already exists";
 	}
 	
-	systemp("rm -rf $tartemp");
+	systemp("sudo rm -rf $tartemp");
 	
 	if (-d $tartemp) {
 		die;
