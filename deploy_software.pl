@@ -1752,9 +1752,9 @@ sub read_name_from_tar_image {
 	}
 	
 	
-	my $tar_json = "tar -x".$z."vOf $image_tarfile 'repository.json'";
+	my $tar_extr = "tar -x".$z."vOf $image_tarfile 'repository.json'";
 	
-	
+	my $tar_json = `$tar_extr`;
 		
 	print "json has: ".$tar_json."\n";
 		
