@@ -39,8 +39,8 @@
 		"install-binary" : ["samtools"]
 	},
 	"usearch" : {
-		"_comment" : "due to license issues of usearch the download url has to be given as a parameter",
-		"source" : {"url" : "${1}", "filename" : "usearch"},
+		"_comment" : "due to license issues of usearch the download uri has to be given as a parameter, e.g. file:///home/user/usearch",
+		"source" : {"uri" : "${1}", "filename" : "usearch"},
 		"ptarget" : "${target}bin",
 		"build-exec" : "chmod +x ${target}bin/usearch",
 		"set-env" : {"PATH" : "${target}bin:$PATH"},
