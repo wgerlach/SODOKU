@@ -268,11 +268,6 @@ sub save_image_to_tar {
 	}
 	
 	
-	my $image_object = get_image_object($image_id);
-	print Dumper($image_object);
-	exit(0);
-	
-	
 	if ($skip_saving == 0) {
 		my $docker_save_cmd = 'docker save '.$image_id.' > '.$image_tarfile; # TODO: use API
 		systemp($docker_save_cmd) == 0 or die;
