@@ -1466,8 +1466,8 @@ sub commandline_upload {
 		my $image_repo = read_name_from_tar_image($image_tarfile);
 		
 		
-		
-		my $i_repo = shift( keys(%{$image_repo}) ) || die;
+		my @i_repos = keys(%{$image_repo});
+		my $i_repo = shift( @i_repos ) || die;
 		my $i_repo_hash = $image_repo->{$i_repo};
 		my $i_tag =  shift( keys(%{$i_repo_hash}) ) || die;
 		
