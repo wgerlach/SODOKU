@@ -1678,13 +1678,49 @@ sub commandline_upload {
 	$docker_info->{'Version'} = $image_docker_version; # other info not available from tarball
 	
 	
-	upload_docker_image_to_shock($shocktoken, $image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile, $docker_info);
+	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile, $docker_info);
 	
-	
+	print "uploaded. shock node id: ".$shock_node_id."\n";
 }
 
 
 
+
+sub commandline_docker2shock {
+	my $something = shift(@_);
+	
+	#### save image
+	
+	my $image_obj = get_image_object($something);
+	
+	unless (defined $image_obj->{'id'} && defined $image_obj->{'name'}) {
+		die ;
+	}
+	my $image_id = $image_obj->{'id'};
+
+	my $print_name = $image_obj->{'name'};
+	$print_name =~ s/[\:\_\/]/\_/g;
+	
+	
+	my ($repo, $tag) = split(':', $image_obj->{'name'});
+	
+	my $image_tarfile = $image_obj->{'id'}.'_'.$print_name.'.tar';
+	
+	save_image_to_tar($image_obj->{'id'}, $image_tarfile);
+	
+	
+	#### modify image (add tags)
+	
+	my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id);
+
+	
+	##### upload
+	
+	
+	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $imagediff_tar_gz, $repo, $tag, $image_id, undef, undef, $docker_version_info);
+	
+	print "uploaded. shock node id: ".$shock_node_id."\n";
+}
 
 sub create_repository {
 	my $repo_file = 'repository.json';
@@ -2426,7 +2462,10 @@ my $help_text;
 	['dockerfile=s',		'(required) specify dockerfile used to create image, possible:none'],
 	['base_image_name=s',	'required if not retrievable from docker, possible:none'],
 	['docker_noupload',		''],
-	['token=s',				'SHOCK token for image upload']
+	['token=s',				'SHOCK token for image upload'],
+'',
+'docker2shock',
+	['docker2shock=s',		'upload image from docker to shock, this does not remove the baseimage!']
 ]);
 
 if ($h->{'help'} || keys(%$h)==0) {
@@ -2510,7 +2549,10 @@ if (defined($h->{'remove_base_layers'})) {
 }
 
 
-
+if (defined $h->{'docker2shock'}) {
+	commandline_docker2shock($h->{'docker2shock'});
+	exit(0);
+}
 
 
 if (defined $h->{'save_image'}) {
@@ -2770,7 +2812,7 @@ if ($d) {
 	
 	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile, $docker_version_info) || die;
 	
-
+	print "uploaded. shock node id: ".$shock_node_id."\n";
 }
 
 
