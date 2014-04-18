@@ -1690,6 +1690,7 @@ sub commandline_docker2shock {
 	my $something = shift(@_);
 	
 	#### save image
+	print "### save image\n";
 	
 	my $image_obj = get_image_object($something);
 	
@@ -1710,12 +1711,12 @@ sub commandline_docker2shock {
 	
 	
 	#### modify image (add tags)
-	
+	print "### modify image\n";
 	my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id);
 
 	
 	##### upload
-	
+	print "### upload image\n";
 	
 	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $imagediff_tar_gz, $repo, $tag, $image_id, undef, undef, $docker_version_info);
 	
