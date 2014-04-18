@@ -1700,6 +1700,14 @@ sub commandline_docker2shock {
 	
 	my ($repo, $tag) = split(':', $image_obj->{'name'});
 	
+	unless (defined $datadir) {
+		die;
+	}
+	if ($datadir eq '') {
+		die;
+	}
+	
+	
 	my $image_tarfile = $datadir.$image_obj->{'id'}.'_'.$print_name.'.tar';
 	
 	save_image_to_tar($image_obj->{'id'}, $image_tarfile);
