@@ -1450,6 +1450,11 @@ sub commandline_upload {
 		die;
 	}
 	
+	unless ($image_tarfile =~ /gz$/) {
+		die "error: please gzip first";
+	}
+	
+	
 	# tag
 	my $repo = undef;
 	my $tag = undef;
@@ -1457,6 +1462,10 @@ sub commandline_upload {
 	if (defined $h->{'tag'}) {
 		($repo, $tag) = split(':', $h->{'tag'});
 	} else {
+		
+		my $image_repo = read_name_from_tar_image($image_tarfile);
+		
+		
 		die "error: please define --tag , e.g. --tag=namespace/repo:version";
 		
 	}
@@ -1692,13 +1701,60 @@ sub read_history_from_tar_image {
 	# extract all jsons: tar -xvOf $image_tarfile --wildcards '*/json'
 	#my $tar_extr = "tar -xvOf $image_tarfile ".$image_id.'/json';
 	
+	my $z;
 	
-	my $tar_extr = "tar -xvOf $image_tarfile --wildcards '*/json'";
+	if ($image_tarfile =~ /\.tar$/) {
+		$z = '';
+	} elsif ($image_tarfile =~ /\.tar\.gz$/) {
+		$z = 'z';
+	} elsif ($image_tarfile =~ /\.tgz$/) {
+		$z = 'z';
+	} else {
+		die;
+	}
+	
+	
+	
+	my $tar_extr = "tar -x".$z."vOf $image_tarfile --wildcards '*/json'";
 	
 	my $tar_json = '['.`$tar_extr`.']';
 	
 	# insert commas: TODO this is ugly!
 	$tar_json =~ s/\}\{\"id\"/\},\{\"id\"/g;
+		
+	print "json has: ".$tar_json."\n";
+		
+	my $json = JSON->new;
+	my $tar_hash = $json->decode( $tar_json );
+	print Dumper($tar_hash);
+	return $tar_hash;
+		
+}
+
+
+sub read_name_from_tar_image {
+	
+	my ($image_tarfile) = @_;
+	
+	# extract all jsons: tar -xvOf $image_tarfile --wildcards '*/json'
+	#my $tar_extr = "tar -xvOf $image_tarfile ".$image_id.'/json';
+	
+	my $z;
+	
+	if ($image_tarfile =~ /\.tar$/) {
+		$z = '';
+	} elsif ($image_tarfile =~ /\.tar\.gz$/) {
+		$z = 'z';
+	} elsif ($image_tarfile =~ /\.tgz$/) {
+		$z = 'z';
+	} else {
+		die;
+	}
+	
+	
+	my $tar_json = "tar -x".$z."vOf $image_tarfile 'repository.json'";
+	
+	
 		
 	print "json has: ".$tar_json."\n";
 		
