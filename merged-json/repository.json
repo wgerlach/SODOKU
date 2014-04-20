@@ -313,14 +313,14 @@
    "usearch" : {
       "source" : {
          "filename" : "usearch",
-         "url" : "${1}"
+         "uri" : "${1}"
       },
       "set-env" : {
          "PATH" : "${target}bin:$PATH"
       },
       "ptarget" : "${target}bin",
       "build-exec" : "chmod +x ${target}bin/usearch",
-      "_comment" : "due to license issues of usearch the download url has to be given as a parameter",
+      "_comment" : "due to license issues of usearch the download uri has to be given as a parameter, e.g. file:///home/user/usearch",
       "subpackages" : [
          {
             "exec" : "mkdir -p ${target}bin"
