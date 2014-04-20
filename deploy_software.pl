@@ -59,6 +59,8 @@ my $shock_client_module_available = 0;
 my $d=undef; # docker inidicator
 
 my @docker_file_content=();
+my $docker_build_context_dir=undef;
+
 my $docker_deps={};
 
 my $is_root_user = undef;
@@ -179,22 +181,55 @@ sub createDockerImage {
 	
 	### create docker image ###
 	
-	my $docker_build_cmd = 'docker build --tag='.$repotag.' -'; #--no-cache=true --rm
-	
-	print "docker_build_cmd: $docker_build_cmd\n";
-	
-	
-	
 	
 	unless (defined($image_id) ) {
-		open(my $fh, "|-", $docker_build_cmd)
+		
+		
+		#my $docker_build_cmd = 'docker build --tag='.$repotag.' -'; #--no-cache=true --rm
+		my $docker_build_cmd
+		
+		
+		if (defined $docker_build_context_dir) {
+			# use context dir
+			
+			write_file($docker_build_context_dir.'/Dockerfile', $dockerfile);
+			
+			$docker_build_cmd = 'docker build --tag='.$repotag.' '.$docker_build_context_dir;
+			systemp($docker_build_cmd)==0 or die "docker build failed";
+			
+		} else {
+			# no context, pipe dockerfile into docker client
+			$docker_build_cmd = 'docker build --tag='.$repotag.' -'; #--no-cache=true --rm
+			
+			print "docker_build_cmd: $docker_build_cmd\n";
+			
+			open(my $fh, "|-", $docker_build_cmd)
 			or die "cannot run docker: $!";
-	
-		print $fh $dockerfile;
-		close ($fh);
+			
+			print $fh $dockerfile;
+			close ($fh);
+			
+			sleep(3);
+		}
 		
-		sleep(3);
 		
+		
+		
+		
+		
+		if (false) {
+			my $docker_build_cmd = 'docker build --tag='.$repotag.' -'; #--no-cache=true --rm
+			
+			print "docker_build_cmd: $docker_build_cmd\n";
+			
+			open(my $fh, "|-", $docker_build_cmd)
+				or die "cannot run docker: $!";
+		
+			print $fh $dockerfile;
+			close ($fh);
+			
+			sleep(3);
+		}
 		
 		$result_hash = undef;
 		
@@ -488,15 +523,72 @@ sub upload_docker_image_to_shock {
 	
 }
 
+sub create_url {
+	my ($resource, %query) = @_;
+	
+	my $my_url = 'http:'.$docker_socket.'/'.$endpoint;
+	
+	#build query string:
+	my $query_string = "";
+	
+	foreach my $key (keys %query) {
+		my $value = $query{$key};
+		
+		unless (defined $value) {
+			if ((length($query_string) != 0)) {
+				$query_string .= '&';
+			}
+			$query_string .= $key;
+			next;
+		}
+		
+		my @values=();
+		if (ref($value) eq 'ARRAY') {
+			@values=@$value;
+		} else {
+			@values=($value);
+		}
+		
+		foreach my $value (@values) {
+			if ((length($query_string) != 0)) {
+				$query_string .= '&';
+			}
+			$query_string .= $key.'='.$value;
+		}
+	}
+	
+	
+	if (length($query_string) != 0) {
+		
+		#print "url: ".$my_url.'?'.$query_string."\n";
+		$my_url .= '?'.$query_string;#uri_escape()
+	}
+	
+	
+	
+	
+	return $my_url;
+}
+
 
 sub dockerSocket {
-	my ($request_type, $endpoint) = @_;
+	my ($request_type, $endpoint, $query, $headers) = @_;
+	
+	my $url = create_url($endpoint, %$query);
 	
 	
-	
-	my $url = 'http:'.$docker_socket.'/'.$endpoint;
 	
 	print "request: $request_type $url\n";
+	
+	my @method_args = ($url);
+	if (defined $headers) {
+		#if (defined $headers->{':content_cb'}){
+		#	$is_download = 1;
+		#}
+		
+		push(@method_args, %$headers);
+	}
+	
 	
 	my $agent = LWP::UserAgent->new;
 	
@@ -513,7 +605,9 @@ sub dockerSocket {
 
 		
 		if ($request_type eq 'GET') {
-			$response_object = $agent->get($url);
+			$response_object = $agent->get(@method_args);
+		} elsif ($request_type eq 'POST') {
+			$response_object = $agent->post(@method_args);
 		} else {
 			die;
 		}
@@ -777,7 +871,7 @@ sub INI_cmds_to_hash {
 sub downloadFile {
 	my %args = @_;
 	
-	my $url = $args{'url'};
+	my $url = $args{'uri'};
 	my $dir = $args{'target-dir'};
 	my $targetname = $args{'target-name'};
 	#my $output = $args{'output'};
@@ -819,43 +913,82 @@ sub downloadFile {
 		}
 	}
 	
-	my $ssl= "";
-	if (defined $h->{'nossl'}) {
-		$ssl = "--insecure";
-	}
 	
-	
-	my $curl_download_cmd = "cd $dir && curl $ssl -L -o $targetname --retry 1 --retry-delay 5 \"$url\"";
-	
-	my $file_downloaded = 0;
-	if ($shock_client_module_available && $d==0) { # TODO use this only for versioned downloads !!!!
-		print "try using SHOCK cache\n";
-		#check SHOCK
+	if ($url =~ /^file\:\/\//) {
 		
-		unless (defined $shock) {
-			$shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
-		}
-		my $download_return = $shock->cached_download($url, $dir, $targetname, $curl_download_cmd);
-		
-		if (defined $download_return) {
-			$file_downloaded = 1;
-			print "file downloaded from SHOCK cache\n";
+		my ($localfilename) = /^file\:\/\/(.*)$/;
+		unless (defined $localfilename) {
+			die;
 		}
 		
+		my $localfilename_base = basename($localfilename);
 		
-	}
-	
-	
-	if ($file_downloaded == 0) {
-		system_install($curl_download_cmd) == 0 or die;
-	} else {
-		# file was downloaded from SHOCK cache
 		if ($d) {
-			#Dockerfile still needs to download it
-			addDockerCmd($curl_download_cmd);
+			
+			
+			# copy file into build context !
+			unless (defined $docker_build_context_dir) {
+				$docker_build_context_dir = File::Temp->newdir();
+			}
+			
+			systemp("cp $localfilename $docker_build_context_dir") == 0 or die;
+			push(@docker_file_content, "ADD $localfilename_base $file");
+			
+			
+		} else {
+			unless (-e $localfilename) {
+				die "file not found: $localfilename";
+			}
+			
+			system_install("cp $localfilename $file") == 0 or die;
+			
+		}
+		
+		
+		
+		
+		
+	} else {
+	
+	
+		
+		my $ssl= "";
+		if (defined $h->{'nossl'}) {
+			$ssl = "--insecure";
+		}
+		
+		
+		my $curl_download_cmd = "cd $dir && curl $ssl -L -o $targetname --retry 1 --retry-delay 5 \"$url\"";
+		
+		my $file_downloaded = 0;
+		if ($shock_client_module_available && $d==0) { # TODO use this only for versioned downloads !!!!
+			print "try using SHOCK cache\n";
+			#check SHOCK
+			
+			unless (defined $shock) {
+				$shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
+			}
+			my $download_return = $shock->cached_download($url, $dir, $targetname, $curl_download_cmd);
+			
+			if (defined $download_return) {
+				$file_downloaded = 1;
+				print "file downloaded from SHOCK cache\n";
+			}
+			
+			
+		}
+		
+		
+		if ($file_downloaded == 0) {
+			system_install($curl_download_cmd) == 0 or die;
+		} else {
+			# file was downloaded from SHOCK cache
+			if ($d) {
+				#Dockerfile still needs to download it
+				addDockerCmd($curl_download_cmd);
+			}
 		}
 	}
-	
 	unless (-s $file || $d) {
 		die "file $file was not downloaded!?";
 	}
@@ -2062,7 +2195,7 @@ sub install_package {
 			
 			my $source_branch;
 			if (ref($source_obj) eq 'HASH') {
-				$source = $source_obj->{'url'};
+				$source = $source_obj->{'uri'};
 				$source_subdir = $source_obj->{'subdir'};
 				$source_filename=$source_obj->{'filename'};
 				$source_branch=$source_obj->{'branch'};
@@ -2176,7 +2309,7 @@ sub install_package {
 			} elsif ($st eq 'download') {
 				#simple download
 				
-				$downloaded_file = downloadFile('url' => $source,
+				$downloaded_file = downloadFile('uri' => $source,
 												'target-dir' => $temp_dir, #$ptarget,
 												'target-name' => $source_filename,
 												'remove-existing-file' => $package_hash->{'source-remove-existing-file'});
@@ -2515,6 +2648,8 @@ if (defined($h->{'docker'}) ) {
 	unless (defined $base_image_object->{'id'} && defined $base_image_object->{'name'}) {
 		die ;
 	}
+	
+	
 }
 
 
