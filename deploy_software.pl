@@ -2932,7 +2932,7 @@ if ($d) {
 		
 	
 	# create Dockerfile
-	my $dockerfile = @{createDockerFile($base_image_object->{'name'})};
+	my $dockerfile = createDockerFile($base_image_object->{'name'});
 	
 	
 	
