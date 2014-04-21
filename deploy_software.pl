@@ -745,7 +745,7 @@ sub get_diff_layers {
 	if (defined($base_id) && ($found_base ==0) ) {
 		die "did not find expected base image $base_id in history of $image_id";
 	}
-exit(0);
+
 
 	
 	print "found ".@diff_layers." diff layers (layers on top of base image) for image ".$image_id."\n";
