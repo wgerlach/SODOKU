@@ -705,6 +705,8 @@ sub get_diff_layers {
 	
 	if (defined($base_id)) {
 		print "base_id: $base_id\n";
+	} else {
+		die; # TODO remove
 	}
 	# check history of image
 	my $found_base = 0;
