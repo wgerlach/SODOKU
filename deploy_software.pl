@@ -35,7 +35,7 @@ my $ubuntu_cmd2package = {
 };
 
 my $docker_socket = '/var/run/docker.sock';
-my $base_image_object = undef; # containes name and id ! 'ubuntu:13.10';
+
 my $author = 'Wolfgang Gerlach';
 
 my $shock_server = 'http://shock.metagenomics.anl.gov:80';
@@ -313,7 +313,7 @@ sub save_image_to_tar {
 sub remove_base_from_image_and_set_tag {
 	
 	
-	my ($image_tarfile, $repo, $tag, $image_id) = @_;
+	my ($image_tarfile, $repo, $tag, $image_id, $base_image_id) = @_;
 	
 	unless ($image_tarfile =~ /\.tar$/) {
 		die "tar expected";
@@ -346,7 +346,7 @@ sub remove_base_from_image_and_set_tag {
 	
 	
 	
-	my @diff_layers = get_diff_layers($image_id, $base_image_object->{'id'});
+	my @diff_layers = get_diff_layers($image_id, $base_image_id);
 	
 	if (@diff_layers == 0) {
 		die ;
@@ -1362,6 +1362,7 @@ sub replacePtarget {
 sub commandline_remove_base_layers {
 	
 	my $image_tarfile = abs_path(shift(@_));
+	my $base_image_id = shift(@_);
 	
 	unless ($image_tarfile =~ /\.tar$/) {
 		die "tar expected";
@@ -1404,7 +1405,7 @@ sub commandline_remove_base_layers {
 	
 	print "use imaged_id: $image_id\n";
 	
-	my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id);
+	my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, $base_image_id);
 	
 	
 }
@@ -2635,6 +2636,7 @@ if (defined $h->{'token'}) {
 }
 
 
+my $base_image_object = undef; # containes name and id ! 'ubuntu:13.10';
 if (defined($h->{'docker'}) ) {
 	$d = 1;
 	
@@ -2694,7 +2696,7 @@ if (defined($h->{'upload'})) {
 
 
 if (defined($h->{'remove_base_layers'})) {
-	commandline_remove_base_layers($h->{'remove_base_layers'});
+	commandline_remove_base_layers($h->{'remove_base_layers'}, $base_image_object->{'id'});
 	exit(0);
 }
 
@@ -2898,6 +2900,10 @@ foreach my $package_string (@package_list) {
 
 
 if ($d) {
+	
+	
+	
+	
 	
 	if (@packages_installed > 1) {
 		die "not supported";
