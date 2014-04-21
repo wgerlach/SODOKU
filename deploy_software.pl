@@ -1809,7 +1809,7 @@ sub commandline_upload {
 
 sub commandline_docker2shock {
 	my $something = shift(@_);
-	my base_image_object = shift(@_);
+	my $base_image_object = shift(@_);
 	
 	#### save image
 	print "### save image\n";
@@ -1842,7 +1842,7 @@ sub commandline_docker2shock {
 	
 	#### modify image (add tags)
 	print "### modify image\n";
-	my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, base_image_object);
+	my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, $base_image_object);
 
 	
 	##### upload
