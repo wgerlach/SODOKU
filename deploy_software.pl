@@ -117,7 +117,7 @@ sub createDockerFile {
 
 sub createDockerImage {
 	
-	my ($repo, $tag, $dockerfile, $docker_base_image_name) = @_;
+	my ($repo, $tag, $dockerfile, $docker_base_image) = @_;
 
 	my $repotag = $repo.':'.$tag;
 	
@@ -233,7 +233,7 @@ sub createDockerImage {
 	
 	my $tag_converted = $repotag;
 	$tag_converted =~ s/[\/]/\_/g;
-	my $docker_base_image_converted = $docker_base_image_name;
+	my $docker_base_image_converted = $docker_base_image->{'name'};
 	$docker_base_image_converted =~ s/[\/]/\_/g;
 	
 	
@@ -251,7 +251,7 @@ sub createDockerImage {
 	# open and modify tar archive
 	
 	
-	my $imagediff_tarfile_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id);
+	my $imagediff_tarfile_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, $docker_base_image);
 		
 	
 		
@@ -293,7 +293,7 @@ sub save_image_to_tar {
 sub remove_base_from_image_and_set_tag {
 	
 	
-	my ($image_tarfile, $repo, $tag, $image_id, $base_image_id) = @_;
+	my ($image_tarfile, $repo, $tag, $image_id, $base_image_id, $docker_base_image) = @_;
 	
 	unless ($image_tarfile =~ /\.tar$/) {
 		die "tar expected";
@@ -326,7 +326,7 @@ sub remove_base_from_image_and_set_tag {
 	
 	
 	
-	my @diff_layers = get_diff_layers($image_id, $base_image_id);
+	my @diff_layers = get_diff_layers($image_id, $docker_base_image->{'id'});
 	
 	if (@diff_layers == 0) {
 		die ;
@@ -701,6 +701,9 @@ sub get_diff_layers {
 		die "history broken for $image_id ?";
 	}
 	
+	if (defined($base_id)) {
+		print "base_id: $base_id\n";
+	}
 	# check history of image
 	my $found_base = 0;
 	for (my $i = 0; $i < @{$history}; ++$i) {
@@ -712,7 +715,7 @@ sub get_diff_layers {
 		}
 		
 		
-		if (defined($base_id) && $id eq $base_id) {
+		if (defined($base_id) && ($id eq $base_id)) {
 			$found_base = 1;
 			print "found base id: $base_id\n";
 			last;
@@ -1806,6 +1809,7 @@ sub commandline_upload {
 
 sub commandline_docker2shock {
 	my $something = shift(@_);
+	my base_image_object = shift(@_);
 	
 	#### save image
 	print "### save image\n";
@@ -1838,7 +1842,7 @@ sub commandline_docker2shock {
 	
 	#### modify image (add tags)
 	print "### modify image\n";
-	my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id);
+	my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, base_image_object);
 
 	
 	##### upload
@@ -2629,20 +2633,17 @@ my $base_image_object = undef; # containes name and id ! 'ubuntu:13.10';
 if (defined($h->{'docker'}) ) {
 	$d = 1;
 	
-	
-	
 	unless (defined($h->{'base_image'})) {
 		die "please define --base_image, e.g. --base_image=ubuntu:13.10";
 	}
-	
+}
+
+if (defined($h->{'base_image'})) {
 	$base_image_object = get_image_object($h->{'base_image'});
 	unless (defined $base_image_object->{'id'} && defined $base_image_object->{'name'}) {
 		die ;
 	}
-	
-	
 }
-
 
 
 if (defined($d) && ($d == 1)) {
@@ -2691,7 +2692,7 @@ if (defined($h->{'remove_base_layers'})) {
 
 
 if (defined $h->{'docker2shock'}) {
-	commandline_docker2shock($h->{'docker2shock'});
+	commandline_docker2shock($h->{'docker2shock'}, $base_image_object);
 	exit(0);
 }
 
@@ -2946,7 +2947,7 @@ if ($d) {
 	
 	
 	# create docker image
-	my $ref = createDockerImage($repo, $tag, $dockerfile, $base_image_object->{'name'});
+	my $ref = createDockerImage($repo, $tag, $dockerfile, $base_image_object);
 	my ($image_tarfile, $image_id) = @{$ref};
 	
 	
