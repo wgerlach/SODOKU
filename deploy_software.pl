@@ -119,6 +119,11 @@ sub createDockerImage {
 	
 	my ($repo, $tag, $dockerfile, $docker_base_image) = @_;
 
+	
+	unless (defined $docker_base_image->{'id'}) {
+		die; # TODO remove
+	}
+	
 	my $repotag = $repo.':'.$tag;
 	
 	
@@ -1814,6 +1819,11 @@ sub commandline_upload {
 sub commandline_docker2shock {
 	my ($something,$base_image_object) = @_;
 	
+	
+	unless (defined $base_image_object->{'id'}) {
+		die; # TODO remove
+	}
+	
 	#### save image
 	print "### save image\n";
 	
@@ -2901,7 +2911,9 @@ foreach my $package_string (@package_list) {
 
 if ($d) {
 	
-	
+	unless (defined $base_image_object->{'id'}) {
+		die; # TODO remove
+	}
 	
 	
 	
