@@ -916,9 +916,9 @@ sub downloadFile {
 	
 	if ($url =~ /^file\:\/\//) {
 		
-		my ($localfilename) = /^file\:\/\/(.*)$/;
+		my ($localfilename) = $url =~ /^file\:\/\/(.*)$/;
 		unless (defined $localfilename) {
-			die;
+			die "died parsing ";
 		}
 		
 		my $localfilename_base = basename($localfilename);
