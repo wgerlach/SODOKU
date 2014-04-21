@@ -318,12 +318,7 @@ sub remove_base_from_image_and_set_tag {
 		die "error: \"".$output_targz."\" already exists";
 	}
 	
-	#systemp("sudo rm -rf $tartemp");
-	
-	#if (-d $tartemp) {
-	#	die;
-	#}
-	
+		
 	$tartemp = File::Temp->newdir( TEMPLATE => 'SODOKU_tar_XXXXXXX' );
 	
 	#systemp("mkdir -p $tartemp ; rm -f ".$output_tar);
