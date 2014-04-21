@@ -6,7 +6,7 @@
 		"source-apt" : "golang curl wget git mercurial bzr make build-essential cpanminus python-setuptools python-dev checkinstall"
 	},
 	"docker" : {
-		"source-apt" : "docker.io"
+		"source-apt" : "docker.io",
 		"exec" : [ 
 			"ln -s /usr/bin/docker.io /usr/bin/docker"
 		]
