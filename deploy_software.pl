@@ -1812,8 +1812,7 @@ sub commandline_upload {
 
 
 sub commandline_docker2shock {
-	my $something = shift(@_);
-	my $base_image_object = shift(@_);
+	my ($something,$base_image_object) = @_;
 	
 	#### save image
 	print "### save image\n";
@@ -2648,7 +2647,9 @@ if (defined($h->{'base_image'})) {
 		die ;
 	}
 }
-
+else {
+	die;
+}
 
 if (defined($d) && ($d == 1)) {
 	
@@ -2696,6 +2697,11 @@ if (defined($h->{'remove_base_layers'})) {
 
 
 if (defined $h->{'docker2shock'}) {
+	
+	unless (defined $base_image_object->{'id'}) {
+		die;
+	}
+	
 	commandline_docker2shock($h->{'docker2shock'}, $base_image_object);
 	exit(0);
 }
