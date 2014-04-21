@@ -324,7 +324,9 @@ sub remove_base_from_image_and_set_tag {
 	
 	
 	
-	
+	unless (defined $docker_base_image->{'id'}) {
+		die; # TODO remove
+	}
 	
 	my @diff_layers = get_diff_layers($image_id, $docker_base_image->{'id'});
 	
@@ -1354,7 +1356,7 @@ sub replacePtarget {
 sub commandline_remove_base_layers {
 	
 	my $image_tarfile = abs_path(shift(@_));
-	my $base_image_id = shift(@_);
+	my $base_image_obj = shift(@_);
 	
 	unless ($image_tarfile =~ /\.tar$/) {
 		die "tar expected";
@@ -1397,7 +1399,7 @@ sub commandline_remove_base_layers {
 	
 	print "use imaged_id: $image_id\n";
 	
-	my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, $base_image_id);
+	my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, $base_image_obj);
 	
 	
 }
@@ -2686,7 +2688,7 @@ if (defined($h->{'upload'})) {
 
 
 if (defined($h->{'remove_base_layers'})) {
-	commandline_remove_base_layers($h->{'remove_base_layers'}, $base_image_object->{'id'});
+	commandline_remove_base_layers($h->{'remove_base_layers'}, $base_image_object);
 	exit(0);
 }
 
