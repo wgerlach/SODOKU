@@ -2894,7 +2894,7 @@ if ($d) {
 	
 	if (defined $h->{'tag'}) {
 		($repo, $tag) = split(':', $h->{'tag'});
-		print "version: $package, $version\n";
+		print "version: $repo, $tag\n";
 		
 		unless (defined $tag) {
 			die "version not defined in --tag repo:ver";
@@ -2909,8 +2909,8 @@ if ($d) {
 		#print "got: ".join('-', @{$version} )."\n";
 		#exit(0);
 	} else {
-		my $version_array_ref =undef;
-		($package, $version_array_ref) = @{shift(@packages_installed)};
+		
+		my ($package, $version_array_ref) = @{shift(@packages_installed)};
 		$repo = 'wgerlach/'.$package;
 		$version = join('.', @{$version_array_ref});
 		
