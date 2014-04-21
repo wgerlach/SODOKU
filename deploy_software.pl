@@ -70,35 +70,15 @@ my $shocktoken=undef;
 
 
 sub createDockerFile {
-	my ($package, $version, $docker_base_image) = @_;
+	my ($docker_base_image) = @_;
 	
 	
 	unless (defined $docker_base_image) {
 		die "error: base image not defined";
 	}
 	
-	my $version_str = undef;
-	if (defined $version) {
-		$version_str = join('.', @{$version});
-	} else {
-		$version_str = 'latest';
-	}
 	
-	print "version: $package, $version_str\n";
-	#exit(0);
-	if (defined $h->{'tag'} && !(defined $version_str)) {
-		die;
-	}
-	
-	
-	unless (defined $version_str) {
-		$version_str = 'latest';
-	}
-	
-	if ( $version_str eq '') {
-		$version_str = 'latest';
-	}
-	
+		
 	print "deps: ".join(',', keys(%$docker_deps)) ."\n";
 	
 	my $dep_packages={};
@@ -131,7 +111,7 @@ sub createDockerFile {
 	
 	#print "tag: \"$tag\"\n";
 	
-	return ['wgerlach/'.$package, $version_str , $dockerfile];
+	return $dockerfile;
 }
 
 
@@ -2909,27 +2889,31 @@ if ($d) {
 		die "not supported";
 	}
 	
-	my $package=undef;
-	my $version=undef;
+	my $repo=undef;
+	my $tag=undef;
 	
 	if (defined $h->{'tag'}) {
-		($package, $version) = split(':', $h->{'tag'});
+		($repo, $tag) = split(':', $h->{'tag'});
 		print "version: $package, $version\n";
 		
-		unless (defined $version) {
+		unless (defined $tag) {
 			die "version not defined in --tag repo:ver";
 		}
-		if ($version eq '') {
+		if ($tag eq '') {
 			die "version not defined in --tag repo:ver";
 		}
-		my @ver = split(/\./, $version);
+		#my @ver = split(/\./, $version);
 		#print "got: ".join('-', @ver )."\n";
-		$version = \@ver;
+		#$version = \@ver;
 		
 		#print "got: ".join('-', @{$version} )."\n";
 		#exit(0);
 	} else {
-		($package, $version) = @{shift(@packages_installed)};
+		my $version_array_ref =undef;
+		($package, $version_array_ref) = @{shift(@packages_installed)};
+		$repo = 'wgerlach/'.$package;
+		$version = join('.', @{$version_array_ref});
+		
 	}
 	
 	
@@ -2948,10 +2932,7 @@ if ($d) {
 		
 	
 	# create Dockerfile
-	my ($repo, $tag, $dockerfile) = @{createDockerFile($package, $version, $base_image_object->{'name'})};
-	unless (defined $tag) {
-		die;
-	}
+	my $dockerfile = @{createDockerFile($base_image_object->{'name'})};
 	
 	
 	
