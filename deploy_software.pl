@@ -502,7 +502,9 @@ sub upload_docker_image_to_shock {
 	
 	my $shock_node_id = $up_result->{'data'}->{'id'} || die "SHOCK node id not found for uploaded image";
 	
-	$shock->permisson_readable($shock_node_id) || die "error makeing node readable";
+	unless (defined $h->{'private'}) {
+		$shock->permisson_readable($shock_node_id) || die "error makeing node readable";
+	}
 	
 	print "Docker image uploaded ($shock_node_id).\n";
 	
