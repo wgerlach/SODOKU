@@ -217,7 +217,7 @@ sub createDockerImage {
 		
 		
 		
-		if (false) {
+		if (0) {
 			my $docker_build_cmd = 'docker build --tag='.$repotag.' -'; #--no-cache=true --rm
 			
 			print "docker_build_cmd: $docker_build_cmd\n";
