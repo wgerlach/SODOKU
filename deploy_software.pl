@@ -524,7 +524,7 @@ sub upload_docker_image_to_shock {
 }
 
 sub create_url {
-	my ($resource, %query) = @_;
+	my ($endpoint, %query) = @_;
 	
 	my $my_url = 'http:'.$docker_socket.'/'.$endpoint;
 	
