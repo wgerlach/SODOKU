@@ -239,7 +239,7 @@ sub createDockerImage {
 	
 	
 	my $image_tarfile = $datadir.$image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.complete.tar';
-	my $imagediff_tarfile = $datadir.$image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.diff.tar';
+	#my $imagediff_tarfile = $datadir.$image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.diff.tar';
 	
 	
 	save_image_to_tar($image_id, $image_tarfile);
@@ -712,6 +712,7 @@ sub get_diff_layers {
 		
 		
 		if (defined($base_id) && $id eq $base_id) {
+			print "found base id: $base_id\n";
 			last;
 		}
 		
@@ -726,6 +727,8 @@ sub get_diff_layers {
 		
 		
 	}
+
+exit(0);
 
 	print "found ".@diff_layers." diff layers (layers on top of base image) for image ".$image_id."\n";
 
