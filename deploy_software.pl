@@ -298,7 +298,7 @@ sub save_image_to_tar {
 sub remove_base_from_image_and_set_tag {
 	
 	
-	my ($image_tarfile, $repo, $tag, $image_id, $base_image_id, $docker_base_image) = @_;
+	my ($image_tarfile, $repo, $tag, $image_id, $docker_base_image) = @_;
 	
 	unless ($image_tarfile =~ /\.tar$/) {
 		die "tar expected";
