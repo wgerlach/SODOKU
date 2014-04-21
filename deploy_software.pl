@@ -2912,7 +2912,7 @@ if ($d) {
 		
 		my ($package, $version_array_ref) = @{shift(@packages_installed)};
 		$repo = 'wgerlach/'.$package;
-		$version = join('.', @{$version_array_ref});
+		$tag = join('.', @{$version_array_ref});
 		
 	}
 	
