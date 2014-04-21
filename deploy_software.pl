@@ -42,7 +42,7 @@ my $shock_server = 'http://shock.metagenomics.anl.gov:80';
 
 # for temporary files
 my $datadir='/mnt/tmp/';
-my $tartemp = $datadir.'tar_temp/';
+#my $tartemp = $datadir.'tar_temp/';
 
 #########################################
 
@@ -318,13 +318,17 @@ sub remove_base_from_image_and_set_tag {
 		die "error: \"".$output_targz."\" already exists";
 	}
 	
-	systemp("sudo rm -rf $tartemp");
+	#systemp("sudo rm -rf $tartemp");
 	
-	if (-d $tartemp) {
-		die;
-	}
+	#if (-d $tartemp) {
+	#	die;
+	#}
 	
-	systemp("mkdir -p $tartemp ; rm -f ".$output_tar);
+	$tartemp = File::Temp->newdir( TEMPLATE => 'SODOKU_tar_XXXXXXX' );
+	
+	#systemp("mkdir -p $tartemp ; rm -f ".$output_tar);
+	
+	
 	systemp("cd $tartemp && tar xvf ".$image_tarfile) ==0 or die;
 	
 	
@@ -342,7 +346,7 @@ sub remove_base_from_image_and_set_tag {
 	my $diff_layers_hash = {};
 	foreach my $layer (@diff_layers) {
 		
-		my $layer_dir = $tartemp.$layer;
+		my $layer_dir = $tartemp.'/'.$layer;
 		
 		unless (-d $layer_dir) {
 			die "error: expected layer directory not found";
@@ -352,7 +356,7 @@ sub remove_base_from_image_and_set_tag {
 	}
 	
 	
-	my @directories = glob ($tartemp.'*');
+	my @directories = glob ($tartemp.'/*');
 	
 	print "total layers: ".@directories." in $tartemp\n";
 	if (@directories == 0) {
