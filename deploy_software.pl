@@ -702,6 +702,7 @@ sub get_diff_layers {
 	}
 	
 	# check history of image
+	my $found_base = 0;
 	for (my $i = 0; $i < @{$history}; ++$i) {
 		
 		my $layer = $history->[$i];
@@ -712,6 +713,7 @@ sub get_diff_layers {
 		
 		
 		if (defined($base_id) && $id eq $base_id) {
+			$found_base = 1;
 			print "found base id: $base_id\n";
 			last;
 		}
@@ -728,8 +730,12 @@ sub get_diff_layers {
 		
 	}
 
+	if (defined($base_id) && ($found_base ==0) ) {
+		die "did not find expected base image $base_id in history of $image_id";
+	}
 exit(0);
 
+	
 	print "found ".@diff_layers." diff layers (layers on top of base image) for image ".$image_id."\n";
 
 	if (@diff_layers == 0 ) {
