@@ -1821,9 +1821,7 @@ sub commandline_docker2shock {
 	my ($something,$base_image_object) = @_;
 	
 	
-	unless (defined $base_image_object->{'id'}) {
-		die; # TODO remove
-	}
+	
 	
 	#### save image
 	print "### save image\n";
