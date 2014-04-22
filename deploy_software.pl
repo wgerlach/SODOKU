@@ -2707,9 +2707,9 @@ if (defined($h->{'remove_base_layers'})) {
 
 if (defined $h->{'docker2shock'}) {
 	
-	unless (defined $base_image_object->{'id'}) {
-		die;
-	}
+	#unless (defined $base_image_object->{'id'}) {
+	#	die;
+	#}
 	
 	commandline_docker2shock($h->{'docker2shock'}, $base_image_object);
 	exit(0);
