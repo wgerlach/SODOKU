@@ -328,9 +328,7 @@ sub remove_base_from_image_and_set_tag {
 	
 	
 	
-	unless (defined $docker_base_image->{'id'}) {
-		die; # TODO remove
-	}
+	
 	
 	my @diff_layers = get_diff_layers($image_id, $docker_base_image->{'id'});
 	
