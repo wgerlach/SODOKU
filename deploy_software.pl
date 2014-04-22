@@ -319,7 +319,7 @@ sub remove_base_from_image_and_set_tag {
 	}
 	
 		
-	$tartemp = File::Temp->newdir( TEMPLATE => 'SODOKU_tar_XXXXXXX' );
+	my $tartemp = File::Temp->newdir( TEMPLATE => 'SODOKU_tar_XXXXXXX' );
 	
 	#systemp("mkdir -p $tartemp ; rm -f ".$output_tar);
 	
