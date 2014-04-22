@@ -2658,9 +2658,7 @@ if (defined($h->{'base_image'})) {
 		die ;
 	}
 }
-else {
-	die;
-}
+
 
 if (defined($d) && ($d == 1)) {
 	
