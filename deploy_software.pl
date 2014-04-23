@@ -187,7 +187,7 @@ sub buildDockerImage {
 			print "docker_build_cmd: $docker_build_cmd\n";
 			
 			open(my $fh, "|-", $docker_build_cmd)
-			or die "cannot run docker: $!";
+				or die "cannot run docker: $!";
 			
 			print $fh $dockerfile;
 			close ($fh);
@@ -238,6 +238,8 @@ sub buildDockerImage {
 sub saveDockerImage {
 	my ($repo, $tag, $docker_base_image) = @_;
 	### save image as tar archive file
+	
+	my $repotag = $repo.':'.$tag;
 	
 	my $tag_converted = $repotag;
 	$tag_converted =~ s/[\/]/\_/g;
