@@ -235,7 +235,7 @@ sub buildDockerImage {
 	return $image_id;
 }
 
-sub saveDockerImage {
+sub createAndSaveDiffImage {
 	my ($image_id, $repo, $tag, $docker_base_image) = @_;
 	### save image as tar archive file
 	
@@ -317,6 +317,8 @@ sub remove_base_from_image_and_set_tag {
 		die "tar expected";
 	}
 	
+	
+	
 	my ($output_tar) = $image_tarfile =~ /^(.*)\.tar$/;
 	
 	unless (defined $output_tar) {
@@ -325,77 +327,91 @@ sub remove_base_from_image_and_set_tag {
 	
 	$output_tar .= '.diff.tar';
 	
-	my $output_targz  = $output_tar.'.gz';
+	
+	my $modify_tar = $output_tar;
+	unless (defined $docker_base_image) {
+		$modify_tar = $image_tarfile;
+	}
+	
+	
+	my $output_targz  = $modify_tar.'.gz';
 	
 	if (-e $output_targz) {
 		die "error: \"".$output_targz."\" already exists";
 	}
 	
+	if (defined $docker_base_image) {
+		my $tartemp = File::Temp->newdir( TEMPLATE => 'SODOKU_tar_XXXXXXX' );
 		
-	my $tartemp = File::Temp->newdir( TEMPLATE => 'SODOKU_tar_XXXXXXX' );
-	
-	#systemp("mkdir -p $tartemp ; rm -f ".$output_tar);
-	
-	
-	systemp("cd $tartemp && tar xvf ".$image_tarfile) ==0 or die;
-	
-	
-	
-	
-	
-	my @diff_layers = get_diff_layers($image_id, $docker_base_image->{'id'});
-	
-	if (@diff_layers == 0) {
-		die ;
-	}
-	
-	my $diff_layers_hash = {};
-	foreach my $layer (@diff_layers) {
+		#systemp("mkdir -p $tartemp ; rm -f ".$output_tar);
 		
-		my $layer_dir = $tartemp.'/'.$layer;
 		
-		unless (-d $layer_dir) {
-			die "error: expected layer directory not found";
+		systemp("cd $tartemp && tar xvf ".$image_tarfile) ==0 or die;
+		
+		
+		
+		
+		
+		my @diff_layers = get_diff_layers($image_id, $docker_base_image->{'id'});
+		
+		if (@diff_layers == 0) {
+			die ;
 		}
 		
-		$diff_layers_hash->{$layer} = 1;
-	}
-	
-	
-	my @directories = glob ($tartemp.'/*');
-	
-	print "total layers: ".@directories." in $tartemp\n";
-	if (@directories == 0) {
-		die ;
-	}
-	
-	my $count_keep_layers = 0;
-	foreach my $layer_dir (@directories) {
+		my $diff_layers_hash = {};
 		
-		my $dir = basename($layer_dir);
-		#my $layer_dir = $tartemp.$dir;
+	
+		foreach my $layer (@diff_layers) {
+			
+			my $layer_dir = $tartemp.'/'.$layer;
+			
+			unless (-d $layer_dir) {
+				die "error: expected layer directory not found";
+			}
+			
+			$diff_layers_hash->{$layer} = 1;
+		}
+	
+	
+		my @directories = glob ($tartemp.'/*');
 		
-		unless (-d $layer_dir) {
-			die "layer_dir $layer_dir not found !?";
+		print "total layers: ".@directories." in $tartemp\n";
+		if (@directories == 0) {
+			die ;
 		}
 		
-		unless (defined $diff_layers_hash->{$dir}) {
-			print "delete non-diff layer directory $layer_dir\n";
-			systemp("sudo rm -rf ".$layer_dir);
-		} else {
-			$count_keep_layers++;
+		my $count_keep_layers = 0;
+		foreach my $layer_dir (@directories) {
+			
+			my $dir = basename($layer_dir);
+			#my $layer_dir = $tartemp.$dir;
+			
+			unless (-d $layer_dir) {
+				die "layer_dir $layer_dir not found !?";
+			}
+			
+			unless (defined $diff_layers_hash->{$dir}) {
+				print "delete non-diff layer directory $layer_dir\n";
+				systemp("sudo rm -rf ".$layer_dir);
+			} else {
+				$count_keep_layers++;
+			}
+			
 		}
+		
+		if ($count_keep_layers == 0) {
+			die "all layers deleted...";
+		}
+		
+		
+		print "create new tar without the base layers\n";
+		systemp("cd $tartemp && ls -la") == 0 or die;
+		systemp("cd $tartemp && sudo tar -cf $output_tar *") == 0 or die;
+		systemp("sudo chmod 666 ".$output_tar);
 		
 	}
 	
-	if ($count_keep_layers == 0) {
-		die "all layers deleted...";
-	}
 	
-	print "create new tar without the base layers\n";
-	systemp("cd $tartemp && ls -la") == 0 or die;
-	systemp("cd $tartemp && sudo tar -cf $output_tar *") == 0 or die;
-	systemp("sudo chmod 666 ".$output_tar);
 	
 	
 	
@@ -415,7 +431,9 @@ sub remove_base_from_image_and_set_tag {
 	
 	
 	
-	my $py_cmd = "python -c \"import tarfile; f=tarfile.open('".$output_tar."', 'a'); f.add('repositories'); f.close()\"";
+	
+	
+	my $py_cmd = "python -c \"import tarfile; f=tarfile.open('".$modify_tar."', 'a'); f.add('repositories'); f.close()\"";
 	
 	
 	systemp($py_cmd) == 0 or die;
@@ -423,7 +441,7 @@ sub remove_base_from_image_and_set_tag {
 	
 	print "gzip tar file\n";
 	
-	systemp("gzip ".$output_tar)==0 or die;
+	systemp("gzip ".$modify_tar)==0 or die;
 
 	unless (-e $output_targz) {
 		die;
@@ -2977,11 +2995,30 @@ if ($d) {
 	
 	my $image_id = buildDockerImage($repo, $tag, $dockerfile);
 	
+	my $image_tarfile = $datadir.$image_id.'_'.$print_name.'.tar';
+	
+	# save to tar
+	save_image_to_tar($image_id, $image_tarfile);
+	
+	
+	#### modify image (add tags)
+	print "### modify image\n";
+	my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, undef);
+	
+	
+	##### upload
+	print "### upload image\n";
+	
+	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $imagediff_tar_gz, $repo, $tag, $image_id, undef, undef, get_docker_version());
+	
+	print "uploaded. shock node id: ".$shock_node_id."\n";
+	
+	
 	print "early exit\n";
 	exit(0);
 	
 	# create docker image
-	my $ref = saveDockerImage($image_id, $repo, $tag, $base_image_object);
+	my $ref = createAndSaveDiffImage($image_id, $repo, $tag, $base_image_object);
 	my ($image_tarfile, $image_id) = @{$ref};
 	
 	
