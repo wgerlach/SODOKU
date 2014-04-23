@@ -115,14 +115,12 @@ sub createDockerFile {
 }
 
 
-sub createDockerImage {
+sub buildDockerImage {
 	
-	my ($repo, $tag, $dockerfile, $docker_base_image) = @_;
+	my ($repo, $tag, $dockerfile) = @_;
 
 	
-	unless (defined $docker_base_image->{'id'}) {
-		die; # TODO remove
-	}
+	
 	
 	my $repotag = $repo.':'.$tag;
 	
@@ -234,16 +232,27 @@ sub createDockerImage {
 		die "image ID not found";
 	}
 
+	
+}
+
+sub saveDockerImage {
+	my ($repo, $tag, $docker_base_image) = @_;
 	### save image as tar archive file
 	
 	my $tag_converted = $repotag;
 	$tag_converted =~ s/[\/]/\_/g;
-	my $docker_base_image_converted = $docker_base_image->{'name'};
-	$docker_base_image_converted =~ s/[\/]/\_/g;
+	
+	my $image_tarfile
+	if (defined $docker_base_image) {
+		my $docker_base_image_converted = $docker_base_image->{'name'};
+		$docker_base_image_converted =~ s/[\/]/\_/g;
+		$image_tarfile = $datadir.$image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.complete.tar';
+	} else {
+		$image_tarfile = $datadir.$image_id.'_'.$tag_converted.'.complete.tar';
+	}
 	
 	
 	
-	my $image_tarfile = $datadir.$image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.complete.tar';
 	#my $imagediff_tarfile = $datadir.$image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.diff.tar';
 	
 	
@@ -2962,8 +2971,13 @@ if ($d) {
 	
 	
 	
+	buildDockerImage($repo, $tag, $dockerfile);
+	
+	print "early exit\n";
+	exit(0);
+	
 	# create docker image
-	my $ref = createDockerImage($repo, $tag, $dockerfile, $base_image_object);
+	my $ref = saveDockerImage($repo, $tag, $base_image_object);
 	my ($image_tarfile, $image_id) = @{$ref};
 	
 	
