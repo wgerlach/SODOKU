@@ -242,7 +242,7 @@ sub saveDockerImage {
 	my $tag_converted = $repotag;
 	$tag_converted =~ s/[\/]/\_/g;
 	
-	my $image_tarfile
+	my $image_tarfile;
 	if (defined $docker_base_image) {
 		my $docker_base_image_converted = $docker_base_image->{'name'};
 		$docker_base_image_converted =~ s/[\/]/\_/g;
@@ -278,6 +278,8 @@ sub saveDockerImage {
 	
 	return [$imagediff_tarfile_gz, $image_id];
 }
+
+
 
 sub save_image_to_tar {
 	my ($image_id, $image_tarfile) = @_;
