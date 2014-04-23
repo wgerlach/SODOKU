@@ -2995,6 +2995,9 @@ if ($d) {
 	
 	my $image_id = buildDockerImage($repo, $tag, $dockerfile);
 	
+	my $print_name = "$repo_$tag";
+	$print_name =~ s/[\:\_\/]/\_/g;
+	
 	my $image_tarfile = $datadir.$image_id.'_'.$print_name.'.tar';
 	
 	# save to tar
