@@ -2211,7 +2211,7 @@ sub install_package {
 			
 			my $source_branch;
 			if (ref($source_obj) eq 'HASH') {
-				$source = $source_obj->{'uri'};
+				$source = $source_obj->{'uri'} || $source_obj->{'url'};
 				$source_subdir = $source_obj->{'subdir'};
 				$source_filename=$source_obj->{'filename'};
 				$source_branch=$source_obj->{'branch'};
