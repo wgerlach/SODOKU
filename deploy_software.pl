@@ -255,23 +255,20 @@ sub createAndSaveDiffImage {
 	
 	
 	
-	#my $imagediff_tarfile = $datadir.$image_id.'_'.$docker_base_image_converted.'_'.$tag_converted.'.diff.tar';
-	
-	
+		
+	#### SAVE IMAGE
 	save_image_to_tar($image_id, $image_tarfile);
 	
 	unless (defined $repotag) {
 		die;
 	}
 	
-	# open and modify tar archive
-	
+	#### open and modify tar archive
 	
 	my $imagediff_tarfile_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, $docker_base_image);
 		
 	
 		
-	#my $imagediff_tarfile_gz = $imagediff_tarfile.'.gz';
 	unless (-e $imagediff_tarfile_gz) {
 		die;
 	}
@@ -3012,7 +3009,7 @@ if ($d) {
 	##### upload
 	print "### upload image\n";
 	
-	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $imagediff_tar_gz, $repo, $tag, $image_id, undef, undef, get_docker_version());
+	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $imagediff_tar_gz, $repo, $tag, $image_id, undef, $dockerfile, get_docker_version());
 	
 	print "uploaded. shock node id: ".$shock_node_id."\n";
 	
@@ -3025,12 +3022,7 @@ if ($d) {
 	#my ($image_tarfile, $image_id) = @{$ref};
 	
 	
-	# upload docker image
-	
-	#my $shock_node_id = upload_docker_image_to_shock($shocktoken, $image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile, get_docker_version()) || die;
-	
-	#print "uploaded. shock node id: ".$shock_node_id."\n";
-}
+	}
 
 
 unless ($d) {
