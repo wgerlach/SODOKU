@@ -3019,14 +3019,14 @@ if ($d) {
 	
 	# create docker image
 	my $ref = createAndSaveDiffImage($image_id, $repo, $tag, $base_image_object);
-	my ($image_tarfile, $image_id) = @{$ref};
+	#my ($image_tarfile, $image_id) = @{$ref};
 	
 	
 	# upload docker image
 	
-	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile, get_docker_version()) || die;
+	#my $shock_node_id = upload_docker_image_to_shock($shocktoken, $image_tarfile, $repo, $tag, $image_id, $base_image_object, $dockerfile, get_docker_version()) || die;
 	
-	print "uploaded. shock node id: ".$shock_node_id."\n";
+	#print "uploaded. shock node id: ".$shock_node_id."\n";
 }
 
 
