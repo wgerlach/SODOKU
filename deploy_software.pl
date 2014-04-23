@@ -232,11 +232,11 @@ sub buildDockerImage {
 		die "image ID not found";
 	}
 
-	
+	return $image_id;
 }
 
 sub saveDockerImage {
-	my ($repo, $tag, $docker_base_image) = @_;
+	my ($image_id, $repo, $tag, $docker_base_image) = @_;
 	### save image as tar archive file
 	
 	my $repotag = $repo.':'.$tag;
@@ -2975,13 +2975,13 @@ if ($d) {
 	
 	
 	
-	buildDockerImage($repo, $tag, $dockerfile);
+	my $image_id = buildDockerImage($repo, $tag, $dockerfile);
 	
 	print "early exit\n";
 	exit(0);
 	
 	# create docker image
-	my $ref = saveDockerImage($repo, $tag, $base_image_object);
+	my $ref = saveDockerImage($image_id, $repo, $tag, $base_image_object);
 	my ($image_tarfile, $image_id) = @{$ref};
 	
 	
