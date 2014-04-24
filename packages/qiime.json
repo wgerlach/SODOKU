@@ -15,7 +15,7 @@
 		"source" : "git://github.com/qiime/qiime-deploy.git",
 		"source-temporary" : 1,
 		"build-exec" : "cd ${source-dir} ; python qiime-deploy.py ${target}qiime_software/ -f ${1} --force-remove-failed-dirs",
-		"test" : ". ${target}qiime_software/activate.sh ; print_qiime_config.py -t",
+		"test" : "#. ${target}qiime_software/activate.sh ; print_qiime_config.py -t",
 		"subpackages" : [
 			{
 				"source-apt" : "software-properties-common lsb-release"
