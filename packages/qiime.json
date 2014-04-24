@@ -18,7 +18,7 @@
 		"test" : ". ${target}qiime_software/activate.sh ; print_qiime_config.py -t",
 		"subpackages" : [
 			{
-				"source-apt" : "lsb-release"
+				"source-apt" : "software-properties-common lsb-release"
 			},
 			{
 				"exec" : "add-apt-repository \"deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe multiverse\"",
