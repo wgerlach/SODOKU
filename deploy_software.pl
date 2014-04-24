@@ -171,18 +171,22 @@ sub buildDockerImage {
 		#my $docker_build_cmd = 'docker build --tag='.$repotag.' -'; #--no-cache=true --rm
 		my $docker_build_cmd;
 		
+		my $cache = '';
+		if (defined ($h->{'no-cache'})) {
+			$cache = ' --no-cache=true ';
+		}
 		
 		if (defined $docker_build_context_dir) {
 			# use context dir
 			
 			write_file($docker_build_context_dir.'/Dockerfile', $dockerfile);
 			
-			$docker_build_cmd = 'docker build --tag='.$repotag.' '.$docker_build_context_dir;
+			$docker_build_cmd = 'docker build $cache --tag='.$repotag.' '.$docker_build_context_dir;
 			systemp($docker_build_cmd)==0 or die "docker build failed";
 			
 		} else {
 			# no context, pipe dockerfile into docker client
-			$docker_build_cmd = 'docker build --tag='.$repotag.' -'; #--no-cache=true --rm
+			$docker_build_cmd = 'docker build $cache --tag='.$repotag.' -'; #--no-cache=true --rm
 			
 			print "docker_build_cmd: $docker_build_cmd\n";
 			
@@ -2629,6 +2633,7 @@ my $help_text;
 	['private',				'do not make image public on shock server'],
 	['tag=s',				'specifiy image name, e.g. me/mytool:1.0.1'],
 	['force_base',			'force upload of image even if baseimage is not in shock'],
+	['no-cache',			'docker build with --no-cache=true '],
 '',
 'save image to tar:',
 	['save_image=s',		'save image in tar file'],
