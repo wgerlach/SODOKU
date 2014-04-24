@@ -259,13 +259,9 @@
       "source-extract" : 1
    },
    "docker" : {
+      "source-apt" : "docker.io",
       "exec" : [
-         "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list",
-         "apt-get update",
-         "apt-get install lxc-docker",
-         "groupadd docker",
-         "gpasswd -a $USER docker",
-         "service docker restart"
+         "ln -s /usr/bin/docker.io /usr/bin/docker"
       ]
    },
    "emirge-data-cached" : {
@@ -313,14 +309,14 @@
    "usearch" : {
       "source" : {
          "filename" : "usearch",
-         "url" : "${1}"
+         "uri" : "${1}"
       },
       "set-env" : {
          "PATH" : "${target}bin:$PATH"
       },
       "ptarget" : "${target}bin",
       "build-exec" : "chmod +x ${target}bin/usearch",
-      "_comment" : "due to license issues of usearch the download url has to be given as a parameter",
+      "_comment" : "due to license issues of usearch the download uri has to be given as a parameter, e.g. file:///home/user/usearch",
       "subpackages" : [
          {
             "exec" : "mkdir -p ${target}bin"
@@ -428,6 +424,14 @@
                "numpy"
             ]
          }
+      ]
+   },
+   "use-mnt-tmp" : {
+      "exec" : [
+         "rm -rf /tmp",
+         "mkdir -p /mnt/tmp/",
+         "ln -s /mnt/tmp /tmp",
+         "sudo chmod 777 /mnt/tmp/"
       ]
    },
    "MG-RAST" : {
