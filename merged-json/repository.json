@@ -1,10 +1,4 @@
 {
-   "aweclient/cfg-awe.cfg" : {
-      "set-ini-values" : {
-         "cfg-string" : "${arguments}",
-         "file" : "${target}awe.cfg"
-      }
-   },
    "kbase-modules" : {
       "depend-function" : [
          {
@@ -114,6 +108,15 @@
          }
       ]
    },
+   "aweclient/config" : {
+      "set-ini-values" : {
+         "cfg-string" : "${arguments}",
+         "file" : "${target}awec.cfg"
+      },
+      "depends" : [
+         "aweclient/cfg/default"
+      ]
+   },
    "picrust_data" : {
       "source" : [
          "ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/16S_13_5_precalculated.tab.gz",
@@ -130,8 +133,8 @@
    },
    "aweclient/cfg/default" : {
       "source" : {
-         "filename" : "${1}",
-         "url" : "http://www.mcs.anl.gov/~wtang/files/awe.cfg"
+         "filename" : "awec.cfg",
+         "url" : "https://raw.githubusercontent.com/MG-RAST/AWE/master/templates/awec.cfg.template"
       },
       "source-remove-existing-file" : 1
    },
