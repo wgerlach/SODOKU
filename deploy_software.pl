@@ -2887,6 +2887,12 @@ if ($@) {
 	exit(1);
 }
 
+
+my $hostename = `hostname`;
+chomp($hostename);
+
+$ENV{'HOSTNAME'} = $hostename;
+
 datastructure_walk('data' => $repository, 'sub' => \&process_scalar, 'user_specific' => 1); # for my "environment variables"... ;-)
 
 
