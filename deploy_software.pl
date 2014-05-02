@@ -23,8 +23,8 @@ use Data::Dumper;
 1;
 
 
-
-my $default_repository = 'https://raw.github.com/wgerlach/SODOKU/master/merged-json/repository.json';
+my $default_repository = 'https://raw.githubusercontent.com/wgerlach/SODOKU/master/merged-json/repository.json';
+#my $default_repository = 'https://raw.github.com/wgerlach/SODOKU/master/merged-json/repository.json';
 
 my $ubuntu_cmd2package = {
 	'curl' => 'curl',
