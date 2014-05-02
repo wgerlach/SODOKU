@@ -2894,6 +2894,8 @@ chomp($hostname);
 
 $ENV{'HOSTNAME'} = $hostname;
 
+print "hostname: $hostname\n";
+
 datastructure_walk('data' => $repository, 'sub' => \&process_scalar, 'user_specific' => 1); # for my "environment variables"... ;-)
 
 
