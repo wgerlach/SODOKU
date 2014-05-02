@@ -1457,6 +1457,7 @@ sub parsePackageString{
 		#print "package_arg_lineB: $package_arg_line\n";
 		
 		if (defined $package_arg_line && $package_arg_line ne "") {
+			$package_arg_line = process_scalar($package_arg_line);
 			@package_args = split(' ', $package_arg_line) ;
 		}
 
@@ -2888,10 +2889,10 @@ if ($@) {
 }
 
 
-my $hostename = `hostname`;
-chomp($hostename);
+my $hostname = `hostname`;
+chomp($hostname);
 
-$ENV{'HOSTNAME'} = $hostename;
+$ENV{'HOSTNAME'} = $hostname;
 
 datastructure_walk('data' => $repository, 'sub' => \&process_scalar, 'user_specific' => 1); # for my "environment variables"... ;-)
 
