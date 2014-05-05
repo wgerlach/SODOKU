@@ -4,13 +4,13 @@
 			"cmd" : "pick_closed_reference_otus.py -i @[INPUTFILE] -o ucr -p @[INPUT-PARAMETER] -r /qiime_software/gg_otus-13_8-release/rep_set/97_otus.fasta",
 			"inputs" : ["[INPUT]", "[INPUT-PARAMETER]"],
 			"outputs" : ["ucr/otu_table.biom"]
-		}
+		},
 		"dockerimage" : "wgerlach/qiime:1.8.0"
 	},
 	"Emirge" : {
 		"normalize_by_copy_number" : {
 			"cmd" : "normalize_by_copy_number.py -i @[INPUT] -o @@[OUTPUT]"
-		}
+		},
 		"predict_metagenomes" : {
 			"cmd" : "predict_metagenomes.py -i @[INPUT] -o @@[OUTPUT]"
 		},
