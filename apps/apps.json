@@ -15,4 +15,5 @@
 			"cmd" : "predict_metagenomes.py -i @[INPUT] -o @@[OUTPUT]"
 		},
 		"dockerimage" : "wgerlach/emirge:latest"
+	}
 }
