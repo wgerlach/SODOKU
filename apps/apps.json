@@ -20,13 +20,13 @@
 				"default" : {
 					"function" : "file INPUT",
 					"output_array" : ["${OUTPUT-FILE}"],
-					"variable" : { "OUTPUT-FILE" : "[suffix_remove:INPUT].normalized.fna"},
-					"cmd" : "normalize_by_copy_number.py -i @[INPUT] -o [OUTPUT-FILE]"
+					"variable" : { "OUTPUT-FILE" : "${suffix_remove:INPUT}.normalized.fna"},
+					"cmd" : "normalize_by_copy_number.py -i @${INPUT} -o ${OUTPUT-FILE}"
 				}
 			},
 			"predict_metagenomes" : {
 				"default" : {
-					"cmd" : "predict_metagenomes.py -i @[INPUT] -o @@[OUTPUT]"
+					"cmd" : "predict_metagenomes.py -i @${INPUT} -o @@${OUTPUT}"
 				}
 			}
 		}
