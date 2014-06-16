@@ -23,8 +23,8 @@ use Data::Dumper;
 1;
 
 
-
-my $default_repository = 'https://raw.github.com/wgerlach/SODOKU/master/merged-json/repository.json';
+my $default_repository = 'https://raw.githubusercontent.com/wgerlach/SODOKU/master/merged-json/repository.json';
+#my $default_repository = 'https://raw.github.com/wgerlach/SODOKU/master/merged-json/repository.json';
 
 my $ubuntu_cmd2package = {
 	'curl' => 'curl',
@@ -1457,6 +1457,7 @@ sub parsePackageString{
 		#print "package_arg_lineB: $package_arg_line\n";
 		
 		if (defined $package_arg_line && $package_arg_line ne "") {
+			$package_arg_line = process_scalar($package_arg_line);
 			@package_args = split(' ', $package_arg_line) ;
 		}
 
@@ -2886,6 +2887,14 @@ if ($@) {
 	print "$e\n";
 	exit(1);
 }
+
+
+my $hostname = `hostname`;
+chomp($hostname);
+
+$ENV{'HOSTNAME'} = $hostname;
+
+print "hostname: $hostname\n";
 
 datastructure_walk('data' => $repository, 'sub' => \&process_scalar, 'user_specific' => 1); # for my "environment variables"... ;-)
 

@@ -76,22 +76,22 @@
 					"ln --force -s ${target}picrust_data/ko_13_5_precalculated.tab.gz $QIIME/../picrust-1.0.0-release/lib/python2.7/site-packages/picrust/data/ko_13_5_precalculated.tab.gz"],
 		"depends" : ["picrust_data"]
 	},
-
-	"aweclient/cfg-awe.cfg" : {
-		"set-ini-values" : {
-			"file" : "${target}awe.cfg",
-			"cfg-string" : "${arguments}"
-		}
-	},
 	"aweclient/cfg-awec.cfg" : {
 		"set-ini-values" : {
 			"file" : "${target}awec.cfg",
 			"cfg-string" : "${arguments}"
 		}
 	},
+	"aweclient/config" : {
+		"set-ini-values" : {
+			"file" : "${target}awec.cfg",
+			"cfg-string" : "${arguments}"
+		},
+		"depends" : ["aweclient/cfg/default"]
+	},
 	"aweclient/cfg/default" : {
-		"source" : {	"url" : "http://www.mcs.anl.gov/~wtang/files/awe.cfg",
-						"filename" : "${1}"
+		"source" : {	"url" : "https://raw.githubusercontent.com/MG-RAST/AWE/master/templates/awec.cfg.template",
+				"filename" : "awec.cfg"
 		},
 		"source-remove-existing-file" : 1
 	},

@@ -1,0 +1,34 @@
+{
+	"QIIME" : {
+		"dockerimage" : "wgerlach/qiime:1.8.0",
+		"commands" : {
+			"pick_closed_reference_otus" : {
+				"default" : {
+					"function" : "file INPUT-FILE, file INPUT-PARAMETER, number IDENTITY=97, string OUTPUT-DIR=ucr, file *array, **dict",
+					"output_array" : ["${OUTPUT-DIR}/otu_table.biom"],
+					"output_map" : {},
+					"cmd" : "pick_closed_reference_otus.py -i @${INPUT-FILE} -o ${OUTPUT-DIR} -p @${INPUT-PARAMETER} -r /qiime_software/gg_otus-13_8-release/rep_set/${IDENTITY}_otus.fasta",
+					"example" : "QIIME.pick_closed_reference_otus(input.fas, param.txt, IDENTITY=90)"
+				}
+			}
+		}
+	},
+	"Emirge" : {
+		"dockerimage" : "wgerlach/emirge:latest",
+		"commands" : {
+			"normalize_by_copy_number" : {
+				"default" : {
+					"function" : "file INPUT",
+					"output_array" : ["${OUTPUT-FILE}"],
+					"variable" : { "OUTPUT-FILE" : "${suffix_remove:INPUT}.normalized.biom"},
+					"cmd" : "normalize_by_copy_number.py -i @${INPUT} -o ${OUTPUT-FILE}"
+				}
+			},
+			"predict_metagenomes" : {
+				"default" : {
+					"cmd" : "predict_metagenomes.py -i @${INPUT} -o @@${OUTPUT}"
+				}
+			}
+		}
+	}
+}

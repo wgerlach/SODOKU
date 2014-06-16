@@ -1,10 +1,4 @@
 {
-   "aweclient/cfg-awe.cfg" : {
-      "set-ini-values" : {
-         "cfg-string" : "${arguments}",
-         "file" : "${target}awe.cfg"
-      }
-   },
    "kbase-modules" : {
       "depend-function" : [
          {
@@ -96,19 +90,31 @@
    "qiime-deploy" : {
       "source-temporary" : 1,
       "source" : "git://github.com/qiime/qiime-deploy.git",
-      "test" : ". ${target}qiime_software/activate.sh ; print_qiime_config.py -t",
+      "test" : "#. ${target}qiime_software/activate.sh ; print_qiime_config.py -t",
       "build-exec" : "cd ${source-dir} ; python qiime-deploy.py ${target}qiime_software/ -f ${1} --force-remove-failed-dirs",
       "_comment" : "QIIME uses a configuration file like qiime.conf for the deployment, which has to be given as an argument to this package",
       "subpackages" : [
          {
+            "source-apt" : "software-properties-common lsb-release"
+         },
+         {
             "set-env" : {
                "JAVA_HOME" : "/usr/lib/jvm/java-6-openjdk-amd64"
             },
-            "exec" : "add-apt-repository \"deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe multiverse\""
+            "exec" : "add-apt-repository \"deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) multiverse\""
          },
          {
             "source-apt" : "python-dev libncurses5-dev libssl-dev libzmq-dev libgsl0-dev openjdk-6-jdk libxml2 libxslt1.1 libxslt1-dev ant git subversion build-essential zlib1g-dev libpng12-dev libfreetype6-dev mpich2 libreadline-dev gfortran unzip libmysqlclient18 libmysqlclient-dev ghc sqlite3 libsqlite3-dev libc6-i386 libbz2-dev"
          }
+      ]
+   },
+   "aweclient/config" : {
+      "set-ini-values" : {
+         "cfg-string" : "${arguments}",
+         "file" : "${target}awec.cfg"
+      },
+      "depends" : [
+         "aweclient/cfg/default"
       ]
    },
    "picrust_data" : {
@@ -127,8 +133,8 @@
    },
    "aweclient/cfg/default" : {
       "source" : {
-         "filename" : "${1}",
-         "url" : "http://www.mcs.anl.gov/~wtang/files/awe.cfg"
+         "filename" : "awec.cfg",
+         "url" : "https://raw.githubusercontent.com/MG-RAST/AWE/master/templates/awec.cfg.template"
       },
       "source-remove-existing-file" : 1
    },
