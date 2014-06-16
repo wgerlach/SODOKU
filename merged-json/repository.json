@@ -284,9 +284,9 @@
       ],
       "exec" : [
          "ln -s /usr/bin/docker.io /usr/bin/docker",
-         "mkdir /mnt/docker-tmp",
+         "mkdir -p /mnt/docker-tmp",
          "rm -rf /var/lib/docker",
-         "mkdir /mnt/docker/",
+         "mkdir -p /mnt/docker/",
          "ln -s /mnt/docker /var/lib/docker"
       ]
    },
