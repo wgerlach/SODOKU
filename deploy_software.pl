@@ -17,6 +17,8 @@ or die "USAGEPOD is missing:\n sudo apt-get install cpanminus \n sudo cpanm git:
 use File::Temp;
 use LWP::UserAgent;
 use Data::Dumper;
+
+use File::Slurp;
 #eval "use Try::Tiny; 1"
 #or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm install Try::Tiny";
 
@@ -2519,8 +2521,52 @@ sub install_package {
 	}
 
 
-	
-	
+	if (defined($package_hash->{'set-values'})) { # config for simple key=value pairs in text files
+		
+		print "set-values\n";
+		
+		my $configfile = $package_hash->{'set-values'}->{'file'};
+		unless (defined $configfile) {
+			die "config-file $configfile not defined";
+		}
+		
+		unless (-e $configfile || $d) {
+			die "config-file $configfile not found";
+		}
+		
+		my $cfg_strings = $package_hash->{'set-values'}->{'cfg-string'} || "";
+		
+		unless (ref($cfg_strings) eq 'ARRAY') {
+			$cfg_strings = [$cfg_strings];
+		}
+		
+		
+		my @config_lines = read_file( $configfile ) ;
+		
+		foreach my $cfg_string (@{$cfg_strings}) {
+			
+			my ($key) = $cfg_string =~ /^\s*(\S+)\s*\=/;
+			
+			my $change = 0;
+			foreach my $config_line (@config_lines) {
+				if ($config_line =~ /^\s*$key\s*\=/) {
+					$config_line = $cfg_string;
+					$change=1;
+				}
+				
+			}
+			if ($change == 0) {
+				push(@config_lines, $cfg_string);
+			}
+
+			
+		}
+
+			
+		write_file($configfile, @config_lines ) ;
+		
+		
+	}
 	
 	if (defined($package_hash->{'set-ini-values'})) {
 		
@@ -2541,11 +2587,20 @@ sub install_package {
 		if ($cfg_string ne "") {
 			
 			print "cfg_string: \"$cfg_string\"\n";
+			#if ($cfg_string =~ /^\[.*\]/) {
 			
 			my @cfg_strings = split(' ', $cfg_string);
 			
 			my $ini_hash = INI_cmds_to_hash( \@cfg_strings );
-			modifyINIfile($inifile, $ini_hash)
+			modifyINIfile($inifile, $ini_hash);
+			#} else {
+			#	print "simple config file...\n";
+			#	my @config_lines = read_file( $inifile ) ;
+				
+				
+				
+				
+			#}
 		}else {
 			print STDERR "warning: cfg_string emtpy, will not modify $inifile\n";
 		};
@@ -2708,14 +2763,14 @@ if (defined($d) && ($d == 1)) {
 		die "error: docker image upload to SHOCK requires module SHOCK::Client";
 	}
 	
-	eval {
-		require File::Slurp;
-		File::Slurp->import();
-		1;
-	} or do {
-		my $error = $@;
-		print "not using File::Slurp: $error\n";
-	};
+	#eval {
+	#	require File::Slurp;
+	#	File::Slurp->import();
+	#	1;
+	#} or do {
+	#	my $error = $@;
+	#	print "not using File::Slurp: $error\n";
+	#};
 }
 
 
