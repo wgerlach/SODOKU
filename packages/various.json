@@ -8,8 +8,18 @@
 	"docker" : {
 		"source-apt" : "docker.io",
 		"exec" : [ 
-			"ln -s /usr/bin/docker.io /usr/bin/docker"
-		]
+			"ln -s /usr/bin/docker.io /usr/bin/docker",
+			"mkdir /mnt/docker-tmp",
+			"rm -rf /var/lib/docker",
+			"mkdir /mnt/docker/",
+			"ln -s /mnt/docker /var/lib/docker"
+		],
+		"set-values" : { 
+				"cfg-string" : [ "DOCKER_OPTS=\"-g /mnt/docker\"", 
+						 "export TMPDIR=\"/mnt/docker-tmp\""],
+				"file" : "/etc/default/docker.io"
+				},
+		"depends" : ["use-mnt-tmp"]
 	},
 	"use-mnt-tmp" : {
 		"exec" : [
