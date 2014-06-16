@@ -1169,6 +1169,14 @@ sub setenv {
 	my ($key, $value) = @_;
 	
 	if ($d) {
+		
+		if ($value =~ /\$/ || $value =~ /\~/) {
+			#make sure that environment variables are evaluated
+			my $echocmd = "echo \"$value\"";
+			$value = `$echocmd`;
+			chomp($value);
+		}
+		
 		push(@docker_file_content, "ENV $key $value");
 		
 	} else {
