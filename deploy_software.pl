@@ -170,6 +170,14 @@ sub buildDockerImage {
 	unless (defined($image_id) ) {
 		
 		
+		my $docker_bin = '/usr/bin/docker.io'; # on ubuntu
+		unless (-e $docker_bin) {
+			$docker_bin = '/usr/bin/docker'; # normal docker binary
+		}
+		unless (-e $docker_bin) {
+			die "docker binary not found ! ;-(";
+		}
+		
 		#my $docker_build_cmd = 'docker build --tag='.$repotag.' -'; #--no-cache=true --rm
 		my $docker_build_cmd;
 		
@@ -183,12 +191,12 @@ sub buildDockerImage {
 			
 			write_file($docker_build_context_dir.'/Dockerfile', $dockerfile);
 			
-			$docker_build_cmd = '/usr/bin/docker build '.$cache.' --tag='.$repotag.' '.$docker_build_context_dir;
+			$docker_build_cmd = $docker_bin.' build '.$cache.' --tag='.$repotag.' '.$docker_build_context_dir;
 			systemp($docker_build_cmd)==0 or die "docker build failed";
 			
 		} else {
 			# no context, pipe dockerfile into docker client
-			$docker_build_cmd = '/usr/bin/docker build '.$cache.' --tag='.$repotag.' -'; #--no-cache=true --rm
+			$docker_build_cmd = $docker_bin.' build '.$cache.' --tag='.$repotag.' -'; #--no-cache=true --rm
 			
 			print "docker_build_cmd: $docker_build_cmd\n";
 			
