@@ -2213,9 +2213,14 @@ sub install_package {
 	}
 
 	if (defined $package_hash->{'set-env'}) {
-		my $env_pairs = $package_hash->{'set-env'};
-		foreach my $key (keys %{$env_pairs} ) {
-			setenv($key, $env_pairs->{$key}) ;
+		my $env_pairs_array = $package_hash->{'set-env'};
+		unless (ref($env_pairs_array) eq 'ARRAY') {
+			die "ARRAY ref expected";
+		}
+		foreach my $env_pairs (@{$env_pairs_array }) {
+			foreach my $key (keys %{$env_pairs} ) {
+				setenv($key, $env_pairs->{$key}) ;
+			}
 		}
 	}
 	
