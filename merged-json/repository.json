@@ -16,9 +16,11 @@
       "exec" : ". /kb/dev_container/user-env.sh ; make update"
    },
    "Shock" : {
-      "set-env" : {
-         "GOPATH" : "$HOME/gocode:$GOPATH"
-      },
+      "set-env" : [
+         {
+            "GOPATH" : "$HOME/gocode:$GOPATH"
+         }
+      ],
       "source-go" : "github.com/MG-RAST/Shock/...",
       "depends" : [
          "golang"
@@ -60,12 +62,16 @@
       ]
    },
    "golang-deprecated" : {
-      "ROOT_set-env" : {
-         "GOPATH" : "/usr/local/go/:$GOPATH"
-      },
-      "USER_set-env" : {
-         "GOPATH" : "$HOME/gopath:$GOPATH"
-      },
+      "ROOT_set-env" : [
+         {
+            "GOPATH" : "/usr/local/go/:$GOPATH"
+         }
+      ],
+      "USER_set-env" : [
+         {
+            "GOPATH" : "$HOME/gopath:$GOPATH"
+         }
+      ],
       "source-apt" : "golang git mercurial bzr"
    },
    "kbase_dev_container-deploy" : {
@@ -79,9 +85,11 @@
       "source-git" : "kbase@git.kbase.us:bootstrap.git"
    },
    "SHOCK-lib" : {
-      "set-env" : {
-         "PERL5LIB" : "${ptarget}Shock/libs/:$PERL5LIB"
-      },
+      "set-env" : [
+         {
+            "PERL5LIB" : "${ptarget}Shock/libs/:$PERL5LIB"
+         }
+      ],
       "source-git" : "https://github.com/wgerlach/Shock"
    },
    "ubuntu-base" : {
@@ -117,6 +125,17 @@
          "aweclient/cfg/default"
       ]
    },
+   "docker-ubuntu-latest" : {
+      "depends" : [
+         "docker-ubuntu"
+      ],
+      "exec" : [
+         "rm -f docker.io",
+         "wget https://get.docker.io/builds/Linux/x86_64/docker-latest -O docker.io",
+         "chmod +x docker.io",
+         "mv docker.io /usr/bin"
+      ]
+   },
    "picrust_data" : {
       "source" : [
          "ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/16S_13_5_precalculated.tab.gz",
@@ -126,9 +145,11 @@
       "dir" : 1
    },
    "wgerlach/AWE-git" : {
-      "set-env" : {
-         "PERL5LIB" : "${ptarget}AWE/utils/lib:$PERL5LIB"
-      },
+      "set-env" : [
+         {
+            "PERL5LIB" : "${ptarget}AWE/utils/lib:$PERL5LIB"
+         }
+      ],
       "source-git" : "https://github.com/wgerlach/AWE"
    },
    "aweclient/cfg/default" : {
@@ -239,10 +260,14 @@
       ]
    },
    "go-deprecated" : {
-      "set-env" : {
-         "PATH" : "$PATH:${target}go/bin:${target}gopath/bin",
-         "GOPATH" : "${target}gopath"
-      },
+      "set-env" : [
+         {
+            "GOPATH" : "${target}gopath"
+         },
+         {
+            "PATH" : "$PATH:${target}go/bin:${target}gopath/bin"
+         }
+      ],
       "build-exec" : "cd ${target}go/src && ./all.bash",
       "source-mercurial" : "-u release https://code.google.com/p/go",
       "subpackages" : [
@@ -263,32 +288,6 @@
       "source" : "http://www.mcs.anl.gov/~wtang/files/fgs.tar.gz",
       "ptarget" : "${target}apps/FragGeneScan",
       "source-extract" : 1
-   },
-   "docker" : {
-      "depends" : [
-         "use-mnt-tmp"
-      ],
-      "subpackages" : [
-         {
-            "set-values" : {
-               "cfg-string" : [
-                  "DOCKER_OPTS=\"-g /mnt/docker\"",
-                  "export TMPDIR=\"/mnt/docker-tmp\""
-               ],
-               "file" : "/etc/default/docker.io"
-            }
-         },
-         {
-            "source-apt" : "docker.io"
-         }
-      ],
-      "exec" : [
-         "ln -s /usr/bin/docker.io /usr/bin/docker",
-         "mkdir -p /mnt/docker-tmp",
-         "rm -rf /var/lib/docker",
-         "mkdir -p /mnt/docker/",
-         "ln -s /mnt/docker /var/lib/docker"
-      ]
    },
    "emirge-data-cached" : {
       "source" : "http://dunkirk.mcs.anl.gov/~wgerlach/SSURef_111.tar.gz",
@@ -337,9 +336,11 @@
          "filename" : "usearch",
          "uri" : "${1}"
       },
-      "set-env" : {
-         "PATH" : "${target}bin:$PATH"
-      },
+      "set-env" : [
+         {
+            "PATH" : "${target}bin:$PATH"
+         }
+      ],
       "ptarget" : "${target}bin",
       "build-exec" : "chmod +x ${target}bin/usearch",
       "_comment" : "due to license issues of usearch the download uri has to be given as a parameter, e.g. file:///home/user/usearch",
@@ -384,6 +385,32 @@
          }
       ]
    },
+   "docker-ubuntu" : {
+      "depends" : [
+         "use-mnt-tmp"
+      ],
+      "subpackages" : [
+         {
+            "set-values" : {
+               "cfg-string" : [
+                  "DOCKER_OPTS=\"-g /mnt/docker\"",
+                  "export TMPDIR=\"/mnt/docker-tmp\""
+               ],
+               "file" : "/etc/default/docker.io"
+            }
+         },
+         {
+            "source-apt" : "docker.io"
+         }
+      ],
+      "exec" : [
+         "ln -s /usr/bin/docker.io /usr/bin/docker",
+         "mkdir -p /mnt/docker-tmp",
+         "rm -rf /var/lib/docker",
+         "mkdir -p /mnt/docker/",
+         "ln -s /mnt/docker /var/lib/docker"
+      ]
+   },
    "deploy-deps" : {
       "source-apt" : "git cpanminus python-setuptools python-dev checkinstall"
    },
@@ -413,10 +440,14 @@
       ]
    },
    "wgerlach/MG-RAST-Tools" : {
-      "set-env" : {
-         "PATH" : "${ptarget}MG-RAST-Tools/tools/bin:$PATH",
-         "PERL5LIB" : "${ptarget}MG-RAST-Tools/tools/lib/:$PERL5LIB"
-      },
+      "set-env" : [
+         {
+            "PERL5LIB" : "${ptarget}MG-RAST-Tools/tools/lib/:$PERL5LIB"
+         },
+         {
+            "PATH" : "${ptarget}MG-RAST-Tools/tools/bin:$PATH"
+         }
+      ],
       "source-git" : "https://github.com/wgerlach/MG-RAST-Tools"
    },
    "kbase_dev_container" : {
@@ -506,11 +537,17 @@
    },
    "golang" : {
       "source" : "http://go.googlecode.com/files/go${v1}.${v2}.linux-amd64.tar.gz",
-      "set-env" : {
-         "GOROOT" : "${ptarget}go/",
-         "GOPATH" : "${ptarget}gopath",
-         "PATH" : "${GOROOT}bin:${ptarget}gopath:${PATH}"
-      },
+      "set-env" : [
+         {
+            "GOROOT" : "${ptarget}go/"
+         },
+         {
+            "PATH" : "${GOROOT}bin:${ptarget}gopath:${PATH}"
+         },
+         {
+            "GOPATH" : "${ptarget}gopath"
+         }
+      ],
       "source-extract" : 1,
       "version" : [
          1,
