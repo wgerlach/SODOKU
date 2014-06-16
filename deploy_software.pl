@@ -2556,7 +2556,7 @@ sub install_package {
 				
 			}
 			if ($change == 0) {
-				push(@config_lines, $cfg_string);
+				push(@config_lines, $cfg_string."\n");
 			}
 
 			
