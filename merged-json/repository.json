@@ -265,17 +265,23 @@
       "source-extract" : 1
    },
    "docker" : {
-      "source-apt" : "docker.io",
       "depends" : [
          "use-mnt-tmp"
       ],
-      "set-values" : {
-         "cfg-string" : [
-            "DOCKER_OPTS=\"-g /mnt/docker\"",
-            "export TMPDIR=\"/mnt/docker-tmp\""
-         ],
-         "file" : "/etc/default/docker.io"
-      },
+      "subpackages" : [
+         {
+            "set-values" : {
+               "cfg-string" : [
+                  "DOCKER_OPTS=\"-g /mnt/docker\"",
+                  "export TMPDIR=\"/mnt/docker-tmp\""
+               ],
+               "file" : "/etc/default/docker.io"
+            }
+         },
+         {
+            "source-apt" : "docker.io"
+         }
+      ],
       "exec" : [
          "ln -s /usr/bin/docker.io /usr/bin/docker",
          "mkdir /mnt/docker-tmp",
