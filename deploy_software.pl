@@ -516,7 +516,7 @@ sub upload_docker_image_to_shock {
 	
 	
 	my $node_attributes = {
-		"temporary"				=> "1",
+	#	"temporary"				=> "1",
 		"type"					=> "dockerimage",
 		"name"					=> $repotag						|| die,
 		"id"					=> $image_id					|| die,
@@ -550,7 +550,7 @@ sub upload_docker_image_to_shock {
 		die;
 	}
 	
-	my $shock_node_id = $up_result->{'data'}->{'Id'} || die "SHOCK node id not found for uploaded image";
+	my $shock_node_id = $up_result->{'data'}->{'id'} || die "SHOCK node id not found for uploaded image";
 	
 	unless (defined $h->{'private'}) {
 		$shock->permisson_readable($shock_node_id) || die "error makeing node readable";
@@ -692,7 +692,7 @@ sub findImageinShock {
 		$shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
 	}
 	
-	my $node_obj = $shock->query('type' => 'dockerimage', 'Id' => $image_id);
+	my $node_obj = $shock->query('type' => 'dockerimage', 'id' => $image_id);
 	print 'node: '.Dumper($node_obj);
 	
 	my @nodes = ();
