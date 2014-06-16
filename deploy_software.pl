@@ -1274,7 +1274,7 @@ sub get_image_object{
 	
 	print "something: ".Dumper($result_hash);
 
-	my $id =  $result_hash->{'id'} || die "error: id not found in image object";
+	my $id =  $result_hash->{'Id'} || die "error: id not found in image object";
 	
 	my $obj = {};
 	$obj->{'id'} = $id;
