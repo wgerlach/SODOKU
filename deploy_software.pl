@@ -1151,22 +1151,22 @@ sub setenv {
 	
 	if ($d) {
 		push(@docker_file_content, "ENV $key $value");
-		return;
+		
+	} else {
+	
+		
+		my $envline = "export $key=$value";
+		#system_install("grep -q -e '$envline' ~/.bashrc || echo '$envline' >> ~/.bashrc");
+		
+		bashrc_append($envline);
+		
+		if ($value =~ /\$/ || $value =~ /\~/) {
+			#make sure that environment variables are evaluated
+			my $echocmd = "echo \"$value\"";
+			$value = `$echocmd`;
+			chomp($value);
+		}
 	}
-	
-	
-	my $envline = "export $key=$value";
-	#system_install("grep -q -e '$envline' ~/.bashrc || echo '$envline' >> ~/.bashrc");
-	
-	bashrc_append($envline);
-	
-	if ($value =~ /\$/ || $value =~ /\~/) {
-		#make sure that environment variables are evaluated
-		my $echocmd = "echo \"$value\"";
-		$value = `$echocmd`;
-		chomp($value);
-	}
-	
 	$ENV{$key}=$value; # makes sure variable can be used even if bashrc is not sourced yet.
 	return;
 }
