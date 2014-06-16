@@ -2550,7 +2550,7 @@ sub install_package {
 			my $change = 0;
 			foreach my $config_line (@config_lines) {
 				if ($config_line =~ /^\s*$key\s*\=/) {
-					$config_line = $cfg_string;
+					$config_line = $cfg_string."\n";
 					$change=1;
 				}
 				
