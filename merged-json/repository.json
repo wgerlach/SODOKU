@@ -391,11 +391,6 @@
       "source-go" : "github.com/MG-RAST/AWE/...",
       "depends" : [
          "golang"
-      ],
-      "subpackages" : [
-         {
-            "source-apt" : "mongodb-server"
-         }
       ]
    },
    "kbase_bootstrap_mgrast" : {
@@ -499,6 +494,16 @@
          }
       ]
    },
+   "AWE-full" : {
+      "depends" : [
+         "AWE"
+      ],
+      "subpackages" : [
+         {
+            "source-apt" : "mongodb-server"
+         }
+      ]
+   },
    "golang" : {
       "source" : "http://go.googlecode.com/files/go${v1}.${v2}.linux-amd64.tar.gz",
       "set-env" : {
@@ -510,6 +515,9 @@
       "version" : [
          1,
          2
+      ],
+      "exec" : [
+         "mkdir -p ${GOPATH}"
       ],
       "subpackages" : [
          {
