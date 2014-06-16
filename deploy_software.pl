@@ -117,6 +117,20 @@ sub createDockerFile {
 }
 
 
+
+sub get_docker_bin {
+	
+	my $docker_bin = '/usr/bin/docker.io'; # on ubuntu
+	unless (-e $docker_bin) {
+		$docker_bin = '/usr/bin/docker'; # normal docker binary
+	}
+	unless (-e $docker_bin) {
+		die "docker binary not found ! ;-(";
+	}
+	
+	return $docker_bin;
+}
+
 sub buildDockerImage {
 	
 	my ($repo, $tag, $dockerfile) = @_;
@@ -170,13 +184,7 @@ sub buildDockerImage {
 	unless (defined($image_id) ) {
 		
 		
-		my $docker_bin = '/usr/bin/docker.io'; # on ubuntu
-		unless (-e $docker_bin) {
-			$docker_bin = '/usr/bin/docker'; # normal docker binary
-		}
-		unless (-e $docker_bin) {
-			die "docker binary not found ! ;-(";
-		}
+		my $docker_bin = get_docker_bin();
 		
 		#my $docker_build_cmd = 'docker build --tag='.$repotag.' -'; #--no-cache=true --rm
 		my $docker_build_cmd;
@@ -313,7 +321,10 @@ sub save_image_to_tar {
 	
 	
 	if ($skip_saving == 0) {
-		my $docker_save_cmd = 'docker save '.$image_id.' > '.$image_tarfile; # TODO: use API
+		
+		my $docker_bin = get_docker_bin();
+		
+		my $docker_save_cmd = $docker_bin.' save '.$image_id.' > '.$image_tarfile; # TODO: use API
 		systemp($docker_save_cmd) == 0 or die;
 	}
 	
