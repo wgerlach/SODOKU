@@ -133,7 +133,7 @@ sub buildDockerImage {
 	
 	my $image_id = undef;
 	if (defined $result_hash) {
-		$image_id = $result_hash->{'id'};
+		$image_id = $result_hash->{'Id'};
 		unless (defined $image_id) {
 			die "hash defined, but not id!?";
 		}
@@ -234,7 +234,7 @@ sub buildDockerImage {
 		
 		
 		if (defined $result_hash) {
-			$image_id = $result_hash->{'id'};
+			$image_id = $result_hash->{'Id'};
 						
 		} else {
 			die "result_hash not defined, docker image was not created !?";
@@ -243,7 +243,7 @@ sub buildDockerImage {
 	}
 	
 	unless (defined $image_id) {
-		die "image ID not found";
+		die "image ID not defined";
 	}
 
 	return $image_id;
@@ -363,7 +363,7 @@ sub remove_base_from_image_and_set_tag {
 		
 		
 		
-		my @diff_layers = get_diff_layers($image_id, $docker_base_image->{'id'});
+		my @diff_layers = get_diff_layers($image_id, $docker_base_image->{'Id'});
 		
 		if (@diff_layers == 0) {
 			die ;
@@ -511,7 +511,7 @@ sub upload_docker_image_to_shock {
 		"id"					=> $image_id					|| die,
 		"docker_version"		=> $image_docker_version_hash	|| die,
 		"base_image_tag"		=> $base_image_object->{'name'} || "",
-		"base_image_id"			=> $base_image_object->{'id'}	|| "",
+		"base_image_id"			=> $base_image_object->{'Id'}	|| "",
 		"dockerfile"			=> $dockerfile_encoded			|| ""
 	};
 	
@@ -539,7 +539,7 @@ sub upload_docker_image_to_shock {
 		die;
 	}
 	
-	my $shock_node_id = $up_result->{'data'}->{'id'} || die "SHOCK node id not found for uploaded image";
+	my $shock_node_id = $up_result->{'data'}->{'Id'} || die "SHOCK node id not found for uploaded image";
 	
 	unless (defined $h->{'private'}) {
 		$shock->permisson_readable($shock_node_id) || die "error makeing node readable";
@@ -681,7 +681,7 @@ sub findImageinShock {
 		$shock = new SHOCK::Client($shock_server, $ENV{'GLOBUSONLINE'});
 	}
 	
-	my $node_obj = $shock->query('type' => 'dockerimage', 'id' => $image_id);
+	my $node_obj = $shock->query('type' => 'dockerimage', 'Id' => $image_id);
 	print 'node: '.Dumper($node_obj);
 	
 	my @nodes = ();
@@ -1277,13 +1277,13 @@ sub get_image_object{
 	my $id =  $result_hash->{'Id'} || die "error: id not found in image object";
 	
 	my $obj = {};
-	$obj->{'id'} = $id;
+	$obj->{'Id'} = $id;
 	
 
 	# if user used id to identify image, try to find a tag
 	if (lc($something) eq lc(substr($id, 0 , length($something)))) {
 	
-		my $history = dockerSocket('GET', "/images/".$obj->{'id'}."/history");
+		my $history = dockerSocket('GET', "/images/".$obj->{'Id'}."/history");
 		
 		print "history: ".Dumper($history);
 		
@@ -1718,7 +1718,7 @@ sub commandline_upload {
 	my $layer_graph_inverse={}; # points to child
 	my $layer_graph={};
 	foreach my $layer (@{$image_history}) {
-		my $id =  $layer->{'id'};
+		my $id =  $layer->{'Id'};
 		$image_history_hash->{$id} = $layer;
 		if (defined $layer->{'parent'}) {
 			$layer_graph_inverse->{$layer->{'parent'}}=$id;
@@ -1741,7 +1741,7 @@ sub commandline_upload {
 	print Dumper($layer_graph_inverse);
 	foreach my $layer (@{$image_history}) {
 		
-		my $id =  $layer->{'id'};
+		my $id =  $layer->{'Id'};
 		
 		#child
 		unless (defined $layer_graph_inverse->{$id}) {
@@ -1796,7 +1796,7 @@ sub commandline_upload {
 			
 			if ($h->{'base_image_name'} ne 'none') {
 				$base_image_object->{'name'} = $h->{'base_image_name'};
-				$base_image_object->{'id'} = $baseimage_id;
+				$base_image_object->{'Id'} = $baseimage_id;
 			} else {
 				$base_image_object = undef;
 			}
@@ -1809,7 +1809,7 @@ sub commandline_upload {
 			unless (defined $base_image_object) {
 				die $err_str;
 			}
-			unless (defined $base_image_object->{'id'}) {
+			unless (defined $base_image_object->{'Id'}) {
 				die $err_str;
 			}
 			unless (defined $base_image_object->{'name'}) {
@@ -1818,11 +1818,11 @@ sub commandline_upload {
 			
 			
 			
-			if ($base_image_object->{'id'} ne $baseimage_id) {
+			if ($base_image_object->{'Id'} ne $baseimage_id) {
 				print STDERR  $err_str."\n";
-				print STDERR "error: id not identical \n\"".$base_image_object->{'id'}."\"\n\"".$baseimage_id."\"\n";
+				print STDERR "error: id not identical \n\"".$base_image_object->{'Id'}."\"\n\"".$baseimage_id."\"\n";
 				
-				#my $a = $base_image_object->{'id'};
+				#my $a = $base_image_object->{'Id'};
 				#my $b = $baseimage_id;
 				#$a =~ s/(.)/ord($1)/eg;
 				#$b =~ s/(.)/ord($1)/eg;
@@ -1868,10 +1868,10 @@ sub commandline_docker2shock {
 	
 	my $image_obj = get_image_object($something);
 	
-	unless (defined $image_obj->{'id'} && defined $image_obj->{'name'}) {
+	unless (defined $image_obj->{'Id'} && defined $image_obj->{'name'}) {
 		die ;
 	}
-	my $image_id = $image_obj->{'id'};
+	my $image_id = $image_obj->{'Id'};
 
 	my $print_name = $image_obj->{'name'};
 	$print_name =~ s/[\:\_\/]/\_/g;
@@ -1887,9 +1887,9 @@ sub commandline_docker2shock {
 	}
 	
 	
-	my $image_tarfile = $datadir.$image_obj->{'id'}.'_'.$print_name.'.tar';
+	my $image_tarfile = $datadir.$image_obj->{'Id'}.'_'.$print_name.'.tar';
 	
-	save_image_to_tar($image_obj->{'id'}, $image_tarfile);
+	save_image_to_tar($image_obj->{'Id'}, $image_tarfile);
 	
 	
 	#### modify image (add tags)
@@ -2746,7 +2746,7 @@ if (defined($h->{'docker'}) ) {
 
 if (defined($h->{'base_image'})) {
 	$base_image_object = get_image_object($h->{'base_image'});
-	unless (defined $base_image_object->{'id'} && defined $base_image_object->{'name'}) {
+	unless (defined $base_image_object->{'Id'} && defined $base_image_object->{'name'}) {
 		die ;
 	}
 }
@@ -2799,7 +2799,7 @@ if (defined($h->{'remove_base_layers'})) {
 
 if (defined $h->{'docker2shock'}) {
 	
-	#unless (defined $base_image_object->{'id'}) {
+	#unless (defined $base_image_object->{'Id'}) {
 	#	die;
 	#}
 	
@@ -2812,16 +2812,16 @@ if (defined $h->{'save_image'}) {
 	
 	my $image_obj = get_image_object($h->{'save_image'});
 	
-	unless (defined $image_obj->{'id'} && defined $image_obj->{'name'}) {
+	unless (defined $image_obj->{'Id'} && defined $image_obj->{'name'}) {
 		die ;
 	}
 	
 	my $name  = $image_obj->{'name'};
 	$name =~ s/[\:\_\/]/\_/g;
 	
-	my $filename = $image_obj->{'id'}.'_'.$name.'.tar';
+	my $filename = $image_obj->{'Id'}.'_'.$name.'.tar';
 	
-	save_image_to_tar($image_obj->{'id'}, $filename);
+	save_image_to_tar($image_obj->{'Id'}, $filename);
 		
 	exit(0);
 }
@@ -3010,7 +3010,7 @@ foreach my $package_string (@package_list) {
 
 if ($d) {
 	
-	unless (defined $base_image_object->{'id'}) {
+	unless (defined $base_image_object->{'Id'}) {
 		die; # TODO remove
 	}
 	
