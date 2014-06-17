@@ -1880,7 +1880,9 @@ sub commandline_docker2shock {
 	my ($something,$base_image_object) = @_;
 	
 	
-	
+	unless (defined $shocktoken) {
+		die;
+	}
 	
 	#### save image
 	print "### save image\n";
