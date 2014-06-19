@@ -7,7 +7,12 @@
 					"function" : "file INPUT-FILE, file INPUT-PARAMETER, number IDENTITY=97, string OUTPUT-DIR=ucr, file *array, **dict",
 					"output_array" : ["${OUTPUT-DIR}/otu_table.biom"],
 					"output_map" : {},
-					"cmd" : "pick_closed_reference_otus.py -i @${INPUT-FILE} -o ${OUTPUT-DIR} -p @${INPUT-PARAMETER} -r /qiime_software/gg_otus-13_8-release/rep_set/${IDENTITY}_otus.fasta",
+					"cmd_interpreter" : "/bin/bash",
+					"cmd_script" : 
+						[
+						"source /home/qiime/qiime_software/activate.sh",
+						"pick_closed_reference_otus.py -i @${INPUT-FILE} -o ${OUTPUT-DIR} -p @${INPUT-PARAMETER} -r /qiime_software/gg_otus-13_8-release/rep_set/${IDENTITY}_otus.fasta"
+						],
 					"example" : "QIIME.pick_closed_reference_otus(input.fas, param.txt, IDENTITY=90)"
 				}
 			}
