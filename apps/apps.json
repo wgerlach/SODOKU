@@ -4,7 +4,16 @@
 		"commands" : {
 			"pick_closed_reference_otus" : {
 				"default" : {
-					"function" : "file INPUT-FILE, file INPUT-PARAMETER, number IDENTITY=97, string OUTPUT-DIR=ucr, file *array, **dict",
+					"function-old" : "file INPUT-FILE, file INPUT-PARAMETER, number IDENTITY=97, string OUTPUT-DIR=ucr, file *array, **dict",
+					"function-old2" : ["file INPUT-FILE", "file INPUT-PARAMETER", "number IDENTITY=97", "string OUTPUT-DIR=ucr", "file *array", "**dict"],
+					"function" : [ 
+							 ["file",	"INPUT-FILE"],
+							 ["file",	"INPUT-PARAMETER"],
+							 ["number",	"IDENTITY",		"97"],
+							 ["string",	"OUTPUT-DIR", 		"ucr"],
+							 ["file",	"*array"],
+							 ["**dict ; not clear if needed"]
+							],
 					"output_array" : ["${OUTPUT-DIR}/otu_table.biom"],
 					"output_map" : {},
 					"cmd_interpreter" : "/bin/bash",
@@ -23,9 +32,9 @@
 		"commands" : {
 			"normalize_by_copy_number" : {
 				"default" : {
-					"function" : "file INPUT",
+					"function" : ["file", "INPUT"],
 					"output_array" : ["${OUTPUT-FILE}"],
-					"variable" : { "OUTPUT-FILE" : "${suffix_remove:INPUT}.normalized.biom"},
+					"variable" : [{ "OUTPUT-FILE" : "${suffix_remove:INPUT}.normalized.biom"}],
 					"cmd" : "normalize_by_copy_number.py -i @${INPUT} -o ${OUTPUT-FILE}"
 				}
 			},
