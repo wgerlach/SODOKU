@@ -6,7 +6,7 @@
 				"default" : {
 					"function-old" : "file INPUT-FILE, file INPUT-PARAMETER, number IDENTITY=97, string OUTPUT-DIR=ucr, file *array, **dict",
 					"function-old2" : ["file INPUT-FILE", "file INPUT-PARAMETER", "number IDENTITY=97", "string OUTPUT-DIR=ucr", "file *array", "**dict"],
-					"function" : [ 
+					"input" : [ 
 							 ["file",	"INPUT-FILE"],
 							 ["file",	"INPUT-PARAMETER"],
 							 ["number",	"IDENTITY",		"97"],
@@ -32,7 +32,7 @@
 		"commands" : {
 			"normalize_by_copy_number" : {
 				"default" : {
-					"function" : ["file", "INPUT"],
+					"input" : ["file", "INPUT"],
 					"output_array" : ["${OUTPUT-FILE}"],
 					"variable" : [{ "OUTPUT-FILE" : "${suffix_remove:INPUT}.normalized.biom"}],
 					"cmd" : "normalize_by_copy_number.py -i @${INPUT} -o ${OUTPUT-FILE}"
