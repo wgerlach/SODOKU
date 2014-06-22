@@ -32,7 +32,7 @@
 		"commands" : {
 			"normalize_by_copy_number" : {
 				"default" : {
-					"input" : ["file", "INPUT"],
+					"input" : [["file", "INPUT"]],
 					"output_array" : ["${OUTPUT-FILE}"],
 					"variable" : [{ "OUTPUT-FILE" : "${suffix_remove:INPUT}.normalized.biom"}],
 					"cmd" : "normalize_by_copy_number.py -i @${INPUT} -o ${OUTPUT-FILE}"
