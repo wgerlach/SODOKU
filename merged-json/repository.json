@@ -480,10 +480,11 @@
    },
    "use-mnt-tmp" : {
       "exec" : [
-         "rm -rf /tmp",
-         "mkdir -p /mnt/tmp/",
-         "ln -s /mnt/tmp /tmp",
-         "sudo chmod 777 /mnt/tmp/"
+         "echo \"#!/bin/bash\" > /etc/init.d/change_tmp.sh",
+         "echo \"rm -rf /tmp ; mkdir -p /mnt/tmp/ ; ln -s /mnt/tmp /tmp; sudo chmod 777 /mnt/tmp/ \" >>  /etc/init.d/change_tmp.sh",
+         "chmod +x /etc/init.d/change_tmp.sh",
+         "chown root:root /etc/init.d/change_tmp.sh",
+         "cd /etc/init.d/ ; update-rc.d change_tmp.sh defaults"
       ]
    },
    "MG-RAST" : {
