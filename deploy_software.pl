@@ -315,7 +315,7 @@ sub save_image_to_tar {
 		}
 	} else {
 		if (-e $image_tarfile) {
-			die "docker image file $image_tarfile already exists";
+			die "docker image file $image_tarfile already exists. Delete or use --docker_reuse_image";
 		}
 	}
 	
@@ -1293,7 +1293,7 @@ sub get_image_object{
 	
 	print "something: ".Dumper($result_hash);
 
-	my $id =  $result_hash->{'Id'} || die "error: id not found in image object";
+	my $id =  $result_hash->{'Id'} || $result_hash->{'id'} || die "error: id not found in image object";
 	
 	my $obj = {};
 	$obj->{'Id'} = $id;
