@@ -136,7 +136,7 @@
          "docker-ubuntu"
       ],
       "exec" : [
-         "chmod +x /usr.bin/docker.io"
+         "chmod +x /usr/bin/docker.io"
       ]
    },
    "picrust_data" : {
