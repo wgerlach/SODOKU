@@ -479,13 +479,12 @@
       ]
    },
    "use-mnt-tmp" : {
-      "exec" : [
-         "echo \"#!/bin/bash\" > /etc/init.d/change_tmp.sh",
-         "echo \"rm -rf /tmp ; mkdir -p /mnt/tmp/ ; ln -s /mnt/tmp /tmp; sudo chmod 777 /mnt/tmp/ \" >>  /etc/init.d/change_tmp.sh",
-         "chmod +x /etc/init.d/change_tmp.sh",
-         "chown root:root /etc/init.d/change_tmp.sh",
-         "cd /etc/init.d/ ; update-rc.d change_tmp.sh defaults"
-      ]
+      "source" : {
+         "filename" : "rc.local",
+         "url" : "https://raw.githubusercontent.com/wgerlach/SODOKU/master/other/rc.local"
+      },
+      "ptarget" : "/etc",
+      "source-remove-existing-file" : 1
    },
    "MG-RAST" : {
       "set-env" : {
