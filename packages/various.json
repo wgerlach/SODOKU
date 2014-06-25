@@ -41,7 +41,8 @@
 						"filename" : "rc.local"
 					},
 		"source-remove-existing-file" : 1,
-		"ptarget" : "/etc"
+		"ptarget" : "/etc",
+		"exec" : "chmod +x /etc/rc.local"
 	},
 	"wgerlach/MG-RAST-Tools": {
 		"source-git" : "https://github.com/wgerlach/MG-RAST-Tools",
