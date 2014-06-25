@@ -15,7 +15,8 @@
 		"depends": ["docker-ubuntu"]
 	},
 	"docker-ubuntu" : {
-		"exec" : [ 
+		"exec" : [
+			"rm -f /usr/bin/docker",
 			"ln -s /usr/bin/docker.io /usr/bin/docker",
 			"mkdir -p /mnt/docker-tmp",
 			"rm -rf /var/lib/docker",
