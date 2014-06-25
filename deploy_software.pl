@@ -2166,7 +2166,7 @@ sub install_package {
 			if ( definedAndTrue( $already_installed{$package} ) ) {
 				print "dependency $dependency already installed\n";
 			}else {
-				print "install dependency $dependency for $dep_package...\n";
+				print "install dependency $dependency ($dep_package) for $package...\n";
 				unless (defined $repository->{$dep_package}) {
 					die "package $dep_package not found\n";
 				}
@@ -2579,7 +2579,12 @@ sub install_package {
 		
 		foreach my $cfg_string (@{$cfg_strings}) {
 			
+			
 			my ($key) = $cfg_string =~ /^\s*(\S+)\s*\=/;
+
+			unless (defined $key) {
+				die "cfg_string: $cfg_string";
+			}
 			
 			my $change = 0;
 			foreach my $config_line (@config_lines) {
