@@ -39,8 +39,8 @@
 	"use-mnt-tmp" : {
 		"source" : {	"url" : "https://raw.githubusercontent.com/wgerlach/SODOKU/master/other/rc.local",
 						"filename" : "rc.local"
-		},
-		"source-remove-existing-file" : 1
+					},
+		"source-remove-existing-file" : 1,
 		"ptarget" : "/etc"
 	},
 	"wgerlach/MG-RAST-Tools": {
