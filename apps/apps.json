@@ -1,6 +1,6 @@
 {
 	"QIIME" : {
-		"dockerimage" : "wgerlach/qiime:1.8.0",
+		"dockerimage" : "qiime:1.8.0-amd64",
 		"commands" : {
 			"pick_closed_reference_otus" : {
 				"default" : {
