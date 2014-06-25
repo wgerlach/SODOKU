@@ -22,17 +22,17 @@
 			"mkdir -p /mnt/docker/",
 			"ln -s /mnt/docker /var/lib/docker"
 		],
-		"subpackages" : [ 
+		"subpackages" : [
+				{
+					"source-apt" : "docker.io"
+				},
 				{
 				"set-values" : { 
 						"cfg-string" : [ "DOCKER_OPTS=\"-g /mnt/docker\"", 
 								 "export TMPDIR=\"/mnt/docker-tmp\""],
 						"file" : "/etc/default/docker.io"
 						}
-				}, 
-				{
-				"source-apt" : "docker.io"
-				}		
+				}
 				],
 		"depends" : ["use-mnt-tmp"]
 	},
