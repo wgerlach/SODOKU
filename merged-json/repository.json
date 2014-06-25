@@ -421,8 +421,13 @@
    },
    "AWE" : {
       "source-go" : "github.com/MG-RAST/AWE/...",
-      "depends" : [
+      "NOT-depends" : [
          "golang"
+      ],
+      "subpackages" : [
+         {
+            "source-apt" : "mongodb-server"
+         }
       ]
    },
    "kbase_bootstrap_mgrast" : {
@@ -528,16 +533,6 @@
                "ln -sf ${target}/apps/pipeline/awecmd/awe_rna_blat.sh",
                "ln -sf ${target}/apps/pipeline/awecmd/awe_rna_search.pl"
             ]
-         }
-      ]
-   },
-   "AWE-full" : {
-      "depends" : [
-         "AWE"
-      ],
-      "subpackages" : [
-         {
-            "source-apt" : "mongodb-server"
          }
       ]
    },
