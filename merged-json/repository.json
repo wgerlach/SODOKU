@@ -391,6 +391,9 @@
       ],
       "subpackages" : [
          {
+            "source-apt" : "docker.io"
+         },
+         {
             "set-values" : {
                "cfg-string" : [
                   "DOCKER_OPTS=\"-g /mnt/docker\"",
@@ -398,9 +401,6 @@
                ],
                "file" : "/etc/default/docker.io"
             }
-         },
-         {
-            "source-apt" : "docker.io"
          }
       ],
       "exec" : [
