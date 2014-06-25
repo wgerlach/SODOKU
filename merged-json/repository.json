@@ -126,14 +126,17 @@
       ]
    },
    "docker-ubuntu-latest" : {
+      "source" : {
+         "filename" : "docker.io",
+         "url" : "https://get.docker.io/builds/Linux/x86_64/docker-latest"
+      },
+      "ptarget" : "/usr/bin",
+      "source-remove-existing-file" : 1,
       "depends" : [
          "docker-ubuntu"
       ],
       "exec" : [
-         "rm -f docker.io",
-         "wget https://get.docker.io/builds/Linux/x86_64/docker-latest -O docker.io",
-         "chmod +x docker.io",
-         "mv docker.io /usr/bin"
+         "chmod +x /usr.bin/docker.io"
       ]
    },
    "picrust_data" : {
