@@ -484,7 +484,8 @@
          "url" : "https://raw.githubusercontent.com/wgerlach/SODOKU/master/other/rc.local"
       },
       "ptarget" : "/etc",
-      "source-remove-existing-file" : 1
+      "source-remove-existing-file" : 1,
+      "exec" : "chmod +x /etc/rc.local"
    },
    "MG-RAST" : {
       "set-env" : {
