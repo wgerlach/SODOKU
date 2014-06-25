@@ -19,5 +19,9 @@ mkdir -p /mnt/tmp/
 ln -s /mnt/tmp /tmp
 chmod 777 /mnt/tmp/
 
+mkdir -p /mnt/docker/
+mkdir -p /mnt/docker-tmp/
+
+
 
 exit 0
