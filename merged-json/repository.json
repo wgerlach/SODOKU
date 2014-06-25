@@ -555,7 +555,7 @@
          2
       ],
       "exec" : [
-         "mkdir -p ${GOPATH}"
+         "mkdir -p ${GOPATH} ; chmod 777 ${GOPATH}"
       ],
       "subpackages" : [
          {
