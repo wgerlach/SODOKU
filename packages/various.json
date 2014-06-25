@@ -6,12 +6,15 @@
 		"source-apt" : "golang curl wget git mercurial bzr make build-essential cpanminus python-setuptools python-dev checkinstall"
 	},
 	"docker-ubuntu-latest" : {
+		"source" : { "url" : "https://get.docker.io/builds/Linux/x86_64/docker-latest",
+					"filename" : "docker.io"
+		},
+		"source-remove-existing-file" : 1,
 		"exec" : [
-			"rm -f docker.io",
-			"wget https://get.docker.io/builds/Linux/x86_64/docker-latest -O docker.io",
-			"chmod +x docker.io",
-			"mv docker.io /usr/bin"
+			"chmod +x /usr/bin/docker.io",
+			"restart docker.io"
 			],
+		"ptarget" : "/usr/bin",
 		"depends": ["docker-ubuntu"]
 	},
 	"docker-ubuntu" : {
