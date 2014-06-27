@@ -141,17 +141,14 @@
 						 ],
 		"depends" : ["golang"]
 	},
-	"AWE-full" : {
+	"AWE" : {
+		"source-go" : "github.com/MG-RAST/AWE/...",
 		"subpackages" : [
 				{
 				 "source-apt" : "mongodb-server"
 				 }
 				],
-		"depends" : ["AWE"]
-	},
-	"AWE" : {
-		"source-go" : "github.com/MG-RAST/AWE/...",
-		"depends" : ["golang"]
+		"NOT-depends" : ["golang"]
 	},
 	"golang" : {
 		"version" : [1,2],
@@ -162,7 +159,7 @@
 				{ "GOPATH" : "${ptarget}gopath" }
 				],
 		"subpackages" : [ {"source-apt" : "git mercurial bzr"} ],
-		"exec" : ["mkdir -p ${GOPATH}"]
+		"exec" : ["mkdir -p ${GOPATH} ; chmod 777 ${GOPATH}"]
 	},
 	"golang-deprecated" : {
 		"source-apt" : "golang git mercurial bzr",
