@@ -7,7 +7,7 @@
 					"input" : [ 
 							 ["file",	"INPUT-FILE"],
 							 ["file",	"INPUT-PARAMETER"],
-							 ["number",	"IDENTITY",		"97", 	"description text"],
+							 ["string",	"IDENTITY",		"97", 	"description text"],
 							 ["string",	"OUTPUT-DIR", 		"ucr", 	"description text"],
 							 ["file",	"*array"],
 							 ["**dict ; not clear if needed"]
