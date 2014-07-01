@@ -1,6 +1,6 @@
 {
 	"QIIME" : {
-		"dockerimage" : "qiime:1.8.0-amd64",
+		"dockerimage" : "qiime:1.8.0-amd64u",
 		"commands" : {
 			"pick_closed_reference_otus" : {
 				"default" : {
@@ -11,7 +11,7 @@
 							 ["string",	"OUTPUT-DIR", 		"ucr", 	"description text"],
 							 ["file",	"*array"],
 							 ["**dict ; not clear if needed"]
-							],
+						],
 					"output_array" : ["${OUTPUT-DIR}/otu_table.biom"],
 					"output_map" : {},
 					"cmd_interpreter" : "/bin/bash",
@@ -26,20 +26,35 @@
 			}
 		}
 	},
-	"Emirge" : {
-		"dockerimage" : "wgerlach/emirge:latest",
+	"PIRCUSt" : {
+		"dockerimage" : "picrust:1.0.0",
 		"commands" : {
 			"normalize_by_copy_number" : {
 				"default" : {
-					"input" : [["file", "INPUT"]],
+					"input" : 
+						[
+							["file",	"INPUT", "", "input biom file"]
+						],
+					"cmd_script" :
+						[
+						"normalize_by_copy_number.py -i @${INPUT} -o ${OUTPUT-FILE}"
+						],
 					"output_array" : ["${OUTPUT-FILE}"],
-					"variable" : [{ "OUTPUT-FILE" : "${suffix_remove:INPUT}.normalized.biom"}],
-					"cmd" : "normalize_by_copy_number.py -i @${INPUT} -o ${OUTPUT-FILE}"
+					"variable" : [{ "OUTPUT-FILE" : "${remove_extension:INPUT}.normalized.biom"}],
+					"something" : "ln -s data, symlink predata",
+					"_predata": {
+                    				"ko_13_5_precalculated.tab.gz":{
+                        				"url" : "http://shock.metagenomics.anl.gov:80/node/e91dd6b3-69b0-4e1f-9cb0-1b94fb9864d0?download"
+                    				},
+						"16S_13_5_precalculated.tab.gz" : {
+							"url" : "http://shock.metagenomics.anl.gov:80/node/ac5952b4-cb43-410c-b545-8855131df518?download"
+						}
+					}
 				}
 			},
 			"predict_metagenomes" : {
 				"default" : {
-					"cmd" : "predict_metagenomes.py -i @${INPUT} -o @@${OUTPUT}"
+					"cmd" : "predict_metagenomes.py -i @${INPUT} -o ${OUTPUT}"
 				}
 			}
 		}
