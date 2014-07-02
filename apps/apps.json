@@ -40,7 +40,7 @@
 						"normalize_by_copy_number.py -i @${INPUT} -o ${OUTPUT-FILE}"
 						],
 					"output_array" : ["${OUTPUT-FILE}"],
-					"variable" : [{ "OUTPUT-FILE" : "${remove_extension:INPUT}.normalized.biom"}],
+					"variables" : [{ "OUTPUT-FILE" : "${remove_extension:INPUT}.normalized.biom"}],
 					"something" : "ln -s data, symlink predata",
 					"_predata": {
                     				"ko_13_5_precalculated.tab.gz":{
