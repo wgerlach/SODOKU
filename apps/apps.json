@@ -37,12 +37,13 @@
 						],
 					"cmd_script" :
 						[
+						"#ln -s /db/16S_13_5_precalculated.tab.gz  /usr/local/lib/python2.7/dist-packages/picrust/data/16S_13_5_precalculated.tab.gz"
 						"normalize_by_copy_number.py -i @${INPUT} -o ${OUTPUT-FILE}"
 						],
 					"output_array" : ["${OUTPUT-FILE}"],
 					"variables" : [{ "OUTPUT-FILE" : "${remove_extension:INPUT}.normalized.biom"}],
 					"something" : "ln -s data, symlink predata",
-					"_predata": {
+					"predata": {
                     				"ko_13_5_precalculated.tab.gz":{
                         				"url" : "http://shock.metagenomics.anl.gov:80/node/e91dd6b3-69b0-4e1f-9cb0-1b94fb9864d0?download"
                     				},
