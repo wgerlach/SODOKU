@@ -37,7 +37,8 @@
 						],
 					"cmd_script" :
 						[
-						"#ln -s /db/16S_13_5_precalculated.tab.gz  /usr/local/lib/python2.7/dist-packages/picrust/data/16S_13_5_precalculated.tab.gz",
+						"ln -s /db/16S_13_5_precalculated.tab.gz  /usr/local/lib/python2.7/dist-packages/picrust/data/16S_13_5_precalculated.tab.gz",
+						"ln -s /db/ko_13_5_precalculated.tab.gz  /usr/local/lib/python2.7/dist-packages/picrust/data/ko_13_5_precalculated.tab.gz",
 						"normalize_by_copy_number.py -i @${INPUT} -o ${OUTPUT-FILE}"
 						],
 					"output_array" : ["${OUTPUT-FILE}"],
