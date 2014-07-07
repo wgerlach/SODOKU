@@ -65,7 +65,7 @@
 						"mkdir -p /usr/local/lib/python2.7/dist-packages/picrust/data/",
 						"ln -s /db/16S_13_5_precalculated.tab.gz  /usr/local/lib/python2.7/dist-packages/picrust/data/16S_13_5_precalculated.tab.gz",
 						"ln -s /db/ko_13_5_precalculated.tab.gz  /usr/local/lib/python2.7/dist-packages/picrust/data/ko_13_5_precalculated.tab.gz",
-						"predict_metagenomes.py -i @${INPUT} -o ${OUTPUT}"
+						"predict_metagenomes.py -i @${INPUT} -o ${OUTPUT-FILE}"
 						],
 					"output_array" : ["${OUTPUT-FILE}"],
 					"variables" : [{ "OUTPUT-FILE" : "${remove_extension:INPUT}.picrust.biom"}],
