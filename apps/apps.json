@@ -93,7 +93,7 @@
 							["string",	"insert_mean", 		"180", 	"insert size mean"],
 							["string",	"insert_stddev", 	"20", 	"insert standard deviation"],
 							["string",	"max_read_length", 	"110", 	"maximal read length"],
-							["string",	"processors", 		"1",	"number of processor to use"],
+							["string",	"processors", 		"1",	"number of processor to use"]
 						],
 					"cmd_script" :
 						[
