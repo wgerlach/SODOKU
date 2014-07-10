@@ -80,5 +80,38 @@
 				}
 			}
 		}
+	},
+	"Emirge" : {
+		"dockerimage" : "emirgexxx",
+		"commands" : {
+			"emirge" : {
+				"default" : {
+					"input" : 
+						[
+							["file",	"INPUT1", 		"", "input biom file"],
+							["file",	"INPUT2", 		"", "input biom file"],
+							["string",	"insert_mean", 		"180", 	"insert size mean"],
+							["string",	"insert_stddev", 	"20", 	"insert standard deviation"],
+							["string",	"max_read_length", 	"110", 	"maximal read length"],
+							["string",	"processors", 		"1",	"number of processor to use"],
+						],
+					"cmd_script" :
+						[
+						"emirge.py outdir -1 ${INPUT1} -2 ${INPUT1} -f /home/ubuntu/data/emirge-data/SSURef_111_candidate_db.fasta -b /home/ubuntu/data/emirge-data/SSU_candidate_db_btindex --insert_mean=${insert_mean} --insert_stddev=${insert_stddev} --max_read_length=${max_read_length} --processors=${processors} --phred33",
+						"emirge_rename_fasta.py outdir/iter.40 > emirge.fas"
+						],
+					"output_array" : ["emirge.fas"],
+					"predata": {
+                    				"ko_13_5_precalculated.tab.gz":{
+                        				"url" : "http://shock.metagenomics.anl.gov:80/node/e91dd6b3-69b0-4e1f-9cb0-1b94fb9864d0?download"
+                    				},
+						"16S_13_5_precalculated.tab.gz" : {
+							"url" : "http://shock.metagenomics.anl.gov:80/node/ac5952b4-cb43-410c-b545-8855131df518?download"
+						}
+					}
+				}
+			},
+		
+		}
 	}
 }
