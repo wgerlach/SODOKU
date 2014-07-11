@@ -1,5 +1,6 @@
 {
 	"emirge_v0.60" : {
+		"version" : [0,60],
 		"_comment" : "fixed versions!, requires usearch version >= 6.0.203",
 		"depends" : ["bowtie==0.12.8", "samtools==0.1.18", "emirge==0.60"]
 	},

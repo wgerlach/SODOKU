@@ -69,7 +69,12 @@
 		"source-extract" : 1,
 		"source-temporary" : 1,
 		"build-type" : "make",
-		"install-binary" : ["samtools"]
+		"install-binary" : ["samtools"],
+		"subpackages" : [
+			{
+				"source-apt" : "zlib1g-dev"
+			}
+		]
 	},
 	"usearch" : {
 		"_comment" : "due to license issues of usearch the download uri has to be given as a parameter, e.g. file:///home/user/usearch",
