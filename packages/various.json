@@ -5,33 +5,62 @@
 	"ubuntu-base" : {
 		"source-apt" : "golang curl wget git mercurial bzr make build-essential cpanminus python-setuptools python-dev checkinstall"
 	},
-	"docker" : {
-		"source-apt" : "docker.io",
-		"exec" : [ 
-			"ln -s /usr/bin/docker.io /usr/bin/docker"
-		]
+	"docker-ubuntu-latest" : {
+		"source" : { "url" : "https://get.docker.io/builds/Linux/x86_64/docker-latest",
+					"filename" : "docker.io"
+		},
+		"source-remove-existing-file" : 1,
+		"exec" : [
+			"chmod +x /usr/bin/docker.io",
+			"restart docker.io"
+			],
+		"ptarget" : "/usr/bin",
+		"depends": ["docker-ubuntu"]
+	},
+	"docker-ubuntu" : {
+		"exec" : [
+			"rm -f /usr/bin/docker",
+			"ln -s /usr/bin/docker.io /usr/bin/docker",
+			"mkdir -p /mnt/docker-tmp",
+			"rm -rf /var/lib/docker",
+			"mkdir -p /mnt/docker/",
+			"ln -s /mnt/docker /var/lib/docker"
+		],
+		"subpackages" : [
+				{
+					"source-apt" : "docker.io"
+				},
+				{
+				"set-values" : { 
+						"cfg-string" : [ "DOCKER_OPTS=\"-g /mnt/docker\"", 
+								 "export TMPDIR=\"/mnt/docker-tmp\""],
+						"file" : "/etc/default/docker.io"
+						}
+				}
+				],
+		"depends" : ["use-mnt-tmp"]
 	},
 	"use-mnt-tmp" : {
-		"exec" : [
-			"rm -rf /tmp",
-			"mkdir -p /mnt/tmp/",
-			"ln -s /mnt/tmp /tmp",
-			"sudo chmod 777 /mnt/tmp/"
-		]
+		"source" : {	"url" : "https://raw.githubusercontent.com/wgerlach/SODOKU/master/other/rc.local",
+						"filename" : "rc.local"
+					},
+		"source-remove-existing-file" : 1,
+		"ptarget" : "/etc",
+		"exec" : "chmod +x /etc/rc.local"
 	},
 	"wgerlach/MG-RAST-Tools": {
 		"source-git" : "https://github.com/wgerlach/MG-RAST-Tools",
-		"set-env" : {"PERL5LIB":"${ptarget}MG-RAST-Tools/tools/lib/:$PERL5LIB",
-				"PATH" : "${ptarget}MG-RAST-Tools/tools/bin:$PATH"
-				}
+		"set-env" : [{"PERL5LIB":"${ptarget}MG-RAST-Tools/tools/lib/:$PERL5LIB"},
+				{"PATH" : "${ptarget}MG-RAST-Tools/tools/bin:$PATH"}
+				]
 	},
 	"wgerlach/AWE-git": {
 		"source-git" : "https://github.com/wgerlach/AWE",
-		"set-env" : {"PERL5LIB":"${ptarget}AWE/utils/lib:$PERL5LIB"}
+		"set-env" : [{"PERL5LIB":"${ptarget}AWE/utils/lib:$PERL5LIB"}]
 	},
 	"SHOCK-lib": {
 		"source-git" : "https://github.com/wgerlach/Shock",
-		"set-env" : {"PERL5LIB":"${ptarget}Shock/libs/:$PERL5LIB"}
+		"set-env" : [{"PERL5LIB":"${ptarget}Shock/libs/:$PERL5LIB"}]
 	},
 	"samtools" : {
 		"version" : [0,1,18],
@@ -47,7 +76,7 @@
 		"source" : {"uri" : "${1}", "filename" : "usearch"},
 		"ptarget" : "${target}bin",
 		"build-exec" : "chmod +x ${target}bin/usearch",
-		"set-env" : {"PATH" : "${target}bin:$PATH"},
+		"set-env" : [{"PATH" : "${target}bin:$PATH"}],
 		"subpackages" : [
 			{
 				"exec" : "mkdir -p ${target}bin"
@@ -115,25 +144,27 @@
 	"AWE" : {
 		"source-go" : "github.com/MG-RAST/AWE/...",
 		"subpackages" : [
-						 {
-						 "source-apt" : "mongodb-server"
-						 }
-						 ],
-		"depends" : ["golang"]
+				{
+				 "source-apt" : "mongodb-server"
+				 }
+				],
+		"NOT-depends" : ["golang"]
 	},
 	"golang" : {
 		"version" : [1,2],
 		"source" : "http://go.googlecode.com/files/go${v1}.${v2}.linux-amd64.tar.gz",
 		"source-extract" : 1,
-		"set-env" : { 	"GOROOT" : "${ptarget}go/",
-				"PATH" : "${GOROOT}bin:${ptarget}gopath:${PATH}",
-				"GOPATH" : "${ptarget}gopath" },
-		"subpackages" : [ {"source-apt" : "git mercurial bzr"} ]
+		"set-env" : [ 	{ "GOROOT" : "${ptarget}go/" },
+				{ "PATH" : "${GOROOT}bin:${ptarget}gopath:${PATH}" },
+				{ "GOPATH" : "${ptarget}gopath" }
+				],
+		"subpackages" : [ {"source-apt" : "git mercurial bzr"} ],
+		"exec" : ["mkdir -p ${GOPATH} ; chmod 777 ${GOPATH}"]
 	},
 	"golang-deprecated" : {
 		"source-apt" : "golang git mercurial bzr",
-		"ROOT_set-env" : { "GOPATH" : "/usr/local/go/:$GOPATH" },
-		"USER_set-env" : { "GOPATH" : "$HOME/gopath:$GOPATH" }
+		"ROOT_set-env" : [{ "GOPATH" : "/usr/local/go/:$GOPATH" }],
+		"USER_set-env" : [{ "GOPATH" : "$HOME/gopath:$GOPATH" }]
 	},
 	"go-deprecated" : {
 		"source-mercurial" : "-u release https://code.google.com/p/go",
@@ -143,8 +174,8 @@
 						 "source-apt" : "bzr make gcc mercurial git"
 						 }
 						 ],
-		"set-env" : {	"GOPATH" : "${target}gopath",
-						"PATH"   : "$PATH:${target}go/bin:${target}gopath/bin"}
+		"set-env" : 	[ 	{"GOPATH" : "${target}gopath"},
+					{"PATH"   : "$PATH:${target}go/bin:${target}gopath/bin"} ]
 	},
 	"Shock" : {
 		"source-go" : "github.com/MG-RAST/Shock/...",
@@ -154,7 +185,7 @@
 						 }
 						],
 		"depends" : ["golang"],
-		"set-env" : {	"GOPATH" : "$HOME/gocode:$GOPATH" }
+		"set-env" : [{	"GOPATH" : "$HOME/gocode:$GOPATH" }]
 	},
 	"bowtie2" : {
 		"version" : [2,2,0],

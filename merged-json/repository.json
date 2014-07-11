@@ -16,9 +16,11 @@
       "exec" : ". /kb/dev_container/user-env.sh ; make update"
    },
    "Shock" : {
-      "set-env" : {
-         "GOPATH" : "$HOME/gocode:$GOPATH"
-      },
+      "set-env" : [
+         {
+            "GOPATH" : "$HOME/gocode:$GOPATH"
+         }
+      ],
       "source-go" : "github.com/MG-RAST/Shock/...",
       "depends" : [
          "golang"
@@ -60,12 +62,16 @@
       ]
    },
    "golang-deprecated" : {
-      "ROOT_set-env" : {
-         "GOPATH" : "/usr/local/go/:$GOPATH"
-      },
-      "USER_set-env" : {
-         "GOPATH" : "$HOME/gopath:$GOPATH"
-      },
+      "ROOT_set-env" : [
+         {
+            "GOPATH" : "/usr/local/go/:$GOPATH"
+         }
+      ],
+      "USER_set-env" : [
+         {
+            "GOPATH" : "$HOME/gopath:$GOPATH"
+         }
+      ],
       "source-apt" : "golang git mercurial bzr"
    },
    "kbase_dev_container-deploy" : {
@@ -79,9 +85,11 @@
       "source-git" : "kbase@git.kbase.us:bootstrap.git"
    },
    "SHOCK-lib" : {
-      "set-env" : {
-         "PERL5LIB" : "${ptarget}Shock/libs/:$PERL5LIB"
-      },
+      "set-env" : [
+         {
+            "PERL5LIB" : "${ptarget}Shock/libs/:$PERL5LIB"
+         }
+      ],
       "source-git" : "https://github.com/wgerlach/Shock"
    },
    "ubuntu-base" : {
@@ -117,6 +125,21 @@
          "aweclient/cfg/default"
       ]
    },
+   "docker-ubuntu-latest" : {
+      "source" : {
+         "filename" : "docker.io",
+         "url" : "https://get.docker.io/builds/Linux/x86_64/docker-latest"
+      },
+      "ptarget" : "/usr/bin",
+      "source-remove-existing-file" : 1,
+      "depends" : [
+         "docker-ubuntu"
+      ],
+      "exec" : [
+         "chmod +x /usr/bin/docker.io",
+         "restart docker.io"
+      ]
+   },
    "picrust_data" : {
       "source" : [
          "ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/16S_13_5_precalculated.tab.gz",
@@ -126,9 +149,11 @@
       "dir" : 1
    },
    "wgerlach/AWE-git" : {
-      "set-env" : {
-         "PERL5LIB" : "${ptarget}AWE/utils/lib:$PERL5LIB"
-      },
+      "set-env" : [
+         {
+            "PERL5LIB" : "${ptarget}AWE/utils/lib:$PERL5LIB"
+         }
+      ],
       "source-git" : "https://github.com/wgerlach/AWE"
    },
    "aweclient/cfg/default" : {
@@ -239,10 +264,14 @@
       ]
    },
    "go-deprecated" : {
-      "set-env" : {
-         "PATH" : "$PATH:${target}go/bin:${target}gopath/bin",
-         "GOPATH" : "${target}gopath"
-      },
+      "set-env" : [
+         {
+            "GOPATH" : "${target}gopath"
+         },
+         {
+            "PATH" : "$PATH:${target}go/bin:${target}gopath/bin"
+         }
+      ],
       "build-exec" : "cd ${target}go/src && ./all.bash",
       "source-mercurial" : "-u release https://code.google.com/p/go",
       "subpackages" : [
@@ -263,12 +292,6 @@
       "source" : "http://www.mcs.anl.gov/~wtang/files/fgs.tar.gz",
       "ptarget" : "${target}apps/FragGeneScan",
       "source-extract" : 1
-   },
-   "docker" : {
-      "source-apt" : "docker.io",
-      "exec" : [
-         "ln -s /usr/bin/docker.io /usr/bin/docker"
-      ]
    },
    "emirge-data-cached" : {
       "source" : "http://dunkirk.mcs.anl.gov/~wgerlach/SSURef_111.tar.gz",
@@ -317,9 +340,11 @@
          "filename" : "usearch",
          "uri" : "${1}"
       },
-      "set-env" : {
-         "PATH" : "${target}bin:$PATH"
-      },
+      "set-env" : [
+         {
+            "PATH" : "${target}bin:$PATH"
+         }
+      ],
       "ptarget" : "${target}bin",
       "build-exec" : "chmod +x ${target}bin/usearch",
       "_comment" : "due to license issues of usearch the download uri has to be given as a parameter, e.g. file:///home/user/usearch",
@@ -364,12 +389,39 @@
          }
       ]
    },
+   "docker-ubuntu" : {
+      "depends" : [
+         "use-mnt-tmp"
+      ],
+      "subpackages" : [
+         {
+            "source-apt" : "docker.io"
+         },
+         {
+            "set-values" : {
+               "cfg-string" : [
+                  "DOCKER_OPTS=\"-g /mnt/docker\"",
+                  "export TMPDIR=\"/mnt/docker-tmp\""
+               ],
+               "file" : "/etc/default/docker.io"
+            }
+         }
+      ],
+      "exec" : [
+         "rm -f /usr/bin/docker",
+         "ln -s /usr/bin/docker.io /usr/bin/docker",
+         "mkdir -p /mnt/docker-tmp",
+         "rm -rf /var/lib/docker",
+         "mkdir -p /mnt/docker/",
+         "ln -s /mnt/docker /var/lib/docker"
+      ]
+   },
    "deploy-deps" : {
       "source-apt" : "git cpanminus python-setuptools python-dev checkinstall"
    },
    "AWE" : {
       "source-go" : "github.com/MG-RAST/AWE/...",
-      "depends" : [
+      "NOT-depends" : [
          "golang"
       ],
       "subpackages" : [
@@ -398,10 +450,14 @@
       ]
    },
    "wgerlach/MG-RAST-Tools" : {
-      "set-env" : {
-         "PATH" : "${ptarget}MG-RAST-Tools/tools/bin:$PATH",
-         "PERL5LIB" : "${ptarget}MG-RAST-Tools/tools/lib/:$PERL5LIB"
-      },
+      "set-env" : [
+         {
+            "PERL5LIB" : "${ptarget}MG-RAST-Tools/tools/lib/:$PERL5LIB"
+         },
+         {
+            "PATH" : "${ptarget}MG-RAST-Tools/tools/bin:$PATH"
+         }
+      ],
       "source-git" : "https://github.com/wgerlach/MG-RAST-Tools"
    },
    "kbase_dev_container" : {
@@ -433,12 +489,13 @@
       ]
    },
    "use-mnt-tmp" : {
-      "exec" : [
-         "rm -rf /tmp",
-         "mkdir -p /mnt/tmp/",
-         "ln -s /mnt/tmp /tmp",
-         "sudo chmod 777 /mnt/tmp/"
-      ]
+      "source" : {
+         "filename" : "rc.local",
+         "url" : "https://raw.githubusercontent.com/wgerlach/SODOKU/master/other/rc.local"
+      },
+      "ptarget" : "/etc",
+      "source-remove-existing-file" : 1,
+      "exec" : "chmod +x /etc/rc.local"
    },
    "MG-RAST" : {
       "set-env" : {
@@ -481,15 +538,24 @@
    },
    "golang" : {
       "source" : "http://go.googlecode.com/files/go${v1}.${v2}.linux-amd64.tar.gz",
-      "set-env" : {
-         "GOROOT" : "${ptarget}go/",
-         "GOPATH" : "${ptarget}gopath",
-         "PATH" : "${GOROOT}bin:${ptarget}gopath:${PATH}"
-      },
+      "set-env" : [
+         {
+            "GOROOT" : "${ptarget}go/"
+         },
+         {
+            "PATH" : "${GOROOT}bin:${ptarget}gopath:${PATH}"
+         },
+         {
+            "GOPATH" : "${ptarget}gopath"
+         }
+      ],
       "source-extract" : 1,
       "version" : [
          1,
          2
+      ],
+      "exec" : [
+         "mkdir -p ${GOPATH} ; chmod 777 ${GOPATH}"
       ],
       "subpackages" : [
          {

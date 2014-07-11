@@ -1,34 +1,117 @@
 {
 	"QIIME" : {
-		"dockerimage" : "wgerlach/qiime:1.8.0",
+		"dockerimage" : "qiime:1.8.0-amd64u",
 		"commands" : {
 			"pick_closed_reference_otus" : {
 				"default" : {
-					"function" : "file INPUT-FILE, file INPUT-PARAMETER, number IDENTITY=97, string OUTPUT-DIR=ucr, file *array, **dict",
+					"input" : [ 
+							 ["file",	"INPUT-FILE"],
+							 ["file",	"INPUT-PARAMETER"],
+							 ["string",	"IDENTITY",		"97", 	"description text"],
+							 ["string",	"OUTPUT-DIR", 		"ucr", 	"description text"],
+							 ["file",	"*array"],
+							 ["**dict ; not clear if needed"]
+						],
 					"output_array" : ["${OUTPUT-DIR}/otu_table.biom"],
 					"output_map" : {},
-					"cmd" : "pick_closed_reference_otus.py -i @${INPUT-FILE} -o ${OUTPUT-DIR} -p @${INPUT-PARAMETER} -r /qiime_software/gg_otus-13_8-release/rep_set/${IDENTITY}_otus.fasta",
-					"example" : "QIIME.pick_closed_reference_otus(input.fas, param.txt, IDENTITY=90)"
+					"cmd_interpreter" : "/bin/bash",
+					"cmd_script" : 
+						[
+						"source /home/qiime/qiime_software/activate.sh",
+						"pick_closed_reference_otus.py -i @${INPUT-FILE} -o ${OUTPUT-DIR} -p @${INPUT-PARAMETER} -r /home/qiime/qiime_software/gg_otus-13_8-release/rep_set/${IDENTITY}_otus.fasta"
+						],
+					"example" : "QIIME.pick_closed_reference_otus(input.fas, param.txt, IDENTITY=90)",
+					"example_interface" : "file INPUT-FILE, file INPUT-PARAMETER, number IDENTITY=97, string OUTPUT-DIR=ucr, file *array, **dict"
+				}
+			}
+		}
+	},
+	"PIRCUSt" : {
+		"dockerimage" : "picrust:1.0.0",
+		"commands" : {
+			"normalize_by_copy_number" : {
+				"default" : {
+					"input" : 
+						[
+							["file",	"INPUT", "", "input biom file"]
+						],
+					"cmd_script" :
+						[
+						"mkdir -p /usr/local/lib/python2.7/dist-packages/picrust/data/",
+						"ln -s /db/16S_13_5_precalculated.tab.gz  /usr/local/lib/python2.7/dist-packages/picrust/data/16S_13_5_precalculated.tab.gz",
+						"ln -s /db/ko_13_5_precalculated.tab.gz  /usr/local/lib/python2.7/dist-packages/picrust/data/ko_13_5_precalculated.tab.gz",
+						"normalize_by_copy_number.py -i @${INPUT} -o ${OUTPUT-FILE}"
+						],
+					"output_array" : ["${OUTPUT-FILE}"],
+					"variables" : [{ "OUTPUT-FILE" : "${remove_extension:INPUT}.normalized.biom"}],
+					"predata": {
+                    				"ko_13_5_precalculated.tab.gz":{
+                        				"url" : "http://shock.metagenomics.anl.gov:80/node/e91dd6b3-69b0-4e1f-9cb0-1b94fb9864d0?download"
+                    				},
+						"16S_13_5_precalculated.tab.gz" : {
+							"url" : "http://shock.metagenomics.anl.gov:80/node/ac5952b4-cb43-410c-b545-8855131df518?download"
+						}
+					}
+				}
+			},
+			"predict_metagenomes" : {
+				"default" : {
+					"input" : 
+						[
+							["file",	"INPUT", "", "normalized input biom file"]
+						],
+					"cmd_script" :
+						[
+						"mkdir -p /usr/local/lib/python2.7/dist-packages/picrust/data/",
+						"ln -s /db/16S_13_5_precalculated.tab.gz  /usr/local/lib/python2.7/dist-packages/picrust/data/16S_13_5_precalculated.tab.gz",
+						"ln -s /db/ko_13_5_precalculated.tab.gz  /usr/local/lib/python2.7/dist-packages/picrust/data/ko_13_5_precalculated.tab.gz",
+						"predict_metagenomes.py -i @${INPUT} -o ${OUTPUT-FILE}"
+						],
+					"output_array" : ["${OUTPUT-FILE}"],
+					"variables" : [{ "OUTPUT-FILE" : "${remove_extension:INPUT}.picrust.biom"}],
+					"predata": {
+                    				"ko_13_5_precalculated.tab.gz":{
+                        				"url" : "http://shock.metagenomics.anl.gov:80/node/e91dd6b3-69b0-4e1f-9cb0-1b94fb9864d0?download"
+                    				},
+						"16S_13_5_precalculated.tab.gz" : {
+							"url" : "http://shock.metagenomics.anl.gov:80/node/ac5952b4-cb43-410c-b545-8855131df518?download"
+						}
+					}
 				}
 			}
 		}
 	},
 	"Emirge" : {
-		"dockerimage" : "wgerlach/emirge:latest",
+		"dockerimage" : "emirgexxx",
 		"commands" : {
-			"normalize_by_copy_number" : {
+			"emirge" : {
 				"default" : {
-					"function" : "file INPUT",
-					"output_array" : ["${OUTPUT-FILE}"],
-					"variable" : { "OUTPUT-FILE" : "${suffix_remove:INPUT}.normalized.biom"},
-					"cmd" : "normalize_by_copy_number.py -i @${INPUT} -o ${OUTPUT-FILE}"
-				}
-			},
-			"predict_metagenomes" : {
-				"default" : {
-					"cmd" : "predict_metagenomes.py -i @${INPUT} -o @@${OUTPUT}"
+					"input" : 
+						[
+							["file",	"INPUT1", 		"", "input biom file"],
+							["file",	"INPUT2", 		"", "input biom file"],
+							["string",	"insert_mean", 		"180", 	"insert size mean"],
+							["string",	"insert_stddev", 	"20", 	"insert standard deviation"],
+							["string",	"max_read_length", 	"110", 	"maximal read length"],
+							["string",	"processors", 		"1",	"number of processor to use"]
+						],
+					"cmd_script" :
+						[
+						"emirge.py outdir -1 ${INPUT1} -2 ${INPUT1} -f /home/ubuntu/data/emirge-data/SSURef_111_candidate_db.fasta -b /home/ubuntu/data/emirge-data/SSU_candidate_db_btindex --insert_mean=${insert_mean} --insert_stddev=${insert_stddev} --max_read_length=${max_read_length} --processors=${processors} --phred33",
+						"emirge_rename_fasta.py outdir/iter.40 > emirge.fas"
+						],
+					"output_array" : ["emirge.fas"],
+					"predata": {
+                    				"ko_13_5_precalculated.tab.gz":{
+                        				"url" : "http://shock.metagenomics.anl.gov:80/node/e91dd6b3-69b0-4e1f-9cb0-1b94fb9864d0?download"
+                    				},
+						"16S_13_5_precalculated.tab.gz" : {
+							"url" : "http://shock.metagenomics.anl.gov:80/node/ac5952b4-cb43-410c-b545-8855131df518?download"
+						}
+					}
 				}
 			}
+		
 		}
 	}
 }
