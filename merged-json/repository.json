@@ -481,7 +481,7 @@
       ],
       "subpackages" : [
          {
-            "source-apt" : "zlib1g-dev python-biopython cython"
+            "source-apt" : "python-biopython cython"
          },
          {
             "source-pip" : [
@@ -626,6 +626,11 @@
       ],
       "install-binary" : [
          "samtools"
+      ],
+      "subpackages" : [
+         {
+            "source-apt" : "zlib1g-dev"
+         }
       ]
    },
    "qiime-wo-deprecated" : {
