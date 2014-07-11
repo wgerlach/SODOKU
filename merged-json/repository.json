@@ -629,7 +629,7 @@
       ],
       "subpackages" : [
          {
-            "source-apt" : "zlib1g-dev"
+            "source-apt" : "zlib1g-dev libncurses-dev"
          }
       ]
    },
