@@ -33,7 +33,8 @@ my $ubuntu_cmd2package = {
 	'make' => 'make build-essential',
 	'git' => 'git',
 	'unzip' => 'unzip',
-	'add-apt-repository' => 'software-properties-common'
+	'add-apt-repository' => 'software-properties-common',
+	'pip' => 'python-pip'
 };
 
 my $docker_socket = '/var/run/docker.sock';
@@ -3073,6 +3074,11 @@ if ($d) {
 	} else {
 		
 		my ($package, $version_array_ref) = @{shift(@packages_installed)};
+		
+		unless (defined $version_array_ref) {
+			die "neither --tag on commandline nor version in package defined";
+		}
+		
 		$repo = 'wgerlach/'.$package;
 		$tag = join('.', @{$version_array_ref});
 		
