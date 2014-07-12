@@ -155,7 +155,7 @@ sub buildDockerImage {
 		
 		print Dumper($result_hash);
 		print "image already exists:\n";
-		print "ID: ".$image_id." $repotag\n";
+		print "ID: ".$image_id." $repotag   (may reuse with --docker_reuse_image)\n";
 		
 		unless (defined $h->{'docker_reuse_image'}) {
 			print "to delete it run docker rmi ".$image_id."\n";
@@ -1882,7 +1882,7 @@ sub commandline_docker2shock {
 	
 	
 	unless (defined $shocktoken) {
-		die;
+		die "no shocktoken";
 	}
 	
 	#### save image
@@ -1915,14 +1915,14 @@ sub commandline_docker2shock {
 	
 	
 	#### modify image (add tags)
-	print "### modify image\n";
-	my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, $base_image_object);
-
+	#print "### modify image\n";
+	#my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, $base_image_object);
+	systemp("gzip ".$image_tarfile)==0 or die;
 	
 	##### upload
 	print "### upload image\n";
 	
-	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $imagediff_tar_gz, $repo, $tag, $image_id, undef, undef, get_docker_version());
+	my $shock_node_id = upload_docker_image_to_shock($shocktoken, image_tarfile.".gz", $repo, $tag, $image_id, undef, undef, get_docker_version());
 	
 	print "uploaded. shock node id: ".$shock_node_id."\n";
 }
@@ -3121,14 +3121,15 @@ if ($d) {
 	
 	
 	#### modify image (add tags)
-	print "### modify image\n";
-	my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, undef);
-	
+	#print "### modify image\n";
+	#my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, undef);
+	systemp("gzip ".$image_tarfile)==0 or die;
+	my $image_tarfile_gz = $image_tarfile .".gz";
 	
 	##### upload
 	print "### upload image\n";
 	
-	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $imagediff_tar_gz, $repo, $tag, $image_id, undef, $dockerfile, get_docker_version());
+	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $image_tarfile_gz, $repo, $tag, $image_id, undef, $dockerfile, get_docker_version());
 	
 	print "uploaded. shock node id: ".$shock_node_id."\n";
 	
@@ -3137,7 +3138,7 @@ if ($d) {
 	exit(0);
 	
 	# create docker image
-	my $ref = createAndSaveDiffImage($image_id, $repo, $tag, $base_image_object);
+	#my $ref = createAndSaveDiffImage($image_id, $repo, $tag, $base_image_object);
 	#my ($image_tarfile, $image_id) = @{$ref};
 	
 	
