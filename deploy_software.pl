@@ -2766,6 +2766,11 @@ if (defined $h->{'token'}) {
 	$shocktoken = $h->{'token'};
 }
 
+if (defined($d)) {
+	unless (defined $h->{'token'}) {
+		die "no token defined";
+	}
+}
 
 my $base_image_object = undef; # containes name and id ! 'ubuntu:13.10';
 if (defined($h->{'docker'}) ) {
