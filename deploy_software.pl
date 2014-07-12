@@ -1922,7 +1922,7 @@ sub commandline_docker2shock {
 	##### upload
 	print "### upload image\n";
 	
-	my $shock_node_id = upload_docker_image_to_shock($shocktoken, image_tarfile.".gz", $repo, $tag, $image_id, undef, undef, get_docker_version());
+	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $image_tarfile.".gz", $repo, $tag, $image_id, undef, undef, get_docker_version());
 	
 	print "uploaded. shock node id: ".$shock_node_id."\n";
 }
