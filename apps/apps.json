@@ -82,7 +82,7 @@
 		}
 	},
 	"Emirge" : {
-		"dockerimage" : "emirgexxx",
+		"dockerimage" : "wgerlach/emirge:0.60",
 		"commands" : {
 			"emirge" : {
 				"default" : {
@@ -102,11 +102,23 @@
 						],
 					"output_array" : ["emirge.fas"],
 					"predata": {
-                    				"ko_13_5_precalculated.tab.gz":{
-                        				"url" : "http://shock.metagenomics.anl.gov:80/node/e91dd6b3-69b0-4e1f-9cb0-1b94fb9864d0?download"
+                    				"SSU_candidate_db_btindex.1.ebwt":{
+                        				"url" : "http://shock.metagenomics.anl.gov:80/node/e401783f-7f9b-486a-ad64-1d8cc8c5e3a6?download"
                     				},
-						"16S_13_5_precalculated.tab.gz" : {
-							"url" : "http://shock.metagenomics.anl.gov:80/node/ac5952b4-cb43-410c-b545-8855131df518?download"
+						"SSU_candidate_db_btindex.2.ebwt" : {
+							"url" : "http://shock.metagenomics.anl.gov:80/node/2ae51a86-2dc3-46cb-8f90-0a6e103cf857?download"
+						},
+						"SSU_candidate_db_btindex.3.ebwt" : {
+							"url" : "http://shock.metagenomics.anl.gov:80/node/c6382101-c67d-4f05-b05e-8a863d6c2abb?download"
+						},
+						"SSU_candidate_db_btindex.4.ebwt" : {
+							"url" : "http://shock.metagenomics.anl.gov:80/node/490f51f0-5b39-4b93-ba3d-1caadbdd5e54?download"
+						},
+						"SSU_candidate_db_btindex.rev.1.ebwt" : {
+							"url" : "http://shock.metagenomics.anl.gov:80/node/e680556c-751a-4a59-b5ad-be20a1614cb2?download"
+						},
+						"SSU_candidate_db_btindex.rev.2.ebwt" : {
+							"url" : "http://shock.metagenomics.anl.gov:80/node/951420f9-4c87-44a7-ac56-c94cd06e2166?download"
 						}
 					}
 				}
