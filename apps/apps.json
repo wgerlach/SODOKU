@@ -5,12 +5,24 @@
 			"pick_closed_reference_otus" : {
 				"default" : {
 					"input" : [ 
-							 ["file",	"INPUT-FILE"],
-							 ["file",	"INPUT-PARAMETER"],
-							 ["string",	"IDENTITY",		"97", 	"description text"],
-							 ["string",	"OUTPUT-DIR", 		"ucr", 	"description text"],
-							 ["file",	"*array"],
-							 ["**dict ; not clear if needed"]
+						{	"type"	: "file",
+							"name"	: "INPUT-FILE",
+							"required" : true
+						},
+						{	"type"	: "file",
+							"name"	: "INPUT-PARAMETER",
+							"required" : true
+						},
+						{	"type"	: "string",
+							"name"	: "IDENTITY",
+							"default_value" : "97",
+							"description" : "percent identity"
+						},
+						{	"type"	: "string",
+							"name"	: "OUTPUT-DIR",
+							"default_value" : "ucr",
+							"description" : "output directory"
+						}
 						],
 					"output_array" : ["${OUTPUT-DIR}/otu_table.biom"],
 					"output_map" : {},
@@ -31,9 +43,12 @@
 		"commands" : {
 			"normalize_by_copy_number" : {
 				"default" : {
-					"input" : 
-						[
-							["file",	"INPUT", "", "input biom file"]
+					"input" : [
+						{	"type"	: "file",
+							"name"	: "INPUT",
+							"required" : true,
+							"description" : "input biom file"
+						}
 						],
 					"cmd_script" :
 						[
@@ -56,9 +71,12 @@
 			},
 			"predict_metagenomes" : {
 				"default" : {
-					"input" : 
-						[
-							["file",	"INPUT", "", "normalized input biom file"]
+					"input" : [
+						{	"type"	: "file",
+							"name"	: "INPUT",	
+							"required" : true,
+							"description" : "normalized input biom file"
+						}
 						],
 					"cmd_script" :
 						[
@@ -86,14 +104,39 @@
 		"commands" : {
 			"emirge" : {
 				"default" : {
-					"input" : 
-						[
-							["file",	"INPUT1", 		"", "input biom file"],
-							["file",	"INPUT2", 		"", "input biom file"],
-							["string",	"insert_mean", 		"180", 	"insert size mean"],
-							["string",	"insert_stddev", 	"20", 	"insert standard deviation"],
-							["string",	"max_read_length", 	"110", 	"maximal read length"],
-							["string",	"processors", 		"1",	"number of processor to use"]
+					"input" : [
+						{	"type"	: "file",
+							"name"	: "INPUT1",
+							"default_value" : "",
+							"required" : true,
+							"description" : "input biom file"
+						},
+						{	"type"	: "file",
+							"name"	: "INPUT2",
+							"default_value" : "",
+							"required" : false,
+							"description" : "input biom file, second read in mate-pairs"
+						},
+						{	"type"	: "string",
+							"name"	: "insert_mean",
+							"default_value" : "180",
+							"description" : "insert size mean"
+						},
+						{	"type"	: "string",
+							"name"	: "insert_stddev",
+							"default_value" : "20",
+							"description" : "insert standard deviation"
+						},
+						{	"type"	: "string",
+							"name"	: "max_read_length",
+							"default_value" : "110",
+							"description" : "maximal read length"
+						},
+						{	"type"	: "string",
+							"name"	: "processors",
+							"default_value" : "1",
+							"description" : "number of processor to use"
+						}
 						],
 					"cmd_script" :
 						[
