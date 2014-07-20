@@ -107,14 +107,12 @@
 					"input" : [
 						{	"type"	: "file",
 							"name"	: "INPUT1",
-							"default_value" : "",
-							"required" : true,
 							"description" : "input biom file"
 						},
 						{	"type"	: "file",
 							"name"	: "INPUT2",
-							"default_value" : "",
-							"required" : false,
+							"optional" : true,
+							"option" : "-2 ",
 							"description" : "input biom file, second read in mate-pairs"
 						},
 						{	"type"	: "string",
@@ -140,7 +138,7 @@
 						],
 					"cmd_script" :
 						[
-						"emirge.py outdir -1 ${INPUT1} -2 ${INPUT1} -f /home/ubuntu/data/emirge-data/SSURef_111_candidate_db.fasta -b /home/ubuntu/data/emirge-data/SSU_candidate_db_btindex --insert_mean=${insert_mean} --insert_stddev=${insert_stddev} --max_read_length=${max_read_length} --processors=${processors} --phred33",
+						"emirge.py outdir -1 ${INPUT1} ${option:INPUT1} -f /home/ubuntu/data/emirge-data/SSURef_111_candidate_db.fasta -b /home/ubuntu/data/emirge-data/SSU_candidate_db_btindex --insert_mean=${insert_mean} --insert_stddev=${insert_stddev} --max_read_length=${max_read_length} --processors=${processors} --phred33",
 						"emirge_rename_fasta.py outdir/iter.40 > emirge.fas"
 						],
 					"output_array" : ["emirge.fas"],
