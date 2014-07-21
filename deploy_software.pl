@@ -2730,6 +2730,7 @@ my $help_text;
 	['tag=s',				'specifiy image name, e.g. me/mytool:1.0.1'],
 	['force_base',			'force upload of image even if baseimage is not in shock'],
 	['no-cache',			'docker build with --no-cache=true '],
+	['no-build', 			'show dockerfile content, then stop'],
 '',
 'save image to tar:',
 	['save_image=s',		'save image in tar file'],
@@ -3107,7 +3108,9 @@ if ($d) {
 	# create Dockerfile
 	my $dockerfile = createDockerFile($base_image_object->{'name'});
 	
-	
+	if (defined $h->{'no-build'}) {
+		exit(0);
+	}
 	
 	my $image_id = buildDockerImage($repo, $tag, $dockerfile);
 	
