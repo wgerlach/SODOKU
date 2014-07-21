@@ -140,6 +140,20 @@
          "restart docker.io"
       ]
    },
+   "scipy" : {
+      "_comment" : "pip install scipy was not enough for emirge",
+      "subpackages" : [
+         {
+            "source-apt" : "gfortran libopenblas-dev liblapack-dev"
+         },
+         {
+            "source-pip" : [
+               "scipy",
+               "numpy"
+            ]
+         }
+      ]
+   },
    "picrust_data" : {
       "source" : [
          "ftp://thebeast.colorado.edu/pub/picrust-references/picrust-1.0.0/16S_13_5_precalculated.tab.gz",
@@ -477,17 +491,17 @@
       "_comment" : "requires usearch version >= 6.0.203",
       "depends" : [
          "bowtie",
-         "samtools"
+         "samtools",
+         "scipy"
       ],
       "subpackages" : [
          {
-            "source-apt" : "python-biopython cython"
+            "source-apt" : "python-biopython python-dev"
          },
          {
             "source-pip" : [
                "pysam",
-               "scipy",
-               "numpy"
+               "cython"
             ]
          }
       ]
