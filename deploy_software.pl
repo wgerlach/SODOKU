@@ -31,7 +31,7 @@ my $default_repository = 'https://raw.githubusercontent.com/wgerlach/SODOKU/mast
 my $ubuntu_cmd2package = {
 	'curl' => 'curl',
 	'make' => 'make build-essential',
-	'git' => 'git',
+	'git' => 'git', # or git-core for ubuntu:10.04
 	'unzip' => 'unzip',
 	'add-apt-repository' => 'software-properties-common',
 	'pip' => 'python-pip'
@@ -88,6 +88,10 @@ sub createDockerFile {
 	foreach my $dep (keys(%$docker_deps)) {
 		my $pack = $ubuntu_cmd2package->{$dep};
 		if (defined $pack) {
+			if ($pack eq "git" && $docker_base_image eq "ubuntu:10.04") {
+				$pack = "git-core";
+			}
+			
 			$dep_packages->{$pack}=1;
 		}
 	}
