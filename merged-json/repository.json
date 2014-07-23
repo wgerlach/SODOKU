@@ -144,12 +144,11 @@
       "_comment" : "pip install scipy was not enough for emirge",
       "subpackages" : [
          {
-            "source-apt" : "gfortran libopenblas-dev liblapack-dev"
+            "source-apt" : "gfortran libblas-dev liblapack-dev python-numpy"
          },
          {
             "source-pip" : [
-               "scipy",
-               "numpy"
+               "scipy"
             ]
          }
       ]
@@ -487,7 +486,10 @@
          0,
          60
       ],
-      "source-pip" : "https://github.com/csmiller/EMIRGE/archive/v${v1}.${v2}.tar.gz",
+      "source-git" : {
+         "url" : "https://github.com/csmiller/EMIRGE.git",
+         "tag" : "v${v1}.${v2}"
+      },
       "_comment" : "requires usearch version >= 6.0.203",
       "depends" : [
          "bowtie",
