@@ -486,6 +486,9 @@
          0,
          60
       ],
+      "build-exec" : [
+         "cd ${source-dir} && python setup.py build && python setup.py install"
+      ],
       "source-git" : {
          "url" : "https://github.com/csmiller/EMIRGE.git",
          "tag" : "v${v1}.${v2}"
