@@ -1216,7 +1216,7 @@ sub bashrc_append {
 
 
 sub git_clone {
-	my ($source, $dir, $gitbranch) = @_;
+	my ($source, $dir, $gitbranch, $gittag) = @_;
 	
 	
 	my $gitname;
@@ -1245,6 +1245,7 @@ sub git_clone {
 	if (-d $gitdir) {
 		if (defined $h->{'update'}) {
 			system_install("cd $gitdir && git pull") == 0 or return undef;
+			print "git_clone returns $gitdir\n";
 			return $gitdir;
 		}
 		if (defined $h->{'new'}) {
@@ -1253,7 +1254,9 @@ sub git_clone {
 	}
 	system_install("cd $dir && git clone --recursive $usebranch $source") == 0 or return undef;
 	
-	
+	if (defined $gittag) {# for compatibility with older git releases (git clone did not support tag, newer versions are ok)
+		system_install("cd $gitdir && git checkout $gittag") == 0 or return undef;
+	}
 	
 	print "git_clone returns $gitdir\n";
 	return $gitdir;
@@ -2267,11 +2270,13 @@ sub install_package {
 			my $source_filename;
 			
 			my $source_branch;
+			my $source_git_tag;
 			if (ref($source_obj) eq 'HASH') {
 				$source = $source_obj->{'uri'} || $source_obj->{'url'};
 				$source_subdir = $source_obj->{'subdir'};
 				$source_filename=$source_obj->{'filename'};
 				$source_branch=$source_obj->{'branch'};
+				$source_git_tag=$source_obj->{'tag'};
 			} else {
 				$source = $source_obj;
 			}
@@ -2312,7 +2317,7 @@ sub install_package {
 				
 				
 				if ($st eq 'git') {
-					$source_dir = git_clone($source, $temp_dir, $source_branch) || die;
+					$source_dir = git_clone($source, $temp_dir, $source_branch, $source_git_tag) || die;
 				} elsif ($st eq 'mercurial') {
 					$source_dir = hg_clone($source, $temp_dir);
 				} elsif ($st eq 'go') {
