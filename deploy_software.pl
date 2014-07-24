@@ -2377,7 +2377,7 @@ sub install_package {
 				#unless (defined($h->{'root'})) {
 				#	$pip_options = " --user ".$ENV{'USER'}; # does not work!
 				#}
-				my $pip_cmd = "pip install ".$source.$pip_options;
+				my $pip_cmd = "pip install -U ".$source.$pip_options;
 				unless ($is_root_user) {
 					$pip_cmd = "sudo ".$pip_cmd;
 				}
@@ -2766,14 +2766,17 @@ if ($h->{'help'} || keys(%$h)==0) {
 
 if (defined $ENV{'GLOBUSONLINE'} && $ENV{'GLOBUSONLINE'} ne '') {
 	$shocktoken = $ENV{'GLOBUSONLINE'};
+	print "using shocktoken from \$GLOBUSONLINE...\n";
 }
 
 if (defined $ENV{'KB_AUTH_TOKEN'} && $ENV{'KB_AUTH_TOKEN'} ne '') {
 	$shocktoken = $ENV{'KB_AUTH_TOKEN'};
+	print "using shocktoken from \$KB_AUTH_TOKEN...\n";
 }
 
 if (defined $h->{'token'}) {
 	$shocktoken = $h->{'token'};
+	print "using shocktoken from --token...\n";
 }
 
 if (defined($d)) {
