@@ -2785,6 +2785,8 @@ if (defined($d)) {
 	}
 }
 
+print "shocktoken: ".($shocktoken || "undef")."\n";
+
 my $base_image_object = undef; # containes name and id ! 'ubuntu:13.10';
 if (defined($h->{'docker'}) ) {
 	$d = 1;
@@ -2852,7 +2854,9 @@ if (defined $h->{'docker2shock'}) {
 	#unless (defined $base_image_object->{'Id'}) {
 	#	die;
 	#}
-	
+	unless ($shocktoken) {
+		die "no token defined";
+	}
 	commandline_docker2shock($h->{'docker2shock'}, $base_image_object);
 	exit(0);
 }
