@@ -2764,6 +2764,10 @@ if ($h->{'help'} || keys(%$h)==0) {
 }
 
 
+
+print Dumper(%ENV);
+exit(0);
+
 if (defined $ENV{'GLOBUSONLINE'} && $ENV{'GLOBUSONLINE'} ne '') {
 	$shocktoken = $ENV{'GLOBUSONLINE'};
 	print "using shocktoken from \$GLOBUSONLINE...\n";
