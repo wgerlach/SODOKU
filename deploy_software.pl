@@ -2765,9 +2765,6 @@ if ($h->{'help'} || keys(%$h)==0) {
 
 
 
-print Dumper(%ENV);
-exit(0);
-
 if (defined $ENV{'GLOBUSONLINE'} && $ENV{'GLOBUSONLINE'} ne '') {
 	$shocktoken = $ENV{'GLOBUSONLINE'};
 	print "using shocktoken from \$GLOBUSONLINE...\n";
@@ -2859,7 +2856,7 @@ if (defined $h->{'docker2shock'}) {
 	#	die;
 	#}
 	unless ($shocktoken) {
-		die "no token defined";
+		die "no token defined (note, sudo does not use your env variables, use --token)";
 	}
 	commandline_docker2shock($h->{'docker2shock'}, $base_image_object);
 	exit(0);
