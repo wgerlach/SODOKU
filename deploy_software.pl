@@ -2590,10 +2590,10 @@ sub install_package {
 		foreach my $cfg_string (@{$cfg_strings}) {
 			
 			
-			my ($key) = $cfg_string =~ /^\s*(\S+)\s*\=/;
+			my ($key) = $cfg_string =~ /^\s*((\S.*)?\S)\s*\=/; # this matches also: export X=Y
 
 			unless (defined $key) {
-				die "cfg_string: $cfg_string";
+				die "key not defined: cfg_string: $cfg_string";
 			}
 			
 			my $change = 0;
