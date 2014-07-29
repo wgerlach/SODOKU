@@ -17,6 +17,8 @@ or die "USAGEPOD is missing:\n sudo apt-get install cpanminus \n sudo cpanm git:
 use File::Temp;
 use LWP::UserAgent;
 use Data::Dumper;
+
+use File::Slurp;
 #eval "use Try::Tiny; 1"
 #or die "perl module required, e.g.: sudo apt-get install cpanminus ; sudo cpanm install Try::Tiny";
 
@@ -29,9 +31,10 @@ my $default_repository = 'https://raw.githubusercontent.com/wgerlach/SODOKU/mast
 my $ubuntu_cmd2package = {
 	'curl' => 'curl',
 	'make' => 'make build-essential',
-	'git' => 'git',
+	'git' => 'git', # or git-core for ubuntu:10.04
 	'unzip' => 'unzip',
-	'add-apt-repository' => 'software-properties-common'
+	'add-apt-repository' => 'software-properties-common',
+	'pip' => 'python-pip'
 };
 
 my $docker_socket = '/var/run/docker.sock';
@@ -85,6 +88,10 @@ sub createDockerFile {
 	foreach my $dep (keys(%$docker_deps)) {
 		my $pack = $ubuntu_cmd2package->{$dep};
 		if (defined $pack) {
+			if ($pack eq "git" && $docker_base_image eq "ubuntu:10.04") {
+				$pack = "git-core";
+			}
+			
 			$dep_packages->{$pack}=1;
 		}
 	}
@@ -115,6 +122,20 @@ sub createDockerFile {
 }
 
 
+
+sub get_docker_bin {
+	
+	my $docker_bin = '/usr/bin/docker.io'; # on ubuntu
+	unless (-e $docker_bin) {
+		$docker_bin = '/usr/bin/docker'; # normal docker binary
+	}
+	unless (-e $docker_bin) {
+		die "docker binary not found ! ;-(";
+	}
+	
+	return $docker_bin;
+}
+
 sub buildDockerImage {
 	
 	my ($repo, $tag, $dockerfile) = @_;
@@ -131,14 +152,14 @@ sub buildDockerImage {
 	
 	my $image_id = undef;
 	if (defined $result_hash) {
-		$image_id = $result_hash->{'id'};
+		$image_id = $result_hash->{'Id'};
 		unless (defined $image_id) {
 			die "hash defined, but not id!?";
 		}
 		
 		print Dumper($result_hash);
 		print "image already exists:\n";
-		print "ID: ".$image_id." $repotag\n";
+		print "ID: ".$image_id." $repotag   (may reuse with --docker_reuse_image)\n";
 		
 		unless (defined $h->{'docker_reuse_image'}) {
 			print "to delete it run docker rmi ".$image_id."\n";
@@ -168,6 +189,8 @@ sub buildDockerImage {
 	unless (defined($image_id) ) {
 		
 		
+		my $docker_bin = get_docker_bin();
+		
 		#my $docker_build_cmd = 'docker build --tag='.$repotag.' -'; #--no-cache=true --rm
 		my $docker_build_cmd;
 		
@@ -181,12 +204,12 @@ sub buildDockerImage {
 			
 			write_file($docker_build_context_dir.'/Dockerfile', $dockerfile);
 			
-			$docker_build_cmd = 'docker build $cache --tag='.$repotag.' '.$docker_build_context_dir;
+			$docker_build_cmd = $docker_bin.' build '.$cache.' --tag='.$repotag.' '.$docker_build_context_dir;
 			systemp($docker_build_cmd)==0 or die "docker build failed";
 			
 		} else {
 			# no context, pipe dockerfile into docker client
-			$docker_build_cmd = 'docker build $cache --tag='.$repotag.' -'; #--no-cache=true --rm
+			$docker_build_cmd = $docker_bin.' build '.$cache.' --tag='.$repotag.' -'; #--no-cache=true --rm
 			
 			print "docker_build_cmd: $docker_build_cmd\n";
 			
@@ -224,7 +247,7 @@ sub buildDockerImage {
 		
 		
 		if (defined $result_hash) {
-			$image_id = $result_hash->{'id'};
+			$image_id = $result_hash->{'Id'};
 						
 		} else {
 			die "result_hash not defined, docker image was not created !?";
@@ -233,7 +256,7 @@ sub buildDockerImage {
 	}
 	
 	unless (defined $image_id) {
-		die "image ID not found";
+		die "image ID not defined";
 	}
 
 	return $image_id;
@@ -297,13 +320,16 @@ sub save_image_to_tar {
 		}
 	} else {
 		if (-e $image_tarfile) {
-			die "docker image file $image_tarfile already exists";
+			die "docker image file $image_tarfile already exists. Delete or use --docker_reuse_image";
 		}
 	}
 	
 	
 	if ($skip_saving == 0) {
-		my $docker_save_cmd = 'docker save '.$image_id.' > '.$image_tarfile; # TODO: use API
+		
+		my $docker_bin = get_docker_bin();
+		
+		my $docker_save_cmd = $docker_bin.' save '.$image_id.' > '.$image_tarfile; # TODO: use API
 		systemp($docker_save_cmd) == 0 or die;
 	}
 	
@@ -353,7 +379,7 @@ sub remove_base_from_image_and_set_tag {
 		
 		
 		
-		my @diff_layers = get_diff_layers($image_id, $docker_base_image->{'id'});
+		my @diff_layers = get_diff_layers($image_id, $docker_base_image->{'Id'});
 		
 		if (@diff_layers == 0) {
 			die ;
@@ -495,13 +521,13 @@ sub upload_docker_image_to_shock {
 	
 	
 	my $node_attributes = {
-		"temporary"				=> "1",
+	#	"temporary"				=> "1",
 		"type"					=> "dockerimage",
 		"name"					=> $repotag						|| die,
 		"id"					=> $image_id					|| die,
 		"docker_version"		=> $image_docker_version_hash	|| die,
 		"base_image_tag"		=> $base_image_object->{'name'} || "",
-		"base_image_id"			=> $base_image_object->{'id'}	|| "",
+		"base_image_id"			=> $base_image_object->{'Id'}	|| "",
 		"dockerfile"			=> $dockerfile_encoded			|| ""
 	};
 	
@@ -1148,23 +1174,31 @@ sub setenv {
 	my ($key, $value) = @_;
 	
 	if ($d) {
+		
+		if ($value =~ /\$/ || $value =~ /\~/) {
+			#make sure that environment variables are evaluated
+			my $echocmd = "echo \"$value\"";
+			$value = `$echocmd`;
+			chomp($value);
+		}
+		
 		push(@docker_file_content, "ENV $key $value");
-		return;
+		
+	} else {
+	
+		
+		my $envline = "export $key=$value";
+		#system_install("grep -q -e '$envline' ~/.bashrc || echo '$envline' >> ~/.bashrc");
+		
+		bashrc_append($envline);
+		
+		if ($value =~ /\$/ || $value =~ /\~/) {
+			#make sure that environment variables are evaluated
+			my $echocmd = "echo \"$value\"";
+			$value = `$echocmd`;
+			chomp($value);
+		}
 	}
-	
-	
-	my $envline = "export $key=$value";
-	#system_install("grep -q -e '$envline' ~/.bashrc || echo '$envline' >> ~/.bashrc");
-	
-	bashrc_append($envline);
-	
-	if ($value =~ /\$/ || $value =~ /\~/) {
-		#make sure that environment variables are evaluated
-		my $echocmd = "echo \"$value\"";
-		$value = `$echocmd`;
-		chomp($value);
-	}
-	
 	$ENV{$key}=$value; # makes sure variable can be used even if bashrc is not sourced yet.
 	return;
 }
@@ -1186,7 +1220,7 @@ sub bashrc_append {
 
 
 sub git_clone {
-	my ($source, $dir, $gitbranch) = @_;
+	my ($source, $dir, $gitbranch, $gittag) = @_;
 	
 	
 	my $gitname;
@@ -1215,6 +1249,7 @@ sub git_clone {
 	if (-d $gitdir) {
 		if (defined $h->{'update'}) {
 			system_install("cd $gitdir && git pull") == 0 or return undef;
+			print "git_clone returns $gitdir\n";
 			return $gitdir;
 		}
 		if (defined $h->{'new'}) {
@@ -1223,7 +1258,9 @@ sub git_clone {
 	}
 	system_install("cd $dir && git clone --recursive $usebranch $source") == 0 or return undef;
 	
-	
+	if (defined $gittag) {# for compatibility with older git releases (git clone did not support tag, newer versions are ok)
+		system_install("cd $gitdir && git checkout $gittag") == 0 or return undef;
+	}
 	
 	print "git_clone returns $gitdir\n";
 	return $gitdir;
@@ -1264,16 +1301,16 @@ sub get_image_object{
 	
 	print "something: ".Dumper($result_hash);
 
-	my $id =  $result_hash->{'id'} || die "error: id not found in image object";
+	my $id =  $result_hash->{'Id'} || $result_hash->{'id'} || die "error: id not found in image object \"$something\"";
 	
 	my $obj = {};
-	$obj->{'id'} = $id;
+	$obj->{'Id'} = $id;
 	
 
 	# if user used id to identify image, try to find a tag
 	if (lc($something) eq lc(substr($id, 0 , length($something)))) {
 	
-		my $history = dockerSocket('GET', "/images/".$obj->{'id'}."/history");
+		my $history = dockerSocket('GET', "/images/".$obj->{'Id'}."/history");
 		
 		print "history: ".Dumper($history);
 		
@@ -1708,7 +1745,7 @@ sub commandline_upload {
 	my $layer_graph_inverse={}; # points to child
 	my $layer_graph={};
 	foreach my $layer (@{$image_history}) {
-		my $id =  $layer->{'id'};
+		my $id =  $layer->{'Id'};
 		$image_history_hash->{$id} = $layer;
 		if (defined $layer->{'parent'}) {
 			$layer_graph_inverse->{$layer->{'parent'}}=$id;
@@ -1731,7 +1768,7 @@ sub commandline_upload {
 	print Dumper($layer_graph_inverse);
 	foreach my $layer (@{$image_history}) {
 		
-		my $id =  $layer->{'id'};
+		my $id =  $layer->{'Id'};
 		
 		#child
 		unless (defined $layer_graph_inverse->{$id}) {
@@ -1786,7 +1823,7 @@ sub commandline_upload {
 			
 			if ($h->{'base_image_name'} ne 'none') {
 				$base_image_object->{'name'} = $h->{'base_image_name'};
-				$base_image_object->{'id'} = $baseimage_id;
+				$base_image_object->{'Id'} = $baseimage_id;
 			} else {
 				$base_image_object = undef;
 			}
@@ -1799,7 +1836,7 @@ sub commandline_upload {
 			unless (defined $base_image_object) {
 				die $err_str;
 			}
-			unless (defined $base_image_object->{'id'}) {
+			unless (defined $base_image_object->{'Id'}) {
 				die $err_str;
 			}
 			unless (defined $base_image_object->{'name'}) {
@@ -1808,11 +1845,11 @@ sub commandline_upload {
 			
 			
 			
-			if ($base_image_object->{'id'} ne $baseimage_id) {
+			if ($base_image_object->{'Id'} ne $baseimage_id) {
 				print STDERR  $err_str."\n";
-				print STDERR "error: id not identical \n\"".$base_image_object->{'id'}."\"\n\"".$baseimage_id."\"\n";
+				print STDERR "error: id not identical \n\"".$base_image_object->{'Id'}."\"\n\"".$baseimage_id."\"\n";
 				
-				#my $a = $base_image_object->{'id'};
+				#my $a = $base_image_object->{'Id'};
 				#my $b = $baseimage_id;
 				#$a =~ s/(.)/ord($1)/eg;
 				#$b =~ s/(.)/ord($1)/eg;
@@ -1851,17 +1888,19 @@ sub commandline_docker2shock {
 	my ($something,$base_image_object) = @_;
 	
 	
-	
+	unless (defined $shocktoken) {
+		die "no shocktoken";
+	}
 	
 	#### save image
 	print "### save image\n";
 	
 	my $image_obj = get_image_object($something);
 	
-	unless (defined $image_obj->{'id'} && defined $image_obj->{'name'}) {
+	unless (defined $image_obj->{'Id'} && defined $image_obj->{'name'}) {
 		die ;
 	}
-	my $image_id = $image_obj->{'id'};
+	my $image_id = $image_obj->{'Id'};
 
 	my $print_name = $image_obj->{'name'};
 	$print_name =~ s/[\:\_\/]/\_/g;
@@ -1877,20 +1916,20 @@ sub commandline_docker2shock {
 	}
 	
 	
-	my $image_tarfile = $datadir.$image_obj->{'id'}.'_'.$print_name.'.tar';
+	my $image_tarfile = $datadir.$image_obj->{'Id'}.'_'.$print_name.'.tar';
 	
-	save_image_to_tar($image_obj->{'id'}, $image_tarfile);
+	save_image_to_tar($image_obj->{'Id'}, $image_tarfile);
 	
 	
 	#### modify image (add tags)
-	print "### modify image\n";
-	my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, $base_image_object);
-
+	#print "### modify image\n";
+	#my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, $base_image_object);
+	systemp("gzip ".$image_tarfile)==0 or die;
 	
 	##### upload
 	print "### upload image\n";
 	
-	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $imagediff_tar_gz, $repo, $tag, $image_id, undef, undef, get_docker_version());
+	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $image_tarfile.".gz", $repo, $tag, $image_id, undef, undef, get_docker_version());
 	
 	print "uploaded. shock node id: ".$shock_node_id."\n";
 }
@@ -2135,7 +2174,7 @@ sub install_package {
 			if ( definedAndTrue( $already_installed{$package} ) ) {
 				print "dependency $dependency already installed\n";
 			}else {
-				print "install dependency $dependency for $dep_package...\n";
+				print "install dependency $dependency ($dep_package) for $package...\n";
 				unless (defined $repository->{$dep_package}) {
 					die "package $dep_package not found\n";
 				}
@@ -2184,9 +2223,14 @@ sub install_package {
 	}
 
 	if (defined $package_hash->{'set-env'}) {
-		my $env_pairs = $package_hash->{'set-env'};
-		foreach my $key (keys %{$env_pairs} ) {
-			setenv($key, $env_pairs->{$key}) ;
+		my $env_pairs_array = $package_hash->{'set-env'};
+		unless (ref($env_pairs_array) eq 'ARRAY') {
+			die "ARRAY ref expected";
+		}
+		foreach my $env_pairs (@{$env_pairs_array }) {
+			foreach my $key (keys %{$env_pairs} ) {
+				setenv($key, $env_pairs->{$key}) ;
+			}
 		}
 	}
 	
@@ -2230,11 +2274,13 @@ sub install_package {
 			my $source_filename;
 			
 			my $source_branch;
+			my $source_git_tag;
 			if (ref($source_obj) eq 'HASH') {
 				$source = $source_obj->{'uri'} || $source_obj->{'url'};
 				$source_subdir = $source_obj->{'subdir'};
 				$source_filename=$source_obj->{'filename'};
 				$source_branch=$source_obj->{'branch'};
+				$source_git_tag=$source_obj->{'tag'};
 			} else {
 				$source = $source_obj;
 			}
@@ -2275,7 +2321,7 @@ sub install_package {
 				
 				
 				if ($st eq 'git') {
-					$source_dir = git_clone($source, $temp_dir, $source_branch) || die;
+					$source_dir = git_clone($source, $temp_dir, $source_branch, $source_git_tag) || die;
 				} elsif ($st eq 'mercurial') {
 					$source_dir = hg_clone($source, $temp_dir);
 				} elsif ($st eq 'go') {
@@ -2331,7 +2377,7 @@ sub install_package {
 				#unless (defined($h->{'root'})) {
 				#	$pip_options = " --user ".$ENV{'USER'}; # does not work!
 				#}
-				my $pip_cmd = "pip install ".$source.$pip_options;
+				my $pip_cmd = "pip install -U ".$source.$pip_options;
 				unless ($is_root_user) {
 					$pip_cmd = "sudo ".$pip_cmd;
 				}
@@ -2519,8 +2565,57 @@ sub install_package {
 	}
 
 
-	
-	
+	if (defined($package_hash->{'set-values'})) { # config for simple key=value pairs in text files
+		
+		print "set-values\n";
+		
+		my $configfile = $package_hash->{'set-values'}->{'file'};
+		unless (defined $configfile) {
+			die "config-file $configfile not defined";
+		}
+		
+		unless (-e $configfile || $d) {
+			die "config-file $configfile not found";
+		}
+		
+		my $cfg_strings = $package_hash->{'set-values'}->{'cfg-string'} || "";
+		
+		unless (ref($cfg_strings) eq 'ARRAY') {
+			$cfg_strings = [$cfg_strings];
+		}
+		
+		
+		my @config_lines = read_file( $configfile ) ;
+		
+		foreach my $cfg_string (@{$cfg_strings}) {
+			
+			
+			my ($key) = $cfg_string =~ /^\s*(\S+)\s*\=/;
+
+			unless (defined $key) {
+				die "cfg_string: $cfg_string";
+			}
+			
+			my $change = 0;
+			foreach my $config_line (@config_lines) {
+				if ($config_line =~ /^\s*$key\s*\=/) {
+					$config_line = $cfg_string."\n";
+					$change=1;
+				}
+				
+			}
+			if ($change == 0) {
+				push(@config_lines, $cfg_string."\n");
+			}
+
+			
+		}
+
+			
+		write_file($configfile, @config_lines ) ;
+		
+		
+	}
 	
 	if (defined($package_hash->{'set-ini-values'})) {
 		
@@ -2541,11 +2636,20 @@ sub install_package {
 		if ($cfg_string ne "") {
 			
 			print "cfg_string: \"$cfg_string\"\n";
+			#if ($cfg_string =~ /^\[.*\]/) {
 			
 			my @cfg_strings = split(' ', $cfg_string);
 			
 			my $ini_hash = INI_cmds_to_hash( \@cfg_strings );
-			modifyINIfile($inifile, $ini_hash)
+			modifyINIfile($inifile, $ini_hash);
+			#} else {
+			#	print "simple config file...\n";
+			#	my @config_lines = read_file( $inifile ) ;
+				
+				
+				
+				
+			#}
 		}else {
 			print STDERR "warning: cfg_string emtpy, will not modify $inifile\n";
 		};
@@ -2635,6 +2739,7 @@ my $help_text;
 	['tag=s',				'specifiy image name, e.g. me/mytool:1.0.1'],
 	['force_base',			'force upload of image even if baseimage is not in shock'],
 	['no-cache',			'docker build with --no-cache=true '],
+	['no-build', 			'show dockerfile content, then stop'],
 '',
 'save image to tar:',
 	['save_image=s',		'save image in tar file'],
@@ -2659,18 +2764,29 @@ if ($h->{'help'} || keys(%$h)==0) {
 }
 
 
+
 if (defined $ENV{'GLOBUSONLINE'} && $ENV{'GLOBUSONLINE'} ne '') {
 	$shocktoken = $ENV{'GLOBUSONLINE'};
+	print "using shocktoken from \$GLOBUSONLINE...\n";
 }
 
 if (defined $ENV{'KB_AUTH_TOKEN'} && $ENV{'KB_AUTH_TOKEN'} ne '') {
 	$shocktoken = $ENV{'KB_AUTH_TOKEN'};
+	print "using shocktoken from \$KB_AUTH_TOKEN...\n";
 }
 
 if (defined $h->{'token'}) {
 	$shocktoken = $h->{'token'};
+	print "using shocktoken from --token...\n";
 }
 
+if (defined($d)) {
+	unless (defined $h->{'token'}) {
+		die "no token defined";
+	}
+}
+
+print "shocktoken: ".($shocktoken || "undef")."\n";
 
 my $base_image_object = undef; # containes name and id ! 'ubuntu:13.10';
 if (defined($h->{'docker'}) ) {
@@ -2683,7 +2799,7 @@ if (defined($h->{'docker'}) ) {
 
 if (defined($h->{'base_image'})) {
 	$base_image_object = get_image_object($h->{'base_image'});
-	unless (defined $base_image_object->{'id'} && defined $base_image_object->{'name'}) {
+	unless (defined $base_image_object->{'Id'} && defined $base_image_object->{'name'}) {
 		die ;
 	}
 }
@@ -2708,14 +2824,14 @@ if (defined($d) && ($d == 1)) {
 		die "error: docker image upload to SHOCK requires module SHOCK::Client";
 	}
 	
-	eval {
-		require File::Slurp;
-		File::Slurp->import();
-		1;
-	} or do {
-		my $error = $@;
-		print "not using File::Slurp: $error\n";
-	};
+	#eval {
+	#	require File::Slurp;
+	#	File::Slurp->import();
+	#	1;
+	#} or do {
+	#	my $error = $@;
+	#	print "not using File::Slurp: $error\n";
+	#};
 }
 
 
@@ -2736,10 +2852,12 @@ if (defined($h->{'remove_base_layers'})) {
 
 if (defined $h->{'docker2shock'}) {
 	
-	#unless (defined $base_image_object->{'id'}) {
+	#unless (defined $base_image_object->{'Id'}) {
 	#	die;
 	#}
-	
+	unless ($shocktoken) {
+		die "no token defined (note, sudo does not use your env variables, use --token)";
+	}
 	commandline_docker2shock($h->{'docker2shock'}, $base_image_object);
 	exit(0);
 }
@@ -2749,16 +2867,16 @@ if (defined $h->{'save_image'}) {
 	
 	my $image_obj = get_image_object($h->{'save_image'});
 	
-	unless (defined $image_obj->{'id'} && defined $image_obj->{'name'}) {
+	unless (defined $image_obj->{'Id'} && defined $image_obj->{'name'}) {
 		die ;
 	}
 	
 	my $name  = $image_obj->{'name'};
 	$name =~ s/[\:\_\/]/\_/g;
 	
-	my $filename = $image_obj->{'id'}.'_'.$name.'.tar';
+	my $filename = $image_obj->{'Id'}.'_'.$name.'.tar';
 	
-	save_image_to_tar($image_obj->{'id'}, $filename);
+	save_image_to_tar($image_obj->{'Id'}, $filename);
 		
 	exit(0);
 }
@@ -2947,7 +3065,7 @@ foreach my $package_string (@package_list) {
 
 if ($d) {
 	
-	unless (defined $base_image_object->{'id'}) {
+	unless (defined $base_image_object->{'Id'}) {
 		die; # TODO remove
 	}
 	
@@ -2979,6 +3097,11 @@ if ($d) {
 	} else {
 		
 		my ($package, $version_array_ref) = @{shift(@packages_installed)};
+		
+		unless (defined $version_array_ref) {
+			die "neither --tag on commandline nor version in package defined";
+		}
+		
 		$repo = 'wgerlach/'.$package;
 		$tag = join('.', @{$version_array_ref});
 		
@@ -3002,7 +3125,9 @@ if ($d) {
 	# create Dockerfile
 	my $dockerfile = createDockerFile($base_image_object->{'name'});
 	
-	
+	if (defined $h->{'no-build'}) {
+		exit(0);
+	}
 	
 	my $image_id = buildDockerImage($repo, $tag, $dockerfile);
 	
@@ -3016,14 +3141,15 @@ if ($d) {
 	
 	
 	#### modify image (add tags)
-	print "### modify image\n";
-	my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, undef);
-	
+	#print "### modify image\n";
+	#my $imagediff_tar_gz = remove_base_from_image_and_set_tag($image_tarfile, $repo, $tag, $image_id, undef);
+	systemp("gzip ".$image_tarfile)==0 or die;
+	my $image_tarfile_gz = $image_tarfile .".gz";
 	
 	##### upload
 	print "### upload image\n";
 	
-	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $imagediff_tar_gz, $repo, $tag, $image_id, undef, $dockerfile, get_docker_version());
+	my $shock_node_id = upload_docker_image_to_shock($shocktoken, $image_tarfile_gz, $repo, $tag, $image_id, undef, $dockerfile, get_docker_version());
 	
 	print "uploaded. shock node id: ".$shock_node_id."\n";
 	
@@ -3032,7 +3158,7 @@ if ($d) {
 	exit(0);
 	
 	# create docker image
-	my $ref = createAndSaveDiffImage($image_id, $repo, $tag, $base_image_object);
+	#my $ref = createAndSaveDiffImage($image_id, $repo, $tag, $base_image_object);
 	#my ($image_tarfile, $image_id) = @{$ref};
 	
 	
