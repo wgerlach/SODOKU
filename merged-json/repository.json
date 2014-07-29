@@ -137,17 +137,18 @@
       ],
       "exec" : [
          "chmod +x /usr/bin/docker.io",
-         "restart docker.io"
+         "stop docker.io ; sleep 2 ; start docker.io"
       ]
    },
    "scipy" : {
-      "_comment" : "pip install scipy was not enough for emirge",
+      "_comment" : "pip install scipy was not enough for emirge; python-numpy",
       "subpackages" : [
          {
-            "source-apt" : "gfortran libblas-dev liblapack-dev python-numpy"
+            "source-apt" : "gfortran libblas-dev liblapack-dev python-dev"
          },
          {
             "source-pip" : [
+               "numpy>=1.4",
                "scipy"
             ]
          }
