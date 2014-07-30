@@ -2,6 +2,7 @@
 set -x
 set -e
 
+apt-get update
 apt-get --force-yes -y -q install curl build-essential cpanminus git
 cpanm install JSON LWP::UserAgent LWP::Protocol::http::SocketUnixAlt Config::IniFiles File::Slurp
 cpanm install git://github.com/wgerlach/USAGEPOD.git
