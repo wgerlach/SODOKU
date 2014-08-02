@@ -100,7 +100,7 @@
 		}
 	},
 	"Emirge" : {
-		"dockerimage" : "wgerlach/emirge:0.60",
+		"dockerimage" : "emirge:0.60",
 		"commands" : {
 			"emirge" : {
 				"default" : {
