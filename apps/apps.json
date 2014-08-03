@@ -160,6 +160,9 @@
 						},
 						"SSU_candidate_db_btindex.rev.2.ebwt" : {
 							"url" : "http://shock.metagenomics.anl.gov:80/node/951420f9-4c87-44a7-ac56-c94cd06e2166?download"
+						},
+						"SSURef_111_candidate_db.fasta" : {
+							"url" : "http://shock.metagenomics.anl.gov:80/node/44784ee0-12eb-49c0-b609-76ee30d152af?download"
 						}
 					}
 				}
