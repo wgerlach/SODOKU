@@ -138,7 +138,7 @@
 						],
 					"cmd_script" :
 						[
-						"emirge.py outdir -1 ${INPUT1} ${option:INPUT2} -f /db/SSURef_111_candidate_db.fasta -b /db/SSU_candidate_db_btindex --insert_mean=${insert_mean} --insert_stddev=${insert_stddev} --max_read_length=${max_read_length} --processors=${processors} --phred33",
+						"emirge.py outdir -1 ${INPUT1} ${option:INPUT2} -f ./SSURef_111_candidate_db.fasta -b ./SSU_candidate_db_btindex --insert_mean=${insert_mean} --insert_stddev=${insert_stddev} --max_read_length=${max_read_length} --processors=${processors} --phred33",
 						"emirge_rename_fasta.py outdir/iter.40 > emirge.fas"
 						],
 					"output_array" : ["emirge.fas"],
