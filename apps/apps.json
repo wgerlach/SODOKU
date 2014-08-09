@@ -132,8 +132,8 @@
 						},
 						{	"type"	: "string",
 							"name"	: "processors",
-							"default_value" : "1",
-							"description" : "number of processor to use"
+							"default_value" : "${NumCPU}",
+							"description" : "number of processor to use, default all"
 						}
 						],
 					"cmd_script" :
