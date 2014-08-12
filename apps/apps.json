@@ -195,7 +195,7 @@
 					"cmd_script" :
 						[
 						"source /python_env",
-						"mg-kegg2ss --input ${INPUT} --output ${OUTPUT-TYPE} > ${OUTPUT-FILE-NAME}"
+						"mg-kegg2ss.py --input ${INPUT} --output ${OUTPUT-TYPE} > ${OUTPUT-FILE-NAME}"
 						],
 					"output_array" : ["${OUTPUT-FILE-NAME}"]
 				}
