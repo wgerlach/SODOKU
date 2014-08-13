@@ -134,13 +134,19 @@
 							"name"	: "processors",
 							"default_value" : "${NumCPU}",
 							"description" : "number of processor to use, default all"
+						},
+						{	"type"	: "string",
+							"name"	: "iterations",
+							"default_value" : "40",
+							"valid_values" : ["01", "10", "20", "30", "40"],
+							"description" : "number of iterations"
 						}
 						],
 					"cmd_script" :
 						[
 						"emirge.py outdir -1 ${INPUT1} ${option:INPUT2} -f ./SSURef_111_candidate_db.fasta -b ./SSU_candidate_db_btindex --insert_mean=${insert_mean} --insert_stddev=${insert_stddev} --max_read_length=${max_read_length} --processors=${processors} --phred33",
 						"apt-get --force-yes -y install python-biopython",
-						"emirge_rename_fasta.py outdir/iter.40 > emirge.fas"
+						"emirge_rename_fasta.py outdir/iter.${iterations} > emirge.fas"
 						],
 					"output_array" : ["emirge.fas"],
 					"predata": {
