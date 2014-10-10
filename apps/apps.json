@@ -256,5 +256,201 @@
 				}
 			}
 		}
+	},
+	"CAP" : {
+		"dockerimage" : "cap:20141008",
+		"commands" : {
+			"coverage-bed-reference" : {
+				"default" : {
+					"input" : [
+							   {
+							   "type"	: "file",
+							   "name"	: "INPUT",
+							   "description" : "input FASTA file"
+							   }
+					],
+					"cmd_script" : [
+						"python coverage-bed-reference.py ${INPUT}"
+					],
+					"output_array" : ["${INPUT}.bed"]
+				}
+				
+			},
+			"get-rpkm" : {
+				"default" : {
+					"input" : [
+							   {
+							   "type"	: "file",
+							   "name"	: "INPUT",
+							   "description" : ""
+							   }
+							   ],
+					"cmd_script" : [
+									"python get-rpkm.py ${INPUT}"
+									],
+					"output_array" : ["${INPUT}.rpkm"]
+				}
+			},
+			"final" : {
+				"default" : {
+					"input" : [
+							   {
+							   "type"	: "file",
+							   "name"	: "METATXT",
+							   "filename" : "meta.txt",
+							   "description" : ""
+							   },
+							   {
+							   "type"	: "string",
+							   "name"	: "MGMID",
+							   "default_value" : "mgm identifier"
+							   },
+							   {
+							   "type"	: "*file",
+							   "name"	: "RPKM-FILES",
+							   "description" : ""
+							   }
+							   ],
+					"cmd_script" : [
+									"python merge.py *rpkm",
+									"curl \"http://api.metagenomics.anl.gov/1/annotation/similarity/${MGMID}?type=ontology&source=Subsystems\" > annotations.txt",
+									"python best-hit.py annotations.txt",
+									"R < core.R --vanilla"
+									],
+					"output_array" : ["metag.RData"]
+				}
+			}
+		}
+	},
+	"Bowtie2" : {
+		"dockerimage" : "bowtie2:2.2.2",
+		"commands" : {
+			"bowtie2-build" : {
+				"default" : {
+					"input" : [
+							   {
+							   "type"	: "file",
+							   "name"	: "INPUT",
+							   "description" : "input FASTA file to create database of"
+							   }
+							   ],
+					"variables" : [{ "PREFIX" : "${remove_extension:INPUT}.bowtie_db"}],
+					"cmd_script" : [
+									"bowtie2-build ${INPUT} ${PREFIX}"
+									],
+					"output_array" : ["${PREFIX}.1.bt2", "${PREFIX}.2.bt2", "${PREFIX}.3.bt2", "${PREFIX}.4.bt2", "${PREFIX}.rev.1.bt2", "${PREFIX}.rev.2.bt2"]
+				}
+			},
+			"bowtie2" : {
+				"default" : {
+					"input" : [
+							   {
+							   "type"	: "file",
+							   "name"	: "INPUT",
+							   "description" : "input FASTA file to map"
+							   },
+							   {
+							   "type"	: "file",
+							   "name"	: "DB.1.bt2",
+							   "description" : "bowtie database file"
+							   },
+							   {
+							   "type"	: "file",
+							   "name"	: "DB.2.bt2",
+							   "description" : "bowtie database file"
+							   },
+							   {
+							   "type"	: "file",
+							   "name"	: "DB.3.bt2",
+							   "description" : "bowtie database file"
+							   },
+							   {
+							   "type"	: "file",
+							   "name"	: "DB.4.bt2",
+							   "description" : "bowtie database file"
+							   },
+							   {
+							   "type"	: "file",
+							   "name"	: "DB.rev.1.bt2",
+							   "description" : "bowtie database file"
+							   },
+							   {
+							   "type"	: "file",
+							   "name"	: "DB.rev.2.bt2",
+							   "description" : "bowtie database file"
+							   }
+							   ],
+					"variables" : [{ "DBPREFIX" : "${remove_extension:${remove_extension:DB.1.bt2}}",
+								     "OUTPUT" : "${remove_extension:${INPUT}}.sam"
+								   }],
+					"cmd_script" : [
+									"bowtie2 -x ${PREFIX} -f ${INPUT} -S ${OUTPUT}"
+									],
+					"output_array" : ["${OUTPUT}"]
+				}
+			}
+		}
+		
+	},
+	"Samtools" : {
+		"dockerimage" : "cap:20141008",
+		"commands" : {
+			"samtools" : {
+				"view" : {
+					"input" : [
+							   {
+							   "type"	: "file",
+							   "name"	: "INPUT",
+							   "description" : "SAM or BAM input"
+							   },
+							   {
+							   "type"	: "file",
+							   "name"	: "REFERENCE",
+							   "description" : "input FASTA file"
+							   }
+							   ],
+					"cmd_script" : [
+									"samtools view -b -t ${REFERENCE} ${INPUT} -o ${INPUT}.bam"
+									],
+					"output_array" : ["${INPUT}.bam"]
+				}
+				
+			}
+		}
+	},
+	"Bedtools" : {
+		"dockerimage" : "cap:20141008",
+		"commands" : {
+			"bedtools" : {
+				"bamtobed" : {
+					"input" : [
+							   {
+							   "type"	: "file",
+							   "name"	: "INPUT",
+							   "description" : "BAM input"
+							   }
+							   ],
+					"cmd_script" : [
+									"bedtools bamtobed -i ${INPUT} > $x.bed"
+									],
+					"output_array" : ["${INPUT}.bed"]
+				}
+			},
+			"coverageBed" : {
+				"default" : {
+					"input" : [
+							   {
+							   "type"	: "file",
+							   "name"	: "INPUT",
+							   "description" : ""
+							   }
+							   ],
+					"cmd_script" : [
+									"coverageBed -a ${INPUT} -b contigs.fa.bed > ${INPUT}.reads.mapped"
+									],
+					"output_array" : ["${INPUT}.reads.mapped"]
+				}
+			}
+		}
 	}
 }
