@@ -306,7 +306,7 @@
 							   "default_value" : "mgm identifier"
 							   },
 							   {
-							   "type"	: "*file",
+							   "type"	: "list",
 							   "name"	: "RPKM-FILES",
 							   "description" : ""
 							   }
@@ -431,9 +431,11 @@
 							   }
 							   ],
 					"cmd_script" : [
-									"bedtools bamtobed -i ${INPUT} > $x.bed"
+									"bedtools bamtobed ${OPTIONS} -i ${INPUT} > ${INPUT}.bed"
 									],
-					"output_array" : ["${INPUT}.bed"]
+					"output_array" : ["${INPUT}.bed"],
+					"help" : "bedtools bamtobed",
+					"options_prefix" : " -"
 				}
 			},
 			"coverageBed" : {
