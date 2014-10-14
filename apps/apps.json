@@ -298,7 +298,8 @@
 							   "type"	: "file",
 							   "name"	: "METATXT",
 							   "filename" : "meta.txt",
-							   "description" : ""
+							   "description" : "",
+							   "optional" : true,
 							   },
 							   {
 							   "type"	: "string",
