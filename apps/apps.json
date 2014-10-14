@@ -299,7 +299,7 @@
 							   "name"	: "METATXT",
 							   "filename" : "meta.txt",
 							   "description" : "",
-							   "optional" : true,
+							   "optional" : true
 							   },
 							   {
 							   "type"	: "string",
