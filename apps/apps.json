@@ -258,7 +258,7 @@
 		}
 	},
 	"CAP" : {
-		"dockerimage" : "cap:20141008",
+		"dockerimage" : "cap:20141014",
 		"commands" : {
 			"coverage-bed-reference" : {
 				"default" : {
