@@ -385,7 +385,7 @@
 								     "OUTPUT" : "${remove_extension:${INPUT}}.sam"
 								   }],
 					"cmd_script" : [
-									"bowtie2 -x ${PREFIX} -f ${INPUT} -S ${OUTPUT}"
+									"bowtie2 -x ${DBPREFIX} -f ${INPUT} -S ${OUTPUT}"
 									],
 					"output_array" : ["${OUTPUT}"]
 				}
@@ -446,10 +446,15 @@
 							   "type"	: "file",
 							   "name"	: "INPUT",
 							   "description" : ""
+							   },
+							   {
+							   "type"	: "file",
+							   "name"	: "BEDFILE",
+							   "description" : ""
 							   }
 							   ],
 					"cmd_script" : [
-									"coverageBed -a ${INPUT} -b contigs.fa.bed > ${INPUT}.reads.mapped"
+									"coverageBed -a ${INPUT} -b ${BEDFILE} > ${INPUT}.reads.mapped"
 									],
 					"output_array" : ["${INPUT}.reads.mapped"]
 				}
