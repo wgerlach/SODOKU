@@ -324,7 +324,7 @@
 		}
 	},
 	"Bowtie2" : {
-		"dockerimage" : "bowtie2:2.2.2",
+		"dockerimage" : "wgerlach/bowtie2:2.2.2",
 		"commands" : {
 			"bowtie2-build" : {
 				"default" : {
