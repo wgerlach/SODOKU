@@ -58,7 +58,7 @@
 						"normalize_by_copy_number.py -i @${INPUT} -o ${OUTPUT-FILE}"
 						],
 					"output_array" : ["${OUTPUT-FILE}"],
-					"variables" : [{ "OUTPUT-FILE" : "${remove_extension:INPUT}.normalized.biom"}],
+					"variables" : [{ "OUTPUT-FILE" : "${remove_extension:${INPUT}}.normalized.biom"}],
 					"predata": {
                     				"ko_13_5_precalculated.tab.gz":{
                         				"url" : "http://shock.metagenomics.anl.gov:80/node/e91dd6b3-69b0-4e1f-9cb0-1b94fb9864d0?download"
@@ -86,7 +86,7 @@
 						"predict_metagenomes.py -i @${INPUT} -o ${OUTPUT-FILE}"
 						],
 					"output_array" : ["${OUTPUT-FILE}"],
-					"variables" : [{ "OUTPUT-FILE" : "${remove_extension:INPUT}.picrust.biom"}],
+					"variables" : [{ "OUTPUT-FILE" : "${remove_extension:${INPUT}}.picrust.biom"}],
 					"predata": {
                     				"ko_13_5_precalculated.tab.gz":{
                         				"url" : "http://shock.metagenomics.anl.gov:80/node/e91dd6b3-69b0-4e1f-9cb0-1b94fb9864d0?download"
@@ -335,7 +335,7 @@
 							   "description" : "input FASTA file to create database of"
 							   }
 							   ],
-					"variables" : [{ "PREFIX" : "${remove_extension:INPUT}.bowtie_db"}],
+					"variables" : [{ "PREFIX" : "${remove_extension:${INPUT}}.bowtie_db"}],
 					"cmd_script" : [
 									"bowtie2-build ${INPUT} ${PREFIX}"
 									],
@@ -381,7 +381,7 @@
 							   "description" : "bowtie database file"
 							   }
 							   ],
-					"variables" : [{ "DBPREFIX" : "${remove_extension:${remove_extension:DB.1.bt2}}",
+					"variables" : [{ "DBPREFIX" : "${remove_extension:${remove_extension:${DB.1.bt2}}}",
 								     "OUTPUT" : "${remove_extension:${INPUT}}.sam"
 								   }],
 					"cmd_script" : [
