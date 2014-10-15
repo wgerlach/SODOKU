@@ -270,7 +270,7 @@
 							   }
 					],
 					"cmd_script" : [
-						"python coverage-bed-reference.py ${INPUT}"
+						"python /cap/scripts/coverage-bed-reference.py ${INPUT}"
 					],
 					"output_array" : ["${INPUT}.bed"]
 				}
@@ -286,7 +286,7 @@
 							   }
 							   ],
 					"cmd_script" : [
-									"python get-rpkm.py ${INPUT}"
+									"python /cap/scripts/get-rpkm.py ${INPUT}"
 									],
 					"output_array" : ["${INPUT}.rpkm"]
 				}
@@ -313,10 +313,10 @@
 							   }
 							   ],
 					"cmd_script" : [
-									"python merge.py *rpkm",
+									"python /cap/scripts/merge.py *rpkm",
 									"curl \"http://api.metagenomics.anl.gov/1/annotation/similarity/${MGMID}?type=ontology&source=Subsystems\" > annotations.txt",
-									"python best-hit.py annotations.txt",
-									"R < core.R --vanilla"
+									"python /cap/scripts/best-hit.py annotations.txt",
+									"R < /cap/scripts/core.R --vanilla"
 									],
 					"output_array" : ["metag.RData"]
 				}
