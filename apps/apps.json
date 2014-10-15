@@ -258,7 +258,7 @@
 		}
 	},
 	"CAP" : {
-		"dockerimage" : "cap:20141014",
+		"dockerimage" : "cap:20141015",
 		"commands" : {
 			"coverage-bed-reference" : {
 				"default" : {
@@ -324,7 +324,7 @@
 		}
 	},
 	"Bowtie2" : {
-		"dockerimage" : "wgerlach/bowtie2:2.2.2",
+		"dockerimage" : "skyport/bowtie2:2.1.0",
 		"commands" : {
 			"bowtie2-build" : {
 				"default" : {
